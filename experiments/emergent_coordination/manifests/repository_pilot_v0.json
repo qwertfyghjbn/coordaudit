@@ -15,15 +15,15 @@
   "default_budgets": {
     "global_input_token_cap": 200000,
     "global_output_token_cap": 80000,
-    "per_agent_token_cap": 100000,
-    "max_llm_calls": 40,
+    "hard_team_call_permits": 32,
+    "max_provider_retries": 1,
     "wall_clock_timeout": 600
   },
   "smoke_budgets": {
     "global_input_token_cap": 4000,
     "global_output_token_cap": 2000,
-    "per_agent_token_cap": 2000,
-    "max_llm_calls": 4,
+    "hard_team_call_permits": 4,
+    "max_provider_retries": 1,
     "wall_clock_timeout": 60
   },
   "permissions": {

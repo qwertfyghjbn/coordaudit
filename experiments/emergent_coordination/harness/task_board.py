@@ -52,6 +52,13 @@ class TaskBoard:
             agent_id=agent_id,
             payload={"tool": "list_tasks", "count": len(tasks)},
         )
+        for task in tasks:
+            if task.get("status") == "completed" and task.get("evidence_refs"):
+                self.event_log.emit(
+                    "task_result_observed",
+                    agent_id=agent_id,
+                    payload={"task_id": task["id"], "owner": task.get("owner"), "evidence_refs": task["evidence_refs"]},
+                )
         return tasks
 
     def create_task(
@@ -66,8 +73,9 @@ class TaskBoard:
             "status": "open",
             "owner": None,
             "dependencies": list(dependencies or []),
-            "created_by": agent_id,
-            "result_artifacts": [],
+            "creator": agent_id,
+            "result": None,
+            "evidence_refs": [],
             "created_at": utc_now(),
         }
         with self._lock:
@@ -79,6 +87,12 @@ class TaskBoard:
         with self._lock:
             task = self._read_task(task_id)
             if task["status"] != "open" or task["owner"] is not None:
+                self.event_log.emit(
+                    "task_claim_conflict",
+                    agent_id=agent_id,
+                    payload={"task_id": task_id, "status": task.get("status"), "owner": task.get("owner")},
+                    outcome="rejected",
+                )
                 raise CoordinationError(f"task already claimed: {task_id}")
             for dep in task.get("dependencies", []):
                 dep_task = self._read_task(dep)
@@ -109,7 +123,8 @@ class TaskBoard:
         self,
         agent_id: str,
         task_id: str,
-        result_artifacts: list[str] | None = None,
+        result: str | None = None,
+        evidence_refs: list[str] | None = None,
     ) -> dict[str, Any]:
         with self._lock:
             task = self._read_task(task_id)
@@ -117,13 +132,13 @@ class TaskBoard:
                 raise CoordinationError("only the owner can complete a task")
             task["status"] = "completed"
             task["completed_at"] = utc_now()
-            if result_artifacts:
-                task["result_artifacts"] = list(result_artifacts)
+            task["result"] = result
+            task["evidence_refs"] = list(evidence_refs or [])
             self._write_task(task)
         self.event_log.emit(
             "task_completed",
             agent_id=agent_id,
-            payload={"task_id": task_id, "result_artifacts": result_artifacts or []},
+            payload={"task_id": task_id, "result": result, "evidence_refs": evidence_refs or []},
         )
         return task
 

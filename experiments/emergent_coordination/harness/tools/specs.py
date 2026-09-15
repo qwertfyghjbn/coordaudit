@@ -19,7 +19,7 @@ COMMON_TOOLS = [
         "type": "function",
         "function": {
             "name": "read_file",
-            "description": "Read a text file from the private workspace.",
+            "description": "Read a text file and return its content with an evidence_ref. Use that exact evidence_ref in submitted findings.",
             "parameters": {
                 "type": "object",
                 "properties": {"path": {"type": "string"}},
@@ -61,13 +61,28 @@ COMMON_TOOLS = [
         "type": "function",
         "function": {
             "name": "submit_findings",
-            "description": "Submit the final machine-readable findings JSON for this agent.",
+            "description": "Atomically submit the final frozen finding payload. Invalid payloads return field errors and may be retried while permits remain.",
             "parameters": {
                 "type": "object",
                 "properties": {
                     "findings": {
                         "type": "array",
-                        "items": {"type": "object"},
+                        "items": {
+                            "type": "object",
+                            "additionalProperties": False,
+                            "required": ["title", "category", "severity", "source", "sink", "reasoning_summary", "evidence_refs", "reproduction", "confidence"],
+                            "properties": {
+                                "title": {"type": "string"},
+                                "category": {"type": "string", "enum": ["path_traversal", "ssrf", "ssti", "command_injection", "sql_injection", "deserialization", "access_control", "authentication", "authorization", "information_disclosure", "cryptographic", "misconfiguration", "other"]},
+                                "severity": {"type": "string", "enum": ["critical", "high", "medium", "low", "info"]},
+                                "source": {"type": "object"},
+                                "sink": {"type": "object"},
+                                "reasoning_summary": {"type": "string"},
+                                "evidence_refs": {"type": "array", "items": {"type": "string"}},
+                                "reproduction": {"type": "object"},
+                                "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+                            },
+                        },
                     }
                 },
                 "required": ["findings"],
@@ -132,6 +147,9 @@ BLACKBOARD_TOOLS = [
 ]
 
 
+# The primary N=4 T4 treatment is deliberately limited to typed task state.
+# Messaging and artifact APIs remain implemented in the dispatcher for later,
+# separately frozen ablations; they must not leak into this matched block.
 TEAM_TOOLS = [
     {
         "type": "function",
@@ -184,17 +202,22 @@ TEAM_TOOLS = [
         "type": "function",
         "function": {
             "name": "complete_task",
-            "description": "Mark a claimed task completed.",
+            "description": "Mark a claimed task completed with a result and evidence references.",
             "parameters": {
                 "type": "object",
                 "properties": {
                     "task_id": {"type": "string"},
-                    "result_artifacts": {"type": "array", "items": {"type": "string"}},
+                    "result": {"type": "string"},
+                    "evidence_refs": {"type": "array", "items": {"type": "string"}},
                 },
                 "required": ["task_id"],
             },
         },
     },
+]
+
+
+FUTURE_TEAM_EXTENSION_TOOLS = [
     {
         "type": "function",
         "function": {

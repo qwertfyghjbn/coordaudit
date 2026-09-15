@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import json
+import subprocess
 import tempfile
 import threading
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from experiments.emergent_coordination.harness.budget import BudgetExhausted, BudgetTracker, TokenUsage
 from experiments.emergent_coordination.harness.events import EventLog
@@ -12,7 +14,12 @@ from experiments.emergent_coordination.harness.llm.client import LLMResponse, Mo
 from experiments.emergent_coordination.harness.runner import RunConfig, run_experiment
 from experiments.emergent_coordination.harness.shared_fs import SharedFilesystem
 from experiments.emergent_coordination.harness.task_board import CoordinationError, TaskBoard
-from experiments.emergent_coordination.harness.tools.sandbox import AgentSandbox, ToolError
+from experiments.emergent_coordination.harness.tools.sandbox import (
+    AgentSandbox,
+    SandboxUnavailable,
+    ToolError,
+    assert_os_sandbox_ready,
+)
 from experiments.emergent_coordination.harness.workspace import prepare_run_workspace
 from experiments.emergent_coordination.harness.paths import TARGET_ROOT, GROUND_TRUTH_PATH, PROVENANCE_PATH
 
@@ -61,8 +68,41 @@ class IsolationAndSharedTest(unittest.TestCase):
         sandbox = AgentSandbox("agent_001", self.layout, self.log)
         with self.assertRaises(ToolError):
             sandbox.read_file(str(self.layout.evaluator_private / "ground_truth.json"))
-        with self.assertRaises(ToolError):
-            sandbox.run_shell("cat ../evaluator_private/ground_truth.json")
+
+    def test_shell_uses_bwrap_without_mounting_private_or_evaluator_state(self):
+        sandbox = AgentSandbox("agent_001", self.layout, self.log)
+        completed = subprocess.CompletedProcess(args=[], returncode=0, stdout="ok", stderr="")
+        with mock.patch("experiments.emergent_coordination.harness.tools.sandbox.shutil.which", return_value="/usr/bin/bwrap"), mock.patch(
+            "experiments.emergent_coordination.harness.tools.sandbox.subprocess.run", return_value=completed
+        ) as run:
+            result = sandbox.run_shell("printf ok")
+
+        invocation = run.call_args.args[0]
+        self.assertEqual(result["stdout"], "ok")
+        self.assertIn("--unshare-net", invocation)
+        self.assertIn("--unshare-pid", invocation)
+        self.assertIn("--unshare-ipc", invocation)
+        self.assertIn("--unshare-uts", invocation)
+        self.assertIn("--clearenv", invocation)
+        self.assertIn("--ro-bind", invocation)
+        self.assertIn(str(self.layout.agent_target("agent_001").resolve()), invocation)
+        self.assertIn(str(self.layout.agent_scratch("agent_001").resolve()), invocation)
+        mount_sources = [
+            invocation[index + 1]
+            for index, argument in enumerate(invocation[:-2])
+            if argument in {"--bind", "--ro-bind"}
+        ]
+        self.assertNotIn(str(self.layout.agent_private("agent_001").resolve()), mount_sources)
+        self.assertNotIn(str(self.layout.evaluator_private.resolve()), mount_sources)
+
+    def test_sandbox_self_check_fails_closed(self):
+        completed = subprocess.CompletedProcess(args=[], returncode=1, stdout="", stderr="/home/secret")
+        with mock.patch("experiments.emergent_coordination.harness.tools.sandbox.shutil.which", return_value="/usr/bin/bwrap"), mock.patch(
+            "experiments.emergent_coordination.harness.tools.sandbox.subprocess.run", return_value=completed
+        ):
+            with self.assertRaises(SandboxUnavailable) as ctx:
+                assert_os_sandbox_ready()
+        self.assertNotIn("/home/secret", str(ctx.exception))
 
     def test_blackboard_visibility(self):
         shared = SharedFilesystem(self.layout.shared, self.log, self.layout.artifacts / "snaps")
@@ -98,6 +138,18 @@ class IsolationAndSharedTest(unittest.TestCase):
         claimed = board._read_task(task["id"])
         self.assertEqual(claimed["owner"], winners[0])
         self.assertEqual(claimed["status"], "claimed")
+        self.assertIn("task_claim_conflict", [event["event_type"] for event in self.log.read_all()])
+
+    def test_completed_task_evidence_receipt_is_recorded_for_observer(self):
+        board = TaskBoard(self.layout.runtime / "coordination", self.log)
+        task = board.create_task("agent_001", "inspect routes")
+        board.claim_task("agent_001", task["id"])
+        board.complete_task("agent_001", task["id"], "route checked", ["evt_00000001"])
+        board.list_tasks("agent_002")
+        observed = [event for event in self.log.read_all() if event["event_type"] == "task_result_observed"]
+        self.assertEqual(len(observed), 1)
+        self.assertEqual(observed[0]["agent_id"], "agent_002")
+        self.assertEqual(observed[0]["payload"]["evidence_refs"], ["evt_00000001"])
 
     def test_target_copy_does_not_include_ground_truth(self):
         names = {path.name for path in self.layout.agent_target("agent_001").rglob("*")}
@@ -119,6 +171,54 @@ class BudgetTest(unittest.TestCase):
         with self.assertRaises(BudgetExhausted):
             tracker.charge("agent_002", TokenUsage(input_tokens=1, output_tokens=1))
 
+    def test_pre_call_permits_are_atomic_and_failures_are_not_refunded(self):
+        tracker = BudgetTracker(hard_team_call_permits=2)
+        first = tracker.acquire_call_permit("agent_001")
+        tracker.settle_call_permit(first, outcome="timeout")
+        retry = tracker.acquire_call_permit("agent_001", retry_of=first.permit_id)
+        tracker.settle_call_permit(retry, outcome="provider_error")
+        with self.assertRaises(BudgetExhausted) as ctx:
+            tracker.acquire_call_permit("agent_002")
+
+        snapshot = tracker.snapshot()
+        self.assertEqual(ctx.exception.reason, "hard_team_call_permits")
+        self.assertEqual(snapshot["attempted_llm_calls"], 2)
+        self.assertEqual([entry["outcome"] for entry in snapshot["permit_ledger"]], ["timeout", "provider_error"])
+        self.assertEqual(snapshot["permit_ledger"][1]["retry_of"], first.permit_id)
+
+    def test_concurrent_agents_cannot_overissue_team_permits(self):
+        tracker = BudgetTracker(hard_team_call_permits=3)
+        permits = []
+        denied = []
+        lock = threading.Lock()
+
+        def request(agent_id: str) -> None:
+            try:
+                permit = tracker.acquire_call_permit(agent_id)
+                with lock:
+                    permits.append(permit)
+            except BudgetExhausted:
+                with lock:
+                    denied.append(agent_id)
+
+        threads = [threading.Thread(target=request, args=(f"agent_{index:03d}",)) for index in range(1, 9)]
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join()
+
+        self.assertEqual(len(permits), 3)
+        self.assertEqual(len(denied), 5)
+        self.assertEqual(tracker.snapshot()["attempted_llm_calls"], 3)
+
+    def test_token_stop_threshold_blocks_later_calls_after_reported_usage(self):
+        tracker = BudgetTracker(hard_team_call_permits=3, token_stop_threshold=5)
+        permit = tracker.acquire_call_permit("agent_001")
+        tracker.settle_call_permit(permit, outcome="succeeded", usage=TokenUsage(input_tokens=3, output_tokens=2))
+        with self.assertRaises(BudgetExhausted) as ctx:
+            tracker.acquire_call_permit("agent_002")
+        self.assertEqual(ctx.exception.reason, "token_stop_threshold")
+
 
 class MockedHarnessTest(unittest.TestCase):
     def test_single_agent_lifecycle_and_scoring(self):
@@ -128,6 +228,11 @@ class MockedHarnessTest(unittest.TestCase):
                     "agent_001": [
                         _response(_tool_call("list_files", {"path": "target"}, "c1")),
                         _response(
+                            _tool_call("read_file", {"path": "target/app/routes/files.py"}, "c2"),
+                            _tool_call("read_file", {"path": "target/app/common/http_client.py"}, "c3"),
+                            _tool_call("read_file", {"path": "target/app/common/templates.py"}, "c4"),
+                        ),
+                        _response(
                             _tool_call(
                                 "submit_findings",
                                 {
@@ -135,23 +240,35 @@ class MockedHarnessTest(unittest.TestCase):
                                         {
                                             "title": "unguarded file join",
                                             "category": "path_traversal",
-                                            "files": ["app/common/storage.py"],
-                                            "functions": ["read_file"],
-                                            "sink": "open(",
+                                            "severity": "high",
+                                            "source": {"file": "app/routes/files.py", "function": "download", "anchor": "filename = request.args.get(\"filename\", \"\")"},
+                                            "sink": {"file": "app/common/storage.py", "function": "read_file", "anchor": "with open(file_path, \"rb\") as f:"},
+                                            "reasoning_summary": "The route passes filename to the unguarded open sink.",
+                                            "evidence_refs": ["evt_00000014"],
+                                            "reproduction": {"attempted": False, "successful": False, "artifact_ref": None},
+                                            "confidence": 0.9,
                                         },
                                         {
                                             "title": "unguarded fetch",
                                             "category": "ssrf",
-                                            "files": ["app/common/http_client.py"],
-                                            "functions": ["get_url"],
-                                            "sink": "requests.get",
+                                            "severity": "high",
+                                            "source": {"file": "app/routes/integrations.py", "function": "fetch", "anchor": "url = request.args.get(\"url\", \"\")"},
+                                            "sink": {"file": "app/common/http_client.py", "function": "get_url", "anchor": "resp = requests.get(url, timeout=5)"},
+                                            "reasoning_summary": "The integration route reaches an outbound request sink.",
+                                            "evidence_refs": ["evt_00000016"],
+                                            "reproduction": {"attempted": False, "successful": False, "artifact_ref": None},
+                                            "confidence": 0.9,
                                         },
                                         {
                                             "title": "title concatenated into template",
                                             "category": "ssti",
-                                            "files": ["app/common/templates.py"],
-                                            "functions": ["render_report_template"],
-                                            "sink": "from_string",
+                                            "severity": "high",
+                                            "source": {"file": "app/routes/reports.py", "function": "preview", "anchor": "title = request.args.get(\"title\", \"\")"},
+                                            "sink": {"file": "app/common/templates.py", "function": "render_report_template", "anchor": "template = _env.from_string(template_str)"},
+                                            "reasoning_summary": "The report title reaches template compilation.",
+                                            "evidence_refs": ["evt_00000018"],
+                                            "reproduction": {"attempted": False, "successful": False, "artifact_ref": None},
+                                            "confidence": 0.9,
                                         },
                                     ]
                                 },
@@ -172,8 +289,10 @@ class MockedHarnessTest(unittest.TestCase):
                 ),
                 llm,
             )
-            self.assertEqual(summary["evaluation"]["TP"], 3)
-            self.assertEqual(summary["evaluation"]["FN"], 0)
+            self.assertEqual(summary["evaluation"]["positive_recall"]["true_positives"], 3)
+            self.assertEqual(summary["evaluation"]["positive_recall"]["false_negatives"], 0)
+            self.assertNotIn("GT-001", (Path(summary["run_dir"]) / "evaluation.json").read_text(encoding="utf-8"))
+            self.assertTrue((Path(summary["run_dir"]) / "evaluator_private" / "verification.json").exists())
             runtime_names = {path.name for path in (Path(summary["run_dir"]) / "runtime").rglob("*") if path.is_file()}
             self.assertNotIn("ground_truth.json", runtime_names)
             events = (Path(summary["run_dir"]) / "logs" / "events.jsonl").read_text(encoding="utf-8")
@@ -245,7 +364,7 @@ class MockedHarnessTest(unittest.TestCase):
             self.assertTrue((shared / "from_001.txt").exists())
             self.assertTrue((shared / "from_002.txt").exists())
 
-    def test_structured_team_claim_and_message(self):
+    def test_structured_team_claim(self):
         with tempfile.TemporaryDirectory() as tmp:
             llm = MockLLMClient(
                 scripts={
@@ -273,6 +392,30 @@ class MockedHarnessTest(unittest.TestCase):
             events = (Path(summary["run_dir"]) / "logs" / "events.jsonl").read_text(encoding="utf-8")
             self.assertIn("task_created", events)
 
+    def test_structured_team_rejects_unfrozen_message_extension(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            llm = MockLLMClient(
+                scripts={
+                    "agent_001": [
+                        _response(_tool_call("send_message", {"to": "agent_002", "body": "hello"}, "c1")),
+                        _response(_tool_call("submit_findings", {"findings": []}, "c2")),
+                    ]
+                }
+            )
+            summary = run_experiment(
+                RunConfig(
+                    mode="structured_team",
+                    agent_count=1,
+                    model="mock",
+                    budgets={"max_llm_calls": 20},
+                    runs_dir=Path(tmp),
+                    max_steps=4,
+                ),
+                llm,
+            )
+            events = (Path(summary["run_dir"]) / "logs" / "events.jsonl").read_text(encoding="utf-8")
+            self.assertNotIn("message_sent", events)
+
     def test_budget_stop_is_recorded(self):
         with tempfile.TemporaryDirectory() as tmp:
             llm = MockLLMClient(
@@ -286,7 +429,7 @@ class MockedHarnessTest(unittest.TestCase):
                     mode="single",
                     agent_count=1,
                     model="mock",
-                    budgets={"global_input_token_cap": 25, "max_llm_calls": 10},
+                    budgets={"hard_team_call_permits": 1},
                     runs_dir=Path(tmp),
                     max_steps=6,
                 ),
@@ -295,6 +438,81 @@ class MockedHarnessTest(unittest.TestCase):
             self.assertEqual(summary["agent_results"][0]["stop_reason"], "budget_exhausted")
             events = (Path(summary["run_dir"]) / "logs" / "events.jsonl").read_text(encoding="utf-8")
             self.assertIn("budget_exhausted", events)
+            self.assertIn("call_permit_denied", events)
+
+    def test_timeout_is_an_attempted_call_and_consumes_a_permit(self):
+        class TimeoutClient:
+            def complete(self, messages, tools, *, agent_id):
+                raise TimeoutError("provider timeout")
+
+        with tempfile.TemporaryDirectory() as tmp:
+            summary = run_experiment(
+                RunConfig(
+                    mode="single",
+                    agent_count=1,
+                    model="mock",
+                    budgets={"hard_team_call_permits": 1},
+                    runs_dir=Path(tmp),
+                    max_steps=2,
+                ),
+                TimeoutClient(),
+            )
+            self.assertEqual(summary["agent_results"][0]["stop_reason"], "error")
+            self.assertEqual(summary["budget"]["attempted_llm_calls"], 1)
+            self.assertEqual(summary["budget"]["permit_ledger"][0]["outcome"], "timeout")
+            events = (Path(summary["run_dir"]) / "logs" / "events.jsonl").read_text(encoding="utf-8")
+            self.assertIn("llm_call_attempted", events)
+            self.assertIn('"outcome": "timeout"', events)
+
+    def test_one_recovered_timeout_is_a_warning_with_a_new_permit(self):
+        class RecoveringClient:
+            def __init__(self):
+                self.calls = 0
+
+            def complete(self, messages, tools, *, agent_id):
+                self.calls += 1
+                if self.calls == 1:
+                    raise TimeoutError("provider timeout")
+                return _response(content=json.dumps({"findings": []}))
+
+        with tempfile.TemporaryDirectory() as tmp:
+            summary = run_experiment(
+                RunConfig(
+                    mode="single",
+                    agent_count=1,
+                    model="mock",
+                    budgets={"hard_team_call_permits": 2},
+                    runs_dir=Path(tmp),
+                    max_steps=2,
+                    max_provider_retries=1,
+                ),
+                RecoveringClient(),
+            )
+            ledger = summary["budget"]["permit_ledger"]
+            self.assertEqual(summary["run_validity"]["status"], "valid_with_infrastructure_warning")
+            self.assertEqual([entry["outcome"] for entry in ledger], ["timeout", "succeeded"])
+            self.assertEqual(ledger[1]["retry_of"], ledger[0]["permit_id"])
+
+    def test_two_provider_failures_invalidate_the_run(self):
+        class FailingClient:
+            def complete(self, messages, tools, *, agent_id):
+                raise ConnectionError("provider unavailable")
+
+        with tempfile.TemporaryDirectory() as tmp:
+            summary = run_experiment(
+                RunConfig(
+                    mode="single",
+                    agent_count=1,
+                    model="mock",
+                    budgets={"hard_team_call_permits": 2},
+                    runs_dir=Path(tmp),
+                    max_steps=2,
+                    max_provider_retries=1,
+                ),
+                FailingClient(),
+            )
+            self.assertEqual(summary["run_validity"]["status"], "infrastructure_invalid")
+            self.assertEqual(summary["run_validity"]["provider_failure_attempts"], 2)
 
 
 if __name__ == "__main__":

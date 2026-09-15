@@ -24,7 +24,12 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Run repository-pilot-v0 coordination experiment.")
     parser.add_argument("--mode", required=True, choices=["single", "parallel", "raw_blackboard", "structured_team"])
     parser.add_argument("--agents", type=int, required=True)
-    parser.add_argument("--model", default="mock")
+    parser.add_argument("--model", help="Requested provider model; overrides LLM_MODEL for this run.")
+    parser.add_argument(
+        "--thinking-mode",
+        choices=["enabled", "disabled"],
+        help="Explicit provider thinking mode; overrides LLM_THINKING_MODE for this run.",
+    )
     parser.add_argument("--seed", default="0")
     parser.add_argument("--mock", action="store_true", help="Use the scripted mock LLM client.")
     parser.add_argument("--live", action="store_true", help="Use LLM credentials from the environment.")
@@ -36,7 +41,7 @@ def main() -> int:
     experiment = load_manifest()
     budgets = experiment["smoke_budgets"] if args.smoke_budget else experiment["default_budgets"]
     if args.live and not args.mock:
-        llm = client_from_env()
+        llm = client_from_env(model=args.model, thinking_mode=args.thinking_mode)
         if llm is None:
             print("No LLM credentials found; refusing to start a live run.", file=sys.stderr)
             return 2
@@ -50,9 +55,22 @@ def main() -> int:
             mode=args.mode,
             agent_count=args.agents,
             model=model,
+            model_profile=(
+                {
+                    "requested_model": model,
+                    "provider": "openai_compatible",
+                    "thinking_mode": llm.thinking_mode,
+                    "temperature": llm.temperature,
+                    "max_output_tokens": llm.max_tokens,
+                }
+                if args.live and not args.mock
+                else {"requested_model": "mock"}
+            ),
             seed=args.seed,
             budgets=budgets,
             max_steps=args.max_steps,
+            max_provider_retries=int(budgets.get("max_provider_retries", 0)),
+            require_os_sandbox=bool(args.live and not args.mock),
             runs_dir=Path(args.runs_dir),
         ),
         llm,

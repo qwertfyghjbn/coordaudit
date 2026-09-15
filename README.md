@@ -4,7 +4,7 @@
 
 ## 当前状态
 
-已完成第一次行为保持迁移：CoordAudit runtime、`repository_pilot_v0`、hidden evaluator、测试和专属研究文档已复制到本项目。原仓库的 source 副本将在本迁移验证完成后以跨仓指针替代。
+已完成第一次行为保持迁移，以及 N=4 pilot 的 ADR 0002–0005 加固：CoordAudit runtime、`repository_pilot_v0`、hidden evaluator、测试和专属研究文档已复制到本项目；调用前 permit ledger、fail-closed OS sandbox、可重放事件/模型可见转录、严格 finding intake/hidden verification 与机器可读分析均已落地。v0 候选的 DeepSeek profile 显式使用 `deepseek-flash`、non-thinking mode 与 temperature 0；模型 alias 的 live compatibility 结果尚未构成实验结果。
 
 - 原仓库：`/home/lqs/llm_audit_system_learning`
 - 本地新项目：`/home/lqs/coordaudit`
@@ -51,12 +51,12 @@
 迁移后，在本项目根执行并通过：
 
 ```text
-python3 -m unittest discover -s experiments/emergent_coordination/tests -t . -v  # 35 tests
+python3 -m unittest discover -s experiments/emergent_coordination/tests -t . -v  # 56 tests
 cd experiments/emergent_coordination/repositories/repository_pilot_v0 && python3 -m unittest discover -s tests -v  # 6 tests
 ```
 
 此外，`single`、`parallel`、`raw_blackboard`、`structured_team` 四个 N=4 mock CLI 均已完成运行。它们只验证迁移后的生命周期和 adapter 可达性，不构成安全效果或 coordination 效果结论。
 
-## 下一步 gate
+## 当前 gate 与边界
 
-首次迁移保持现有 Python package 布局；N=4 P0 加固（OS sandbox、调用前预算许可、可关联事件、严格 grader/dedup 与 coordination 指标）必须作为后续独立变更实施。
+ADR 0002–0005 的 runtime hardening 已完成；其准确行为、产物与限制见 [`experiments/emergent_coordination/README.md`](experiments/emergent_coordination/README.md)、[`CONTEXT.md`](CONTEXT.md) 和 [`docs/adr/`](docs/adr/)。`freeze_block.py` 目前只冻结不可覆盖的合同与 digest，**不**调度或授权 live matched block；因此正式 block 仍需由具备整块失败停止、condition 绑定和 equality 校验的执行器启动，不能把单条 run 或 mock smoke 当作 block 完成。

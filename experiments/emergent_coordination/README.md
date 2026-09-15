@@ -79,7 +79,7 @@ All modes use the same `AgentRunner`. Mode differences are a `CoordinationPolicy
 | `single` (`S1`) | `--mode single --agents 1` | none | none |
 | `parallel` (`Pn`) | `--mode parallel --agents N` | none | none |
 | `raw_blackboard` (`Bn`) | `--mode raw_blackboard --agents N` | none by default | raw `/shared` filesystem |
-| `structured_team` (`Tn`) | `--mode structured_team --agents N` | tasks + messages + artifacts | structured board |
+| `structured_team` (`Tn`) | `--mode structured_team --agents N` | typed task state | structured board |
 
 `N` can be `2`, `4`, `8` now. The same runner accepts `16` and `32` without code changes. Do **not** start those expensive runs from this pilot.
 
@@ -101,9 +101,22 @@ The B-mode prompt does **not** tell agents they are a team, to cooperate, to ele
 
 ### T — Structured team
 
-Self-claim task board with atomic `claim_task`, plus messages and artifacts. No pre-assigned team lead.
+The primary N=4 treatment exposes only `create_task`, `list_tasks`, `claim_task`, `release_task`, and `complete_task`. A completed task records its result and evidence references. No pre-assigned team lead, messaging, or artifact channel is exposed.
 
 The interface is intentionally small so later modes (`manager_worker`, `fixed_roles`, `fixed_graph`) can be added as new policies.
+
+## 冻结的 N=4 实验合同
+
+[`manifests/n4_pilot_v0.json`](manifests/n4_pilot_v0.json) 是 S1/P4/B4/T4 的唯一合同来源：四个 condition 共享 `deepseek-flash` 请求别名、显式 non-thinking mode、温度 0、每次最多 1024 output tokens、32 个团队共享调用许可，以及 32-step 非配额安全上限；N=4 不允许 per-agent token cap。non-thinking 是合同的一部分：DeepSeek thinking mode 不实际应用 temperature，不能与温度为 0 的 matched condition 混用。
+
+以下命令只创建不可覆盖的 block manifest，记录 target、private evaluator、runtime、prompt、tool schema 与 Git 状态的 digest；它**不执行模型调用**：
+
+```bash
+python3 -m experiments.emergent_coordination.freeze_block \
+  --block-id n4-pilot-replicate-01
+```
+
+调用前 permit、fail-closed sandbox、模型可见转录/reconciliation、严格 finding intake 与 hidden verification 已按 ADR 0002–0005 实现并有回归测试。`freeze_block.py`/`BlockRunner` 仍是**只冻结、不执行**的合同工具，所以它生成的 `block_manifest.json` 固定标记 `live_gate=blocked`：这不是对上述能力缺失的描述，而是防止把一个未由 block executor 绑定、校验和调度的 manifest 当作 live 运行授权。单条 live run 可由 `run_experiment.py` 在 sandbox 自检通过后执行；正式 matched block 仍必须额外保证四个 condition 绑定同一冻结合同，并在任一 infrastructure-invalid run 后整体停止和重跑。
 
 ## Leakage policy
 
@@ -117,37 +130,43 @@ Agent-visible files must not contain:
 
 Ground truth, source-case IDs, and canonical reports stay in `evaluator_private/` and are copied only into `runs/<id>/evaluator_private/`, which agent tools refuse to read.
 
+## Shell isolation
+
+每次 `run_shell` 都在独立 bubblewrap namespace 中执行：`target` 只读绑定到 `/work/target`，仅当前 Agent 的 `scratch` 可写绑定到 `/work/scratch`，其余运行目录、其他 Agent、shared/task state 与 `evaluator_private` 均不挂载。namespace 使用私有 PID/IPC/UTS/proc/tmp/dev 与 `--unshare-net`，并以环境 allowlist 启动 `/bin/sh -lc`；不会回退到宿主 shell。live run 在启动前必须通过同一 sandbox 自检，失败即拒绝运行。
+
+## 可重放事件与模型可见转录
+
+每个 run 的 `logs/events.jsonl` 是稳定的事件索引：它含顺序化 `event_id`、父事件引用、outcome、预算进度、内容 hash 和 artifact/转录引用，不内联模型或工具正文。`logs/transcripts/<agent>.jsonl` 以 append-only 方式保存每次模型实际收到的 messages/tool schema、模型响应和进入后续上下文的截断工具结果；`logs/artifacts/<agent>.jsonl` 保存从事件索引移出的参数、命令、结果和错误正文。
+
+写盘前会确定性移除 API 凭证、授权头、敏感 provider 参数与宿主绝对路径。若转录或 artifact 触及 hidden evaluator/private 内容，正文会被替换为脱敏标记，run 在结束 reconcile 时被标记为 `infrastructure_invalid`。reconcile 同时验证事件/转录序号、正文 hash、引用完整性，以及每一个 permit ledger 条目都对应一次 LLM 调用和所需转录。
+
 ## Evaluation
 
-Scoring is deterministic first:
+finding intake 会在接受前对完整 payload 做原子式冻结 schema 校验。每个 finding 必须使用 canonical category、明确的 source/sink anchor，以及 Agent 自己 `read_file` 得到的一个或多个 `evidence_ref`。T 条件下，Agent 也可在自己调用 `list_tasks` 并收到 `task_result_observed` 事件后引用该已完成任务明确列出的 evidence ref；这保留可审计的结果接收链，而不是把 task board 当作任意证据旁路。无效 payload 会逐字段返回错误，并可在团队 permit 尚未耗尽时重试；结束时仍没有有效 payload 的 Agent 归类为 `model_format_failure`，而非 infrastructure failure。
 
-- file / function / sink / category aliases
-- positive targets `GT-001`..`GT-003` are required hits
-- near-miss paths `NM-001`/`NM-002` are **not** required finds
-- a finding aimed at a near-miss path is a false-positive penalty
+hidden evaluator 只有在 canonical category 与 source/sink anchor 均匹配时才确认 positive。它以 `category + normalized source + normalized sink` 分组重复报告、私下保留全部 provenance，且每组至多计一个 TP。已知 near miss 是确定性 FP；schema 合法但不在冻结标签中的报告归为 `unmatched_review`，不自动断言为 false。
 
-Reported metrics:
+公开 `evaluation.json` 报告：
 
-- `TP` `FP` `FN`
-- precision / recall / F1
-- `verified_findings`
-- `duplicate_findings`
-- `near_miss_false_positives`
-- per-finding match explanation
+- positive recall
+- known-near-miss false positives, unmatched review, invalid submissions, and duplicates
+- closed-world precision lower bound and labeled-only precision upper bound
+- Agent reproduction claims separately from evaluator-verified findings
 
-An LLM semantic judge is **not** used in v0.
+ground-truth assignment、anchors、duplicate provenance 与 verification detail 仅写入 `evaluator_private/verification.json`，不出现在公开评估输出中。v0 不使用 LLM semantic judge。
 
 ## Budget model
 
-Every run has a **shared global** budget plus optional per-agent caps:
+Every run has a **shared global** resource contract:
 
-- `global_input_token_cap`
-- `global_output_token_cap`
-- `per_agent_token_cap`
-- `max_llm_calls`
+- `hard_team_call_permits`
 - `wall_clock_timeout`
+- provider-reported input/output/cached/reasoning token usage
+- optional `token_stop_threshold`
 
-Global caps are not `N × per-agent`. This is required so later `P16 / B16 / T16` comparisons keep the same total budget.
+`hard_team_call_permits` is acquired atomically before the provider request. Each attempted call consumes one permit, including timeout and provider-error attempts; the OpenAI-compatible client has SDK retries disabled. The harness-controlled retry policy is frozen in the run manifest, and every retry obtains a fresh permit. The contract is not `N × per-agent`.
+
+`token_stop_threshold`（如配置）只在 provider 回报实际 input/output usage 后阻止后续调用，不退还已发放 permit；为保证最多一次 in-flight overshoot，启用该阈值时只允许一条未结算 provider 请求。它不是精确的 token admission budget。
 
 Token fields that a provider does not expose are stored as `null`. Dollar prices are not written into run history.
 
@@ -162,7 +181,8 @@ python3 -m unittest discover -s experiments/emergent_coordination/tests -t . -v
 Target-visible smoke tests:
 
 ```bash
-python3 -m unittest discover -s experiments/emergent_coordination/repositories/repository_pilot_v0/tests -v
+(cd experiments/emergent_coordination/repositories/repository_pilot_v0 && \
+  python3 -m unittest discover -s tests -v)
 ```
 
 Mock harness run:
@@ -181,13 +201,34 @@ python3 experiments/emergent_coordination/run_experiment.py \
 
 Missing credentials is not a failure. Do not start 16/32-agent runs from this tree.
 
+在运行任意 Agent 前，可先执行不挂载 target、不提交 finding 的 provider compatibility probe：
+
+```bash
+python3 experiments/emergent_coordination/compatibility_smoke.py --model deepseek-flash
+```
+
+它强制一次无副作用的 function call，并验证 tool-result continuation、provider 的 resolved model、fingerprint（若提供）与 usage 字段。probe 不属于任何 coordination condition，也不构成 matched block。
+
 Analyze a finished run:
 
 ```bash
 python3 -m experiments.emergent_coordination.analysis.analyze_run runs/<run_id>
 ```
 
-The analyzer reports evidence (`shared_path_activity`, `cross_agent_reads`, filename prefixes). It does **not** claim that a leader or mailbox emerged.
+每个完成的 run 会自动写入 `metrics.json`。它包含规范化的文件/search/source→sink hypothesis/test 指纹、跨 Agent 重复工作、permit/token/active-time/并发/Gini、B 的 shared 路径和内容 hash lineage，以及 T 的 claim conflict、未完成任务、重复任务和显式 evidence adoption。
+
+对冻结 block 可显式绑定各 condition 的 run，再生成 `block_comparison.json`：
+
+```bash
+python3 -m experiments.emergent_coordination.analysis.analyze_run \
+  --block-dir runs/<block_id> \
+  --condition-run S1=runs/<s1_run> \
+  --condition-run P4=runs/<p4_run> \
+  --condition-run B4=runs/<b4_run> \
+  --condition-run T4=runs/<t4_run>
+```
+
+分析器只报告可观察证据：路径相邻、一次 shared read、任务被列出或时间相邻均不自动解释为协作、采纳、领导或意图。只有后续 finding 显式复用已观察 task result 中的同一 `evidence_ref`，才记为 task-result evidence adoption。
 
 ## Known limitations
 

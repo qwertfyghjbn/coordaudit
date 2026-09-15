@@ -2,22 +2,27 @@
 
 > 迁移注记（2026-09-15）：本计划的执行根目录已迁至 `/home/lqs/coordaudit`。文中对原 `datasets/` 与既有系统历史结果的描述仅作 benchmark provenance 与研究背景，不构成运行时依赖。
 
-> **如果现在只允许做一个最小实验：先用现有 `repository_pilot_v0`，在同一个冻结配置块内跑 `S1 / P4 / B4-aware / T4` 各 1 次；模型沿用当前 DeepSeek OpenAI-compatible 接入。开跑前只补五类 P0：真正的 P/hidden-oracle 隔离、调用前全局预算许可、可关联的事件/证据日志、duplicate-work 与 coordination 指标、严格 finding 校验/确定性去重。暂不做 M4，也不新造大 benchmark。**
+> 实现状态注记（2026-09-15）：本文的“当前”“缺口”“P0 后”均是 hardening 前的盘点与规划快照，保留以说明决策来由，不能作为 runtime 现状。ADR 0002–0005 已实现：调用前 permit ledger、fail-closed bubblewrap shell、事件/模型可见转录与 reconcile、严格 finding intake/hidden verification、`metrics.json` 与 `block_comparison.json` 均已具备。仍未实现的是正式 matched-block executor；`freeze_block.py` 只冻结合同，不执行 block。
+
+> **如果现在只允许做一个最小实验：先用现有 `repository_pilot_v0`，在同一个冻结配置块内跑 `S1 / P4 / B4-aware / T4` 各 1 次；模型沿用当前 DeepSeek OpenAI-compatible 接入。开跑前只补五类 P0：真正的 P/hidden-oracle 隔离、调用前全局预算许可、可关联的事件/证据日志、duplicate-work 与 coordination 指标、严格 finding 校验/确定性去重。暂不做 M4，也不新造大 benchmark，更不把预设 communication graph topology 加入当前矩阵。**
 
 审计日期：2026-09-15。本文是执行规划，不是实验结果，也不修改 `datasets/` 或现有 harness。仓库递归盘点覆盖 29,463 个文件；对 36 个 case 的 `case.yaml`、`ground_truth.json`、必需文件和源码 anchor 做了结构化核验，对 CoordAudit 原型的全部 harness、grader、测试和现有 run 逐项检查，并抽查/汇总了 DeepAudit、IRIS、OpenAnt 和 Architecture Attribution 的脚本、manifest 与历史结果。大体积第三方 repo snapshot 采用全量文件/测试/anchor 校验和目标链抽查，而不是把 vendored 源码逐行当作本项目实现审阅。
 
 ## 1. Executive Summary
 
 - **结论：GO WITH MINIMAL CHANGES。** 仓库已经有可复用的 S/P/B/T 统一 runner、OpenAI-compatible 模型入口、每 Agent 私有副本、raw shared filesystem、原子 task claim、JSONL 事件、hidden grader 和一个 5-front composite repo，基础不是从零开始。
+- **研究定位：**本 pilot 比较不同 **coordination affordance / coordination substrate** 如何影响现代安全 Agent 的任务分配、信息利用、重复劳动、验证行为和失效模式；它不是比较预设 multi-agent communication topology。
+- **研究问题：**在相同 base audit prompt、模型、Agent-visible target、finding schema 与 team-level budget 下，单 Agent、独立并行、generic shared substrate 与最小 typed task state 分别会诱发何种自主分工、信息利用和验证行为？`P → B/T` 的主要差异是是否存在 coordination substrate，`B → T` 的主要差异是开发者是否提供最小 typed task primitive。
+- 本 pilot 不预设 star / chain / tree / mesh 等 communication graph。若 Agent 最终形成值得分析的 interaction structure，它是运行结果而非实验输入。图拓扑并非没有意义；只是对当前研究问题，hand-crafted fixed topology 不是优先研究变量。更重要的是 Agent 在不同 affordance 下是否主动协调，以及实际 interaction structure 如何形成。
 - 最小实验应只跑 `S1 / P4 / B4-aware / T4 × 1 matched block`；机械指标通过后再补第二个 matched seed/block。M4 当前没有实现，不应为 9.17 强行加入。
 - 推荐 benchmark 是 `experiments/emergent_coordination/repositories/repository_pilot_v0/`。它有 3 个 positive、2 个 near miss、5 条跨文件 HTTP 链，足以勉强验证 N=4 harness，但规模余量很小，不能支持 N=16，也不能用于架构优劣结论。
-- 最大 blocker 不是 Agent loop，而是**测量可信度**：当前预算在 API 返回后才扣费，无法阻止并发超支；没有 API cost；事件没有 event/call/step lineage；分析器没有 `duplicate_work_ratio`；T 的 message read 不记录具体消息；grader 对 source 约束未实际使用。
+- 最大 blocker 不是 Agent loop，而是**测量可信度**：当前预算在 API 返回后才扣费，无法阻止并发超支；没有 API cost；事件没有 event/call/step lineage；分析器没有 `duplicate_work_ratio`；T completion 尚不能记录 `result/evidence_refs`；grader 对 source 约束未实际使用。
 - 当前 `P` 的私有目录隔离有单测，但 `run_shell(shell=True)` 仍运行在宿主机，只靠字符串黑名单和代理环境变量；它可以访问未列入黑名单的绝对路径，`NO_PROXY=*` 也不是断网。正式 live pilot 前必须用本机已有 `/usr/bin/bwrap` 或等价 OS sandbox 收紧。
 - `B` 与 `T` 的代码边界基本清楚：B 只有 generic shared list/read/create/mkdir，不暴露 task/message/claim；T 有 typed task 和进程内原子 claim。需要继续保护该因果区别，不向 B 注入 namespace、任务模板、owner、leader 或 protocol 示例。
 - 当前 4 份保存的 coordination run 只是 `mock` 的 N=1/2 空 finding 生命周期样本，不是 live pilot 证据；本次额外确认 S1/P4/B4/T4 的 mock CLI 都能启动并结束。
 - 当前 `experiments/` 和 `docs/research/` 在工作树中尚未被 Git 跟踪；run manifest 只记 `HEAD=5221728...` 不能唯一冻结实际 harness/benchmark。第一条 live block 必须额外保存 dirty-worktree/tree-content digest。
 - 最低实现工作量是局部加固现有 `experiments/emergent_coordination/`，不需要引入新 framework：预算许可、sandbox、事件字段、grader/dedup、analysis/block summary 五处小范围修改即可。
-- Pilot 模型只用于验证 harness 与行为可观察性。当前 `.env_deepseek` 指向 `deepseek-v4-pro`，但必须先做兼容性 smoke，并在 manifest 记录 provider 返回/实际接受的精确配置；不得把本 pilot 的性能排名外推到未来 N=16 或其他模型。
+- Pilot 模型只用于验证 harness 与行为可观察性。当前计划请求 DeepSeek V4.1 Flash 的 API alias `deepseek-flash`，但必须先做兼容性 smoke，并在 manifest 同时记录 requested alias、provider 返回的 resolved model/version 与实际接受的精确配置；不得把本 pilot 的性能排名外推到未来 N=16 或其他模型。
 
 ## 2. Existing Assets
 
@@ -136,13 +141,13 @@ DeepAudit 脚本（如 `scripts/run_deepaudit_repo_experiment.sh`、`run_deepaud
 |---|---|---|---|---|
 | P isolation | `workspace.py`、`sandbox.py`、`test_harness.py` | 每 Agent target/scratch 副本；工具 schema 无 shared API | 部分已有 | Python API 层通过；shell/host/env 层未隔离 |
 | Raw store | `shared_fs.py`、`BLACKBOARD_TOOLS` | list/read/create/mkdir；create-only，可 append；无 message/task/claim/owner/roster | **Raw shared store** | 可直接复用；`append` 是 generic write 行为，但必须保持不解析 task semantics |
-| Typed backlog | `task_board.py`、`TEAM_TOOLS` | create/list/claim/release/complete；owner/status/dependency/result_artifacts | **Structured coordination** | claim 在当前单进程 thread runner 内原子；没有 claim-conflict event，跨进程不原子 |
-| Messaging | `TaskBoard.send_message/list_messages` | T-only P2P/`*` broadcast | Structured coordination | `message_read` 只记 count，不能知道读了哪些 message；read state 不持久 |
-| Artifacts | `publish_artifact/list_artifacts` | T-only publish metadata | Structured coordination | peer 没有 `read_artifact`，当前实质 write-only；建议 pilot 收窄/修正 |
+| Typed task state | `task_board.py`、`TEAM_TOOLS` | 当前有 create/list/claim/release/complete；含 owner/status/dependency/result_artifacts | **Structured coordination** | claim 在当前单进程 thread runner 内原子；primary T4 须收窄到最小 task primitive，并把 completion 改为 `result/evidence_refs` |
+| Messaging | `TaskBoard.send_message/list_messages` | 当前 T-only P2P/`*` broadcast | 后续 structured extension | **N=4 primary T4 不启用。** 当前 `message_read` 只记 count，不能知道读了哪些 message；read state 不持久，若未来启用须单独设计/ablation |
+| Artifacts | `publish_artifact/list_artifacts` | 当前 T-only publish metadata | 后续 structured extension | **N=4 primary T4 不启用。** peer 没有 `read_artifact`，当前实质 write-only；若未来启用须先补清晰的 read lineage |
 | Worker ID | `paths.py:agent_id_for()` | `agent_001`…`agent_032` | Observer identity | 可复用；B 不提供 peer directory，符合要求 |
 | Manager/queue/lease/CAS | 无 | M、lease、crash recovery、跨进程 CAS 均无 | 缺失 | N=4 pilot 不需要；M4 暂不加入 |
 
-特别说明：B 的 prompt 只说 `/shared` 是其他 concurrent process 可见的持久目录，没有任务、leader、mailbox 或分工模板，符合本次 `B-aware` 定义。T 的 typed task/message/artifact 明显属于 developer-provided semantics，不能与 B 合并报告。
+特别说明：B 的 prompt 只说 `/shared` 是其他 concurrent process 可见的持久目录，没有任务、leader、mailbox 或分工模板，符合本次 `B-aware` 定义。B 只能提供 `store_list/store_read/store_write` 或等价 generic filesystem primitive，绝不提供 task、claim、owner、leader、mailbox、message、broadcast、agent directory、lock、lease、CAS 或 protocol template。T 的 primary tool surface 只有 typed task state，不能与 B 合并报告；现有 message/artifact 实现可保留在代码中，但必须从 primary T4 的 prompt 与 tool schema 关闭。
 
 ### 2.5 Logging
 
@@ -151,11 +156,11 @@ DeepAudit 脚本（如 `scripts/run_deepaudit_repo_experiment.sh`、`run_deepaud
 | `harness/events.py` | timestamp、run_id、agent_id、event_type、payload、token_usage、target；JSONL + thread lock | 高 | 无 event_id、step_id、call_id、parent refs、duration、status |
 | `agent_loop.py` | agent start/finish、LLM usage、tool args、budget/error | 中到高 | 不保存 prompt/assistant output/raw response/tool result；无法还原 hypothesis 形成原因 |
 | `shared_fs.py` | path、creator event、hash、bytes、小内容 inline、snapshot | 高 | analyzer 只算精确 path 的 cross-agent read；append lineage 不完整 |
-| `task_board.py` | task create/claim/release/complete、message send/read、artifact publish | 中 | claim failure 不记专用事件；message read 无 IDs；artifact 无 read；task result语义弱 |
+| `task_board.py` | task create/claim/release/complete、message send/read、artifact publish | 中 | primary T4 应只暴露 task API；claim failure 不记专用事件；completion 仍是 `result_artifacts`，尚无 `result/evidence_refs`；message/artifact 不属于本轮 tool surface |
 | `runs/*` | run_manifest、events、per-agent findings、merged findings、evaluation、summary | 高 | 现有 4 run 全是 mock；没有 live/N4 trace、metrics.json 或 block summary |
 | 旧 `artifacts/` | 49 个 run manifest、35 个 metrics.json、系统专用 task events/results | 中，字段经验可复用 | 没有统一 JSONL schema；系统间 token/cost/event 口径不一致 |
 
-当前只能重建“哪个 Agent 何时调用了哪个工具/读了哪个文件、用了多少 provider-reported tokens、是否写/读同一 shared path”。不能可靠重建“因为看见哪条 message/evidence 而形成哪个 hypothesis，后续哪个 Agent采用并验证”。缺少：稳定 event/evidence/message ID、LLM output/transcript、read receipt、finding→evidence refs、verification event 和 parent/causal links。
+当前只能重建“哪个 Agent 何时调用了哪个工具/读了哪个文件、用了多少 provider-reported tokens、是否写/读同一 shared path”。不能可靠重建“因为看见哪条 shared/task-result evidence 而形成哪个 hypothesis，后续哪个 Agent 采用并验证”。缺少：稳定 event/evidence/task ID、LLM output/transcript、read receipt、finding→evidence refs、verification event 和 parent/causal links。
 
 ### 2.6 Budgeting
 
@@ -169,6 +174,8 @@ DeepAudit 脚本（如 `scripts/run_deepaudit_repo_experiment.sh`、`run_deepaud
 - positive matcher 当前允许 `file+category` 直接命中，定义在 ground truth 的 `required_source_tokens_any` 没有使用；容易把浅层猜测算作 TP。
 - `verified_findings` 只检查 Agent 提交的 `reproduction.successful=true`，即使是 FP 也会计数；它不是 verifier 结果。
 - `merge_findings()` 保留所有重复项；grader只是把同一 GT 的后续命中标为 duplicate。当前 precision 也没有因这些 duplicate submission 受罚。
+- P0 后 `submit_findings` 必须对完整 payload 做原子式严格 schema 校验：finding ID、canonical category/severity、typed source/propagation/sink或guard locations、reasoning summary、存在且可见的 evidence refs、reproduction status/artifacts、confidence。无效 payload 返回逐字段错误并允许在剩余 permits 内重试；最终无有效 payload 记 `model_format_failure`，不作为 infrastructure failure。
+- Composite ground truth 不完备，因此命中已标注 near miss 才是确定的 FP；schema 合法但未命中 positive/near miss 的提交进入 `unmatched_review`。Primary 结果不使用无假设的单一 precision/F1，而同时给 closed-world lower bound 与 labeled-only upper bound。
 - `experiments/emergent_coordination/runs/` 现有 single/parallel/raw_blackboard/structured_team 四次 run 均为 2026-09-13 的 `mock` N=1/2，全部 0 findings；只能证明生命周期和 artifact layout，不能证明 security 或 coordination behavior。
 - 仓库已有 DeepAudit/IRIS/OpenAnt/Architecture Attribution 的丰富历史结果与统一入口 `reports/cross_system/canonical_results.tsv`。这些结果说明 full-repo broad scan 存在 off-target 和高成本问题，但其系统、prompt、tools、预算口径不同，不能当作本 pilot baseline。
 
@@ -199,11 +206,12 @@ DeepAudit 脚本（如 `scripts/run_deepaudit_repo_experiment.sh`、`run_deepaud
 | S/P/B/T 同一 Agent loop | 已有 | `AgentRunner` + `CoordinationPolicy` | 保持，不重构 |
 | P isolation | 部分已有 | private copy/scratch 有测试；shell 可见宿主机和继承 env | bwrap `--unshare-net`、只 bind private workspace/必要 runtime、清理 secret env；增加越界/跨 Agent/网络测试 |
 | B raw store | 已有 | generic list/read/create/mkdir；无 structured API | 冻结 B-aware prompt/tool schema；禁止新增 parser、namespace、通知、CAS/lock |
-| T atomic claim | 部分已有 | `threading.Lock` 对单 runner 内线程原子 | N=4 可用；补 claim-conflict 事件、task result；明确“不支持跨进程” |
+| T atomic claim / completion | 部分已有 | `threading.Lock` 对单 runner 内线程原子；`complete_task` 只有 `result_artifacts` | N=4 可用；补 claim-conflict 事件和 `result/evidence_refs`，明确“不支持跨进程” |
+| T4 primary tool-surface gate | 缺失 | `structured_team` 当前默认同时暴露 task、message、broadcast、artifact 工具 | 新增/冻结仅暴露 `create_task/list_tasks/claim_task/release_task/complete_task` 的 mode/config；不要求删除既有实现 |
 | Global accounting | 部分已有 | usage 字段齐，但 post-call charge 可超支 | 调用前原子 acquire call permit；pilot 用 calls + per-call output hard proxy；所有成功/失败/retry均记账 |
 | API cost | 缺失 | run history 明确不写价格 | manifest 冻结当日 input/cache/output/reasoning 单价或 provider billed cost，生成 derived cost 与 unknown 标志 |
 | Event logging | 部分已有 | JSONL 有基础事件 | event/step/call/op ID、duration、outcome、content/artifact hash、prompt/tool-schema hash、transcript |
-| Evidence lineage | 缺失 | finding evidence 是自由文本，T reads 不可定位 | evidence refs、message/shared origin、read receipt、finding/verifier links；允许明确 adoption，另做时序推断 |
+| Evidence lineage | 缺失 | finding evidence 是自由文本，T task-result reads 不可定位 | evidence refs、task/shared origin、read receipt、finding/verifier links；允许明确 adoption，另做时序推断 |
 | Duplicate-work measurement | 缺失 | 只有 duplicate findings | 规范化 file/search/hypothesis/source→sink/test fingerprints，输出总量与分项 ratio |
 | Work allocation/utilization | 部分已有 | start/finish 和 per-agent budget存在 | per-agent active duration、module/hypothesis fronts、idle、usage Gini、peak concurrency |
 | B behavior metrics | 部分已有 | shared read/write + cross-agent exact-path read | first RAW latency、多读 key、lexical task/owner/mailbox/verify indicators；只报告行为证据 |
@@ -217,15 +225,15 @@ DeepAudit 脚本（如 `scripts/run_deepaudit_repo_experiment.sh`、`run_deepaud
 
 ### 关键 confounders
 
-- `system_prompt()` 和 `user_prompt()` 具有 mode-specific 增量文字，T/B 又有更长 tool schema。这是 treatment 的必要组成，但它会增加输入 token；必须把实际输入 tokens 和 mandatory scaffold bytes/tokens 单列。
-- T 当前同时提供 task、message、broadcast 和不可读 artifact，而建议的核心 treatment 是 typed claim。若保留全部接口，`T-P` 估计的是整套 structured team capability，不是 atomic claim 单一效应。Pilot 可以接受，但必须如此命名；最小化方案见第 8 节。
+- `system_prompt()` 和 `user_prompt()` 具有 mode-specific 增量文字，T/B 又有更长 tool schema。这是 coordination-affordance treatment 的必要组成，但它会增加输入 token；必须把实际输入 tokens 和 mandatory scaffold bytes/tokens 单列。
+- T 当前同时提供 task、message、broadcast 和不可读 artifact，会造成 treatment bundling，也容易把显式 communication network 带回研究设计。N=4 primary T4 必须只启用最小 typed task state；若保留其他接口，只能作为后续扩展/ablation，不能混入本轮结果。
 - B 的 `append=true` 比纯 overwrite store 更利于共享日志且减少 lost update。它仍是 generic storage，但属于 substrate 设计选择，必须冻结并在 manifest 明示。
-- S 与 N=4 若共用相同 per-agent `max_steps`，并不拥有相同 team opportunity；必须让 S 的 step ceiling 等于 team 总 call permits。
+- `max_steps` 不能承担预算分配语义：若设为 8 会让 S1 无法使用团队机会，也会强制 P/B/T 均分。所有 Agent 使用等于 team permits 的 32-step 非约束性安全上限，真正的分配只由共享原子 permit pool 决定。
 - 当前 seed 只写 manifest，不传 provider；不能把不同 seed 标签解释为模型随机种子。
 - `run_shell` 允许 Agent 修改 target copy，和 `write_file()` 的“target read-only”承诺冲突；还可经宿主路径制造跨条件/跨 Agent共享。
 - `score.py` 的宽匹配、Agent 自报 verification 和未去重 merge 会改变 architecture outcome，必须在第一条 live block 前冻结修正。
 
-## 4. Recommended N=4 Architecture
+## 4. Recommended N=4 Coordination Design
 
 不新建 framework，沿用当前文件边界，只把缺失的公共层补齐：
 
@@ -241,7 +249,7 @@ BlockRunner（新增很薄的一层，只冻结并启动 matched runs）
         ├── none_single          → S1
         ├── independent_parallel → P4
         ├── raw_store            → B4-aware
-        ├── structured_backlog   → T4
+        ├── structured_task_state → T4
         └── manager_worker       → M4，暂不实现
 
 Run-final common pipeline
@@ -252,6 +260,10 @@ Run-final common pipeline
 └── matched-block comparison
 ```
 
+Agent capability boundary 必须闭合：模型只能返回文本或调用注册 tool；凡模型输出可触发的 filesystem、network、process/code execution 都必须经过按 condition 过滤的 tool dispatcher。禁止隐式 plugin/MCP、SDK callback、直接 Python execution、宿主 shell 和未记录的 filesystem handle。Controller 的 provider network、snapshot copy、event write 与 evaluator execution 属于 trusted control plane，不能由 Agent tool 参数寻址，也不能把私有内容或宿主路径送回 Agent context。
+
+`run_shell` 是唯一通用代码执行入口，并对每次调用启动 fail-closed bwrap namespace：`target` ro-bind、该 Agent 的 `scratch` rw-bind、隔离 `/tmp`、新 `/proc` 与最小 `/dev`、只读必要 runtime；不挂 repo root、其他 Agent 目录、evaluator-private、宿主 home 或 secret。Shell 使用 env allowlist 和 `--unshare-net`；B shared state 与 T task state 只经受记录 API 访问，不直接挂入 shell。Live sandbox self-test 失败不得退回字符串过滤实现。
+
 核心隔离合同：
 
 | 层 | S1 | P4 | B4 | T4 |
@@ -259,14 +271,37 @@ Run-final common pipeline
 | Model/core audit prompt | 相同 | 相同 | 相同 | 相同 |
 | Target/private scratch | 1 份 | 4 份完全隔离 | 4 份完全隔离 | 4 份完全隔离 |
 | Common audit tools | 相同 | 相同 | 相同 | 相同 |
-| Runtime communication | 无 | 无 | generic store only | typed backlog + 可选 P2P message |
-| Peer roster | 无 | 无 | 无 | 由稳定 pseudonym 支持定向 message；不设 leader |
+| Coordination affordance | 无 | runtime 中无 | generic shared persistent state | minimal typed shared task state |
+| Work allocation | single agent | each agent independently | endogenous | endogenous |
+| Peer roster / prescribed graph | 无 | 无 | 无 | 无；不设 leader、角色、pipeline 或谁必须和谁交互 |
 | Final intake/grader/dedup | 相同 | 相同 | 相同 | 相同 |
 | Team budget | 同一全局上限 | 同一全局上限 | 同一全局上限 | 同一全局上限 |
 
-T4 建议保留 `create_task/list_tasks/claim_task/release_task/complete_task` 与现有 `send_message/list_messages`，但把 `complete_task` 扩为可携带小型 `result`/evidence refs。当前 `publish_artifact/list_artifacts` 因没有 peer read 能力而语义残缺；第一版要么补 `read_artifact` 并计 lineage，要么更简单地从 pilot tool surface 移除。不要把这些接口复制给 B。
+N=4 **primary T4** 只暴露如下 tool surface：
 
-M4 暂缓。仓库没有 manager role、分派权限、worker→manager result channel 或 manager bottleneck metrics；此时新增 M 会同时改变 prompt、权限、消息拓扑和 aggregation，超出最小 feasibility block。
+```text
+create_task
+list_tasks
+claim_task
+release_task
+complete_task
+```
+
+最小 task schema 为：
+
+```text
+task_id
+description
+status
+owner
+creator
+result
+evidence_refs
+```
+
+`claim_task` 必须原子；Agent 自己决定创建和 claim 哪些任务，系统不预设 leader、角色、pipeline、接触对象或 Agent-to-Agent communication graph。`complete_task` 可携带 `result` 和 `evidence_refs`，使其他 Agent 可通过 `list_tasks` 读取已完成工作的可追溯结果。现有 `send_message/list_messages/broadcast/publish_artifact/list_artifacts` **本轮 N=4 primary T4 不启用，推迟到后续扩展/ablation**；无需为删除这些接口重构 runtime，但 P0 必须能从本 pilot 的 prompt 与 tool schema 中关闭它们。不要把这些接口复制给 B。
+
+M4 暂缓。仓库没有 manager role、分派权限、worker→manager result channel 或 manager bottleneck metrics；此时新增 M 会同时改变 centralized control、权限和 aggregation，超出最小 feasibility block。M 测试的是 centralized task allocation，不是 star communication topology：未来 manager 可创建任务、指定 worker、接收结果并重新分配，worker 之间不互相协调。
 
 ## 5. Benchmark Selection
 
@@ -300,19 +335,21 @@ Real-world repo 暂不进入最小 block：每个只有一个标注 target，大
 
 ## 6. Experimental Matrix
 
-| Condition | N | Coordination | Budget | Main purpose | Pilot 状态 |
-|---|---:|---|---|---|---|
-| S | 1 | none | same global | single baseline | 必跑 |
-| P | 4 | none during run | same global | sampling | 必跑 |
-| B | 4 | raw store | same global | emergent shared-state behavior | 必跑，B-aware |
-| T | 4 | typed claim | same global | structured coordination | 必跑 |
-| M | 4 | manager-worker | same global | optional centralized baseline | **不进入最小 block** |
+| Condition | N | Coordination affordance | Work allocation | Budget | Main purpose | Pilot 状态 |
+|---|---:|---|---|---|---|---|
+| S1 | 1 | none | single agent | same global | single-agent baseline | 必跑 |
+| P4 | 4 | none during runtime | each agent independently | same global | parallel sampling baseline | 必跑 |
+| B4 | 4 | generic shared persistent state | endogenous | same global | 是否主动使用 raw substrate、是否自发形成可观察约定 | 必跑，B-aware |
+| T4 | 4 | minimal typed shared task state | endogenous | same global | developer-provided task primitive 是否足以促进自主分工 | 必跑 |
+| M4 future | 4 | centralized task control | manager-directed | same global | centralized-control baseline | **不进入最小 block** |
+
+这里没有 fixed graph topology 条件，也不新增 G4。`P4 → B4/T4` 比较 runtime 中是否存在 coordination substrate；`B4 → T4` 比较 generic substrate 与开发者提供的最小 typed task primitive。B4 与 T4 都不预设 Agent-to-Agent communication graph。
 
 ### 最省成本且有信息价值的规模
 
 阶段 A：1 repo × S1/P4/B4/T4 × 1 matched block（建议 block seed/replicate `17`）。它只回答机械可行性和可观察性。
 
-阶段 B：仅当阶段 A 同时满足无 capability leak、四条件都正常结束、预算/事件完整、至少 4 fronts 被触达、B 有真实 store operation、T 有真实 claim 后，再用第二个 block（建议 `29`）重复。若 provider 不支持 seed，字段改记 `replicate_id`，不得声称 deterministic seed。
+阶段 B：仅当阶段 A 同时满足 B/T capability 确实可调用且 tool schema 正确、无 architecture leakage、四条件都正常结束、预算/日志完整、observer 能可靠记录调用和不调用、并且至少 4 fronts 被触达后，再用第二个 block（建议 `29`）重复。**不要求 B 实际发生 shared-store operation，也不要求 T 实际创建或 claim task。** primitive 是否被 Agent 主动采用本身就是实验结果：很少使用可能表示 benchmark 无须 coordination、模型自身分解已足够、coordination overhead 高于收益，或 affordance 不被认为值得使用。若 provider 不支持 seed，字段改记 `replicate_id`，不得声称 deterministic seed。
 
 M4 只有在 S/P/B/T 的 block 已经产生完整 trace，且 manager adapter 可在不引入专属审计知识/工具的前提下加入时才做；不作为 9.17 成功条件。
 
@@ -323,18 +360,28 @@ M4 只有在 S/P/B/T 的 block 已经产生完整 trace，且 manager adapter �
 ```text
 max_total_model_calls_per_condition = 32
 max_output_tokens_per_call = 1024
-S1 max_steps = 32
-P4/B4/T4 max_steps_per_agent = 8
+max_steps_per_agent = 32  # loop safety ceiling, not a per-agent allocation
+per_agent_model_call_cap = none
 max_common_tool_calls_per_condition = 160
 per_shell_call_timeout_seconds = 30
 wall_clock_safety_ceiling_seconds = 600
 ```
 
-所有 call permit 必须在请求前原子获取；provider 请求失败和 retry 也消耗 call permit。S1 因此能使用完整 32-call team budget，P/B/T 最多 4×8。`global_input_token_cap` 可保留为“完成一次 call 后、发下一次前”的软停机线，但不得称作严格 hard cap。实际 input/output/cached/reasoning tokens 全量记录；reasoning 未返回时写 `null`，不能写 0。
+所有 call permit 必须在请求前原子获取；provider 请求失败也消耗 call permit，retry 必须重新获取 permit。S1/P4/B4/T4 都竞争同一个 32-permit pool，不为每个 Agent 预分配或保留额度。每 Agent 的实际 permit/call 分布属于 allocation outcome；这避免固定 8-call 配额压平 T 的自发综合分工，并避免未来结构性惩罚 M 的 manager/aggregator。`global_input_token_cap`/`global_output_token_cap` 改称 token stop threshold：完成一次 call 后、发下一次前检查，允许最多一次 in-flight overshoot，不得称作严格 hard cap。实际 input/output/cached/reasoning tokens全量记录；reasoning未返回时写 `null`，不能写0，也不进行事后额度补偿。
 
 如果实现了可靠 tokenizer 估计，可在调用前 reserve `estimated_input + max_output`，完成后按 actual refund；这不是第一条 pilot 的必要条件。不要为 pilot 实现复杂 scheduler。
 
-同一 block 冻结：provider、exact model string、temperature=0、max output、reasoning setting、tool schema、common prompt、condition delta prompt、timeout/retry、价格快照和依赖环境。当前 `deepseek-v4-pro` 只作为现有接入候选；先做 1 次不计入 block 的 live compatibility smoke。历史 manifest 已出现模型/provider 值尾随 `\r`，gateway 必须 trim 后同时记录 raw/resolved 值。
+同一 block 冻结：provider、requested model alias、resolved model/version、temperature=0、max output、reasoning setting、tool schema、common prompt、condition delta prompt、timeout/retry、价格快照和依赖环境。当前请求 alias 为 `deepseek-flash`；先做 1 次不计入 block 的 V4.1 Flash live compatibility smoke。历史 manifest 已出现模型/provider 值尾随 `\r`，gateway 必须 trim 后同时记录 raw/requested/resolved 值。
+
+### Infrastructure validity 与 fail-fast
+
+Model call 依次记录 `permit_requested → permit_granted → dispatch_started → response_succeeded | timeout | provider_error`。只有进入 `dispatch_started` 才构成 attempted call并永久消耗 permit；本地序列化或调用前校验失败释放 reservation。Retry 使用新的 call ID和permit，并以 `parent_call_id`、`attempt_index` 关联原请求。
+
+随机基础设施失败只包括 dispatch 后的 timeout、网络错误、429和provider 5xx。冻结策略允许自动 retry 一次：单个失败若随后恢复，run 标记 `valid_with_infrastructure_warning` 且不补回permit；同一run累计至少2个此类失败attempt，或一次失败导致Agent终止且之后没有successful response，立即标记`infrastructure-invalid run`。
+
+以下实现问题不经过重复运行规避，第一次发生就立即标记 invalid 并暂停正式采样：exact model/config漂移；permit超发或无法reconcile；必需usage/call outcome/lineage缺失；请求格式、tool schema等harness错误导致的4xx；runtime crash；sandbox或hidden-evaluator isolation失败。模型拒答、`content_filter`、invalid tool call和模型输出格式错误属于模型/condition行为，不归为infrastructure failure。
+
+任一run invalid即令整个matched block成为`infrastructure-invalid block`。Runner应立即停止该run，取消尚未发出的请求，跳过当前block尚未执行的conditions，保留全部日志、manifest、response metadata与部分产物；替换样本必须重跑完整block，不能只补跑失败condition。若同类随机基础设施失败跨多个block重复出现，也暂停正式采样，检查provider rate limit、并发、retry policy和运行环境。这里的停止只针对当前run/block或正式采样，不终止CoordAudit项目。
 
 ## 7. Metrics
 
@@ -342,16 +389,19 @@ wall_clock_safety_ceiling_seconds = 600
 
 ```text
 unique_true_findings
-false_positives
 false_negatives
-precision / recall / F1
-near_miss_false_positives
-deterministically_verified_findings
-invalid_finding_submissions
+positive_recall
+known_near_miss_false_positives
+unmatched_review_count
+invalid_finding_submissions / model_format_failures
 duplicate_findings_before_dedup
+closed_world_precision_lower_bound / closed_world_F1_lower_bound
+labeled_precision_upper_bound / labeled_F1_upper_bound
+evaluator_verified_findings
+agent_attempted_reproduction / agent_claimed_success
 ```
 
-TP 必须匹配 category + source/dataflow + sink/guard anchor，而不只是 filename/category。`deterministically_verified_findings` 只来自 evaluator-side oracle，不接受 Agent 自报。另保留每个 Agent 原始 findings 和 dedup provenance。
+TP 必须匹配 canonical category + source/dataflow + sink/guard anchor，而不只是 filename/category。Finding evidence refs 必须指向该 Agent 已实际看到的 file/tool/shared/task-result event。按 `category + normalized source + normalized sink` 冻结 fingerprint：同一漏洞只计一个 TP，duplicate 不额外计 FP，但保留全部 submitting Agents、evidence、时间顺序并进入 duplicate-work 指标。`evaluator_verified_findings` 只来自 hidden evaluator，不接受 Agent 自报。Schema 合法但未匹配已知标签者记 `unmatched_review`：closed-world lower bound 将其计 FP，labeled-only upper bound将其排除；两个假设和分母都必须落盘。
 
 ### 7.2 Resource use
 
@@ -359,9 +409,11 @@ TP 必须匹配 category + source/dataflow + sink/guard anchor，而不只是 fi
 input_tokens / cached_input_tokens / output_tokens / reasoning_tokens_or_null
 total_tokens（同时给 raw 与 billed口径）
 API cost 与 price snapshot
-model calls（成功/失败/retry）
+attempted / successful / timeout / provider-error / retry model calls
+permit requested / granted / rejected，以及每 Agent 的 permit wait time
+output tokens 接近 1024 的调用数、`finish_reason=length` 次数、疑似截断 finding/evidence 次数
 tool calls，按 list/read/search/shell/test/coordination 分类
-read bytes / shared bytes / message bytes
+read bytes / shared bytes / task-result bytes
 wall clock / summed agent active seconds / peak concurrency
 termination reason
 ```
@@ -385,7 +437,7 @@ total_cross_agent_units = Σ_f a_f
 duplicate_work_ratio = duplicate_units / total_cross_agent_units
 ```
 
-分别输出 `file_duplicate_ratio`、`search_duplicate_ratio`、`hypothesis_duplicate_ratio`、`reproduction_duplicate_ratio` 和合并值。shared/message/task 工具本身不计审计重复劳动；同 Agent 重读另报 `within_agent_repeat_ratio`。Pilot 主比较为 P4 vs B4 vs T4，S1 只作参考。
+分别输出 `file_duplicate_ratio`、`search_duplicate_ratio`、`hypothesis_duplicate_ratio`、`reproduction_duplicate_ratio` 和合并值。shared/task 工具本身不计审计重复劳动；同 Agent 重读另报 `within_agent_repeat_ratio`。Pilot 主比较为 P4 vs B4 vs T4，S1 只作参考。
 
 ### 7.4 Allocation
 
@@ -398,7 +450,7 @@ Task-starvation 主要看：前 25/50/75% budget 时的 active unique fronts、�
 最小可重建链：
 
 ```text
-origin event/artifact/message/shared-write
+origin event/task-result/shared-write
 → consumer read receipt
 → consumer 后续 tool/hypothesis/finding event
 → verifier event
@@ -429,14 +481,23 @@ duplicate_task_creation（description semantic fingerprint）
 time_to_first_claim / queue wait / task duration
 task result read/adoption
 tasks_per_agent / completion per agent / load-balance Gini
-message send/read/adoption（若启用）
 ```
 
-核心检验是 T4 的 audit-work duplicate ratio 是否低于 P4/B4，同时没有因 task overhead 显著降低 unique fronts 或 verified findings。单 seed 只做描述，不做优劣结论。
+核心观察是 T4 的 audit-work duplicate ratio、任务创建/claim/完成及结果复用如何相对 P4/B4 变化，同时检查 task overhead 是否伴随 unique fronts 或 verified findings 的变化。单 seed 只做描述，不做优劣结论；T 很少创建或 claim task 是有效结果，不是 invalid run。
 
 ### 7.8 Optional M-specific behavior
 
-若后续加入 M4，记录 manager token share、worker idle/queue time、assignment→start latency、reassignment、manager fan-in、worker result丢失/压缩和 critical path。Manager 是 N=4 的一个 slot并计全局预算。
+若后续加入 M4，记录 manager token share、worker idle/queue time、assignment→start latency、reassignment、manager fan-in、worker result丢失/压缩和 critical path。Manager 是 N=4 的一个 slot并计全局预算；它是 centralized-control baseline，不应被表述或实现为 fixed-star topology experiment。
+
+### 7.9 Exploratory Analysis Idea: Temporal Interaction Structure
+
+这只是暂时的后验分析构思，**尚未冻结为正式 protocol**；是否实现、如何实现，应在查看第一批 N=4 event trace 后再决定。它不是 P0 required code change、live gate、pilot success criterion 或 mandatory output file。
+
+若 trace 足够丰富，未来不宜从实验开始永久累积一张 Agent graph：`A` 曾读过 `B` 的内容若永远保留为边，图会越来越稠密，难以表示当下协作状态。可探索按时间窗口、最近若干 coordination events 或 budget-progress window 生成 interaction snapshots；例如概念上的 `0–25% / 25–50% / 50–75% / 75–100%`，但不要求本 pilot 实现。
+
+未来也可能把 interaction 分层：`exposure`（读取他人共享信息）、`adoption`（读取后明确利用 evidence）、`task handoff`（A 创建而 B 接手）和 `verification`（B 独立验证 A 的 finding）。尤其不能把“看过信息”直接等价为“采纳信息”。
+
+Event / Evidence / Task lineage 是 source of truth；若将来构建图，应由这些原始数据派生为可视化或分析结果，例如 heterogeneous `Agent → Evidence → Agent → Task → Agent` lineage。不要为了画图改变运行时行为，也不在本轮要求 graph database、GNN、PageRank、community detection、decay model、graph density 或 centrality 指标。
 
 ## 8. Required Code Changes
 
@@ -444,23 +505,37 @@ message send/read/adoption（若启用）
 
 | 文件 | 需要修改什么 | 为什么 | 预计风险 |
 |---|---|---|---|
-| `harness/budget.py`、`agent_loop.py` | 增加调用前原子 call permit；失败/retry记账；S1 与 team 使用不同 max_steps但相同总 permits | 防并发超支并让 S1 真正拥有 team budget | 中：permit 释放/终止处理错误会死锁或漏账 |
+| `harness/budget.py`、`agent_loop.py` | 增加调用前原子 call permit；失败/retry记账；所有 Agent 的 loop safety ceiling 为 32 但无 per-agent 配额；记录 permit 申请/发放/拒绝/等待 | 防并发超支并让 S/P/B/T 共享同一团队机会，同时保留资源集中或均衡作为 condition 结果 | 中：permit 终止处理错误会死锁或漏账；到达顺序受并发调度影响，必须记录 |
 | `harness/llm/client.py`、`run_experiment.py`、manifest | CLI/manifest 冻结 provider、resolved model、temperature、max tokens、seed support、reasoning config、timeout/retry；trim CR；记录 usage/raw response metadata与价格快照 | 当前 seed无效、参数不入 manifest、历史模型值带 `\r`、无 cost | 中：不同 OpenAI-compatible provider字段差异 |
-| `harness/tools/sandbox.py`、`workspace.py` | 使用现有 `bwrap` 只暴露 Agent private root和必要只读 runtime，`--unshare-net`，清理 API key/host env；shell target只读；各 condition按 policy决定是否有 shared mount/API | P/hidden GT/无网络目前只在字符串层承诺 | 高：Python解释器/动态库 bind 不完整会影响 tests；必须用 isolation tests锁定 |
-| `harness/events.py`、`agent_loop.py`、`sandbox.py` | 添加 monotonic sequence、event_id、step_id、call_id/op_id、parent refs、start/end/duration/outcome；保存每 Agent transcript或等价 request/response artifact（敏感字段脱敏）；合并 dispatcher 与 sandbox 对同一操作重复写入的 `tool_call`，或用同一 `op_id` 明确关联并在统计时只计一次 | 无法重建 hypothesis/evidence lineage 和 active time；当前部分工具调用会被双记，`tool_calls` 不能直接用于条件比较 | 中：日志量、并发顺序、去重口径与敏感信息处理 |
-| `shared_fs.py`、`task_board.py` | B write版本/append origin；T message read记录 message IDs，claim失败发 `task_claim_conflict`；task complete携带 result/evidence refs；修复或移除不可读 artifact API | B/T adoption与T指标当前不可重建 | 中：不能把 T semantics 泄给 B |
-| `harness/tools/specs.py`、`prompts.py` | 所有条件统一收紧 finding JSON schema，增加 finding_id、evidence refs、reproduction artifact；可增加共同 `search_repo` tool | 防无结构输出并支持 duplicate/lineage | 中：schema过严可能增加 invalid submissions，必须先 mock/live smoke |
-| `harness/runner.py`、`evaluator/score.py` | deterministic finding fingerprint、merge/dedup并保留 submitted_by；positive matcher实际检查 source/sink；verification不信任自报 | 当前 outcome 可被浅 filename猜测和自报 verification污染 | 高：grader变化会改变分数；需冻结版本并补 regression tests |
+| `harness/tools/sandbox.py`、`workspace.py`、tool dispatcher | 闭合 Agent capability boundary；每次 `run_shell` 使用 fail-closed bwrap，只暴露 ro target、rw agent scratch、隔离 tmp/proc/dev 与必要只读 runtime，`--unshare-net`、env allowlist；B/T state 仅经 API 且不挂入 shell；live 启动前运行 sandbox self-test | 当前 shell 靠字符串过滤，且未来工具可能形成未登记的 filesystem/network/exec 旁路 | 高：Python解释器/动态库 bind 不完整会影响 tests；必须用 capability inventory 与 isolation tests 锁定 |
+| `harness/events.py`、`agent_loop.py`、`sandbox.py` | 添加全局 monotonic sequence、event_id、agent_id、step_id、call_id/op_id、parent refs、UTC/monotonic time、duration/outcome、budget progress；记录 task creator/claimer/completer、shared artifact creator/reader、finding/evidence refs、deterministic verification link；结构化事件只放hash/artifact ref，按Agent保存脱敏append-only model-visible transcript；合并 dispatcher 与 sandbox 对同一操作重复写入的 `tool_call`，或用同一 `op_id` 明确关联并在统计时只计一次 | 无法重建 hypothesis/evidence/task/store lineage 和 active time；当前部分工具调用会被双记，`tool_calls` 不能直接用于条件比较 | 中：日志量、并发顺序、重放一致性、脱敏与敏感信息处理 |
+| `shared_fs.py`、`task_board.py`、`tools/specs.py`、`prompts.py` | B write版本/append origin；T claim失败发 `task_claim_conflict`；`complete_task` 携带 `result/evidence_refs` 且 `list_tasks` 可读；为 primary T4 冻结只含 create/list/claim/release/complete 的 tool schema/prompt，关闭 message、broadcast、artifact 工具 | B/T 使用/不使用、task-result adoption 与 T 指标当前不可完整重建；当前 runtime **没有单独关闭 T messaging/artifact 的配置面**，这是必须如实补齐的 implementation gap | 中：不能把 T semantics 泄给 B；不必删除既有后续接口 |
+| `harness/tools/specs.py`、`prompts.py` | 所有条件使用同一严格 finding JSON schema；完整payload原子校验，要求finding_id、canonical category/severity、typed locations、存在且可见的evidence refs、reproduction status/artifacts、confidence；错误可在剩余permits内修正；可增加共同`search_repo` tool | 防无结构输出并支持duplicate/lineage；把model format failure与infrastructure failure分开 | 中：schema过严可能增加invalid submissions，必须先mock/live smoke |
+| `harness/runner.py`、`evaluator/score.py` | 以category+normalized source+sink做deterministic fingerprint，merge/dedup并保留全部provenance；positive matcher强制source/sink；near miss确定计FP；unmatched进入review；输出precision/F1上下界；verification不信任自报 | 当前outcome可被浅filename猜测、自报verification和不完备GT下的单一precision污染 | 高：grader变化会改变分数；需冻结版本并补regression tests |
 | `tests/test_repository_semantics.py` 或 evaluator-private runner | 对 run snapshot 运行 private oracle，输出 oracle ID、命令、exit code、时间、finding link；Agent不可见 test名称/内容 | 产生真正 deterministic verification event | 中：import path/cache必须指向本 run，不得误测开发树 |
 | `analysis/analyze_run.py` | 实现第 7 节 duplicate、allocation、B、T、lineage和cost指标，写 `metrics.json` | 当前只有 token/基础 event count | 中：hypothesis semantic fingerprint只能作为近似，需保留分项 |
 | 新增薄 `run_block.py` 或等价 | 从一个 frozen block config 启动 S/P/B/T，固定 config hash、运行顺序、共同预算并生成 block manifest | 手工四条命令易漂移，无法证明 matched block | 低到中：不要把它发展成新 orchestration framework |
-| Tests | 增加 N=4 budget race、shell escape/network/env、B/T tool leak、claim conflict、message receipt、dedup、source-aware grader、snapshot oracle、block-config equality 测试 | 现有 35 测试未覆盖上述关键失效 | 低 |
+| Tests | 增加N=4 budget race、attempt/outcome/retry accounting、infrastructure-invalid fail-fast与整块停止、capability inventory、未注册tool拒绝、shell host/跨Agent/evaluator逃逸、真实断网/env scrub/target只读、B/T tool leak、primary T4 tool-surface exclusion、claim conflict、task-result receipt、atomic schema rejection与resubmit、evidence-ref visibility、dedup provenance、source/sink-aware grader、near-miss/unmatched/precision bounds、snapshot oracle、block-config equality测试 | 现有35测试未覆盖上述关键失效 | 低 |
+
+#### P0 实现依赖顺序
+
+1. **冻结协议面：**先定义 block config、requested/resolved model字段、condition capability inventory、finding schema、event IDs和所有hash输入；此步只固定合同，不先改行为。
+2. **事件与模型网关：**实现append-only event/transcript writer、call state machine、finish reason/usage/raw metadata、固定timeout与最多一次retry，使后续改造都能留下可reconcile证据。
+3. **预算与fail-fast：**实现共享32-permit原子池、无per-agent配额、soft token threshold、attempt outcome分类，以及run/block infrastructure-invalid即时停止。
+4. **能力边界与sandbox：**所有Agent可触发I/O/exec经dispatcher；实现bwrap、env allowlist、只读target、断网和live self-test，禁止unsafe fallback。
+5. **协调surface与lineage：**冻结B generic store和primary T4 minimal typed task state；补claim conflict、task result/evidence refs、shared/task read receipts，确保B/P看不到T semantics。
+6. **Finding intake与evaluator：**原子schema校验、可见evidence refs、source/sink-aware match、dedup provenance、near-miss/unmatched分类、precision bounds和snapshot oracle verification。
+7. **分析与block runner：**实现resource/duplicate/allocation/B/T/lineage指标、config equality、artifact reconciliation和完整block启动/停止；不得靠手工四条命令形成正式样本。
+8. **验证后再live：**依次通过harness tests、repository smoke、S/P/B/T mock smoke、budget race、sandbox self-test、grader regression、block abort/reconciliation；最后做一次不计入block的V4.1 Flash compatibility smoke。
+
+Live gate 要求上述1–8全部通过且工作树/config/artifact hashes已冻结。任一失败只能生成诊断产物，不能产生可用于coordination解释的live matched block。
 
 ### P1 — 强烈建议
 
 | 文件 | 需要修改什么 | 为什么 | 预计风险 |
 |---|---|---|---|
 | `analysis/compare_runs.py`（新增） | 汇总一个 block 为 CSV/Markdown，检查 config hash一致，输出 P/B/T duplicate和trace | 降低手工比较错误 | 低 |
+| messaging / artifact ablation | 仅在 primary T4 稳定后，设计 `send_message/list_messages/broadcast/publish_artifact/list_artifacts` 的独立启用条件、读回语义和 lineage | 避免把完整 team framework 的效果误归因给 task state | 中；不进入本轮 matched block |
 | `repositories/repository_pilot_v0/requirements.txt`、environment manifest | 冻结/记录实际 Python、OpenAI SDK、Flask/Jinja/requests版本 | 当前 requirements 用范围，已出现 requests dependency warning | 低 |
 | `README.md` | 修正 target smoke 的 cwd 和 analyze_run 的实际 run path | 当前根目录命令可复现失败 | 低 |
 | Composite v1（仅 starvation 后） | 匿名接入现有 `SSTI-PY-REPO-002` 作为第 6 near miss，更新 private provenance/oracle/version | 增加 N=4 余量并平衡 positive/near miss | 中：benchmark version变化，不得与v0混跑 |
@@ -471,7 +546,7 @@ message send/read/adoption（若启用）
 
 | 文件/组件 | 需要修改什么 | 为什么 | 预计风险 |
 |---|---|---|---|
-| `manager_worker` policy | 1 manager+3/15 worker、严格 star权限、manager metrics | M baseline | 高：同时引入多项 treatment |
+| `manager_worker` policy | 1 manager+3/15 worker、manager-only assignment/result channel、manager metrics；worker 不互相协调 | centralized-control M baseline | 高：同时引入多项 treatment，不能把它当作 star-topology baseline |
 | SQLite/event backend | 跨进程 atomic task、lease、recovery、durable queue | N=16/多进程稳定性 | 中到高；N=4 thread pilot不需要 |
 | repository-v1 / portfolio-v1 | 12–20 N16 work fronts、4–6 CWE、shared semantics、更多可执行 oracle | 当前 v0 对 N=16 明显 task-starved | 高：标注与有效性工作大 |
 | Tool compute arbiter | build/static/test CPU秒和分类额度 | 正式 fixed-global 需要控制替代性compute | 中 |
@@ -547,7 +622,7 @@ python3 experiments/emergent_coordination/run_experiment.py \
 
 ### 9.5 Execute one matched block
 
-下面是现有 CLI 能表达的真实调用形态。`<BLOCK_RUNS_DIR>` 必须替换为同一新 block 目录；S 用 32 steps，N=4 条件每 Agent 8 steps，使总 model-call opportunity 都是 32：
+下面是现有 CLI 能表达的真实调用形态。`<BLOCK_RUNS_DIR>` 必须替换为同一新 block 目录；所有 Agent 的 loop safety ceiling 都设为 32，实际 team model-call opportunity 由 P0 后的共享 32-permit pool 限制，不由 `max_steps` 均分：
 
 ```bash
 python3 experiments/emergent_coordination/run_experiment.py \
@@ -555,15 +630,15 @@ python3 experiments/emergent_coordination/run_experiment.py \
   --runs-dir <BLOCK_RUNS_DIR>
 
 python3 experiments/emergent_coordination/run_experiment.py \
-  --mode parallel --agents 4 --live --seed 17 --max-steps 8 \
+  --mode parallel --agents 4 --live --seed 17 --max-steps 32 \
   --runs-dir <BLOCK_RUNS_DIR>
 
 python3 experiments/emergent_coordination/run_experiment.py \
-  --mode raw_blackboard --agents 4 --live --seed 17 --max-steps 8 \
+  --mode raw_blackboard --agents 4 --live --seed 17 --max-steps 32 \
   --runs-dir <BLOCK_RUNS_DIR>
 
 python3 experiments/emergent_coordination/run_experiment.py \
-  --mode structured_team --agents 4 --live --seed 17 --max-steps 8 \
+  --mode structured_team --agents 4 --live --seed 17 --max-steps 32 \
   --runs-dir <BLOCK_RUNS_DIR>
 ```
 
@@ -583,7 +658,7 @@ python3 -m experiments.emergent_coordination.analysis.analyze_run \
 
 ### 9.7 Matched comparison
 
-对四个 run 验证：repository/prompt/common tool/model/request params/budget/grader hashes 一致；仅 mode、N、condition delta/tool capability按预注册变化。然后生成 security/resource/duplicate/allocation/B/T 指标、至少一条完整 lineage trace 和异常清单。
+对四个 run 验证：repository/prompt/common tool/model/request params/budget/grader hashes 一致；仅 mode、N、condition delta/tool capability按预注册变化。然后生成 security/resource/duplicate/allocation/B/T 指标、至少一条可 replay 的代表性 lineage 或 non-adoption trace 和异常清单。它用于检查记录质量，不要求发生跨 Agent coordination。
 
 如果第一 block 的机械 gate 通过，再以 seed/replicate 29 重跑；若 seed unsupported，明确写 `replicate_id=29, provider_seed=null`。第二 block 不得因第一 block 表现改变预算或 prompt。
 
@@ -597,8 +672,8 @@ experiments/emergent_coordination/runs/<block_id>/
   pilot_summary.csv
   pilot_report.md
   traces/
-    selected_complete_trace.json
-    selected_complete_trace.md
+    selected_representative_trace.json
+    selected_representative_trace.md
   <run_id>/
     run_manifest.json
     logs/events.jsonl
@@ -616,28 +691,28 @@ experiments/emergent_coordination/runs/<block_id>/
 
 `run_manifest.json` 至少保存：provider、exact resolved model、run date、API request params、temperature、max output、seed requested/accepted、reasoning config、tool schema与hash、system/common/delta prompt version/hash、repo/oracle hash、budget/cost价格、environment、git/dirty digest。
 
-`events.jsonl` 至少可关联：Agent LLM/tool/store/task/message/finding/verifier事件；`metrics.json` 给机器读；`pilot_summary.csv` 每 run一行并保留分项指标；`pilot_report.md` 只给 feasibility 结论，不写架构排名。
+`events.jsonl` 至少可关联：Agent LLM/tool/store/task/finding/verifier事件，以及 event ID、全局sequence、logical step、call/tool ID、parent refs、task creator/claimer/completer、shared artifact creator/reader、finding/evidence refs、deterministic verification link、UTC/monotonic timestamp、duration、outcome与budget progress。正文不塞入event stream；每Agent的append-only transcript保存实际发送给provider的消息、tool schema引用、assistant内容/tool calls、finish reason、实际交付给模型的截断后tool result和脱敏response metadata。`metrics.json`给机器读；`pilot_summary.csv`每run一行并保留分项指标；`pilot_report.md`只给feasibility结论，不写architecture ranking。记录完整lineage是P0；由其派生Temporal Interaction Graph不是P0。
 
-一条“完整 multi-agent trace”的完成条件：能从 A 的 evidence/shared/task/message origin，经过 B 的 read/adoption和后续调查，连到最终 finding及 deterministic verifier；若没有跨 Agent adoption，也应输出一条“write/read但未形成后续采用”的完整 negative trace。
+代表性 trace 的最低要求是可从原始 event/evidence/task/store lineage replay。若发生跨 Agent 信息流，完整 trace 可从 A 的 evidence/shared/task-result origin，经 B 的 read/adoption 和后续调查，连到最终 finding 与 deterministic verifier；若只有 write/read 未采用，则输出该 negative trace；若 B/T 完全未采用 coordination primitive，则输出 capability-available-but-not-adopted trace。后三者都属于有效观察，不能把 run 判为无效或人工制造 coordination。
 
 ## 11. Risks / Threats to Validity
 
-- **Model drift / provider non-versioning：**`deepseek-v4-pro` 可能是可变 alias，provider也可能不返回版本。保存精确字符串、日期、响应 metadata/system fingerprint（若有）和请求参数；同 block尽量连续运行，但不能声称后续可完全复现。
+- **Model drift / provider non-versioning：**`deepseek-flash` 是请求 alias，provider可能更新其指向或不返回精确版本。保存requested alias、resolved string/version、日期、response metadata/system fingerprint（若有）和请求参数；同block尽量连续运行，但不能声称后续可完全复现。
 - **Seed 不真实：**当前 seed只进 manifest，不进 API。provider不支持时使用 replicate_id，单次差异视为采样噪声。
 - **Benchmark task starvation：**5 条浅链只勉强支持 N=4；高 duplicate/idle 可能来自 repo 太小。用 front-over-time 判据，失败时只得出 benchmark undersized，不得让 Agent人为重复采样伪造并行度。
-- **Architecture leakage：**T/B 增量 prompt和tool schema是 treatment，但 common audit方法、repo权限、finding schema必须相同。保存 schema/prompt diff，自动拒绝意外额外工具。
-- **Token budget unfairness：**S 若只有 8 steps就无法用 team budget；并发 post-call charge会超支。用 pre-call permit + S32/team 4×8，并报告实际 raw usage与stranded quota。
+- **Coordination-affordance leakage：**T/B 增量 prompt和tool schema是 treatment，但 common audit方法、repo权限、finding schema必须相同。保存 schema/prompt diff，自动拒绝意外额外工具；尤其不得把 T 的 typed primitive 泄给 B/P。
+- **Call budget unfairness：**S 若只有 8 steps 就无法使用完整 team budget；若 P/B/T 固定每 Agent 8 calls，又会压平 coordination condition 自身的资源分配。所有 Agent 使用 32-step 非约束性 loop ceiling，由共享 pre-call permit pool 将 condition 总 attempted calls 严格限制为 32，并报告实际 per-agent allocation、raw token usage 与未使用 permits。
 - **Tool compute substitution：**只控 LLM calls时，某 condition可能用更多 shell/tests弥补。Pilot至少统一工具、记录分类 tool calls/CPU时间并设宽松共同上限；正式实验再精细控制。
 - **Shared filesystem contamination：**当前 shell可接触宿主机、target可被 shell修改，B之外也可能形成隐式共享。bwrap bind policy、run唯一目录、只读 target、scrub env和越界测试是 live gate。
 - **Hidden oracle leakage：**`evaluator_private` 路径过滤不是安全边界。只有 OS mount namespace中根本不可见才算隔离；日志/异常也不能回显 host path或ground-truth名。
 - **B 被意外结构化：**不得预建 `/shared/tasks`、namespace、agent目录、README、owner字段、通知、CAS/lock或解析 task-like文件。Analyzer只能事后读，不可在运行中改变 store语义。
 - **B substrate choice：**create-only + append降低 overwrite冲突，可能比普通 KV更利于协议。将它视为冻结的 B-aware v0 substrate，不能泛化到所有 raw store。
-- **T treatment bundling：**task claim + messages + artifacts 同时启用时，无法把收益单独归因给 claim。Pilot主张只到“structured coordination bundle可运行”；正式研究再做 claim/message ablation。
+- **T treatment bundling：**task claim + messages + artifacts 同时启用时，无法把收益单独归因给 typed task state，也会重新引入显式 communication network。primary T4 只启用最小 task API；message/artifact 只能在后续独立 extension/ablation 中研究。
 - **Atomicity范围：**当前 `threading.Lock` 只对一个 Python进程有效。N=4 thread runner可接受；跨进程/N=16不能宣称原子，需 SQLite事务/文件锁服务。
-- **Deterministic grader limitations：**规则 grader可能接受措辞投机或漏掉同义描述。收紧 source/sink并保留 per-finding explanation；pilot 可做盲人工抽查，但不引入 condition-specific LLM judge。
+- **Deterministic grader limitations：**规则 grader可能接受措辞投机或漏掉同义描述。收紧source/sink、校验evidence refs并保留per-finding explanation；unmatched做condition-blind人工复核时不得回写当前block，也不引入condition-specific LLM judge。
 - **Verification validity：**benchmark oracle通过证明 snapshot语义，不自动证明 Agent真的独立复现。分别报告 `oracle_verified`、`agent_attempted`、`agent_reproduced`，不能合并。
 - **Near-miss policy validity：**网络/DNS等现实残余风险不在 synthetic模型内。评分遵循冻结 benchmark语义，报告不应外推为生产安全证明。
-- **Off-target findings：**composite ground truth不是所有可能问题的完备证明。unmatched finding先标 `unmatched/review`；不要未经人工核验一律当现实 FP。正式 precision需更完整标注。
+- **Off-target findings：**composite ground truth不是所有可能问题的完备证明。合法unmatched finding标`unmatched_review`，分别输出将其全部视为FP的closed-world precision lower bound与排除它们的labeled-only upper bound；不得把任一边界冒充正式全仓precision。
 - **Dependency/environment drift：**当前 target requirements未完全 pin，测试还出现 requests dependency warning。保存环境版本，避免不同 condition临时安装不同依赖/cache。
 - **Single-seed pilot：**1–2 block只验证 harness、task supply与trace，不支持统计显著性或架构排名；廉价模型结果不得与未来不同模型的 N=16直接比较。
 - **历史结果不可合并：**DeepAudit/IRIS/OpenAnt 使用不同 prompt、tools、模型行为与预算，其 canonical结果只能帮助识别风险，不能加入本 pilot分数表。
@@ -653,18 +728,30 @@ experiments/emergent_coordination/runs/<block_id>/
 repository_pilot_v0
 × S1 / P4 / B4-aware / T4
 × 1 matched block
-× 当前可用的同一 DeepSeek-compatible exact model/config
+× 同一 requested `deepseek-flash` + resolved V4.1 Flash exact model/config
 × 32 team call permits + 1024 max output/call
 ```
 
 Live gate 只要求 P0 中最影响因果可信度的五组能力完成并通过测试：
 
-1. bwrap private/hidden-oracle/network/env isolation；
-2. pre-call global call permit与 S/team公平 step ceiling；
-3. event/message/shared/task/finding/verifier可关联日志；
+1. Agent capability inventory 闭合，且 bwrap private/hidden-oracle/network/env/target-readonly isolation fail-closed；
+2. pre-call global call permit、无 per-agent 配额且所有 Agent 使用同一非约束性 loop safety ceiling；
+3. event/shared/task/finding/verifier可关联日志，以及完整 event/evidence/task/store lineage；
 4. deterministic schema validation、source-aware scoring和真实 dedup；
 5. duplicate/allocation/B/T/cost metrics及 block config equality检查。
 
 如果这些 gate 没完成，允许跑 mock/compatibility smoke，但结论应是“harness仍未具备可解释 live pilot条件”，而不是用不可信数据补齐矩阵。M4、第二 repo、N=16、lease/crash recovery和复杂 budget scheduler都不应挤占这次最小实验。
 
-本 pilot 的成功结论应限定为：S/P/B/T 能否在一个 harness 下隔离运行、统一记账；v0 是否至少提供 4 个实际活跃 front；P/B/T 的重复工作能否量化；B 是否真的发生 store行为；T 的原子 claim是否真的被使用；以及能否导出至少一条完整或明确的 negative cross-agent trace。它不回答 B/T/M 谁更强。
+本 pilot 的成功结论应限定为：
+
+1. S/P/B/T 能否在统一 harness 中运行，且 P/B/T isolation 正确；
+2. same-global-budget proxy 是否工作；
+3. v0 是否至少提供 N=4 的基础 work supply；
+4. duplicate work 是否可测；
+5. evidence/task/store lineage 是否可记录；
+6. B capability 是否可用，且其实际使用或不使用均可观测；
+7. T task-state capability 是否可用，且其实际使用或不使用均可观测；
+8. deterministic finding evaluation 是否工作；
+9. 第一批 trace 是否足以判断后续哪些行为分析值得继续。
+
+它不要求 B 一定形成 protocol、T 一定大量 claim、任何 condition 一定 outperform，或 interaction graph 一定出现明显结构。若 `P4 ≈ B4 ≈ T4`，或 B/T 几乎不用 coordination primitive，也不能直接视为 pilot failure；这可能正是“当前模型 + 当前 benchmark 下，coordination affordance 没有被利用或没有带来明显价值”的重要信号。它不回答 B/T/M 谁更强。

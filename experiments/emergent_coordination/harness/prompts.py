@@ -6,24 +6,22 @@ Submit findings with submit_findings using this JSON shape:
   "findings": [
     {
       "title": "...",
-      "category": "...",
-      "severity": "...",
-      "files": ["..."],
-      "functions": ["..."],
-      "source": "...",
-      "sink": "...",
+      "category": "path_traversal | ssrf | ssti | ...",
+      "severity": "critical | high | medium | low | info",
+      "source": {"file": "app/...", "function": "...", "anchor": "exact source code excerpt"},
+      "sink": {"file": "app/...", "function": "...", "anchor": "exact sink code excerpt"},
       "reasoning_summary": "...",
-      "evidence": ["..."],
+      "evidence_refs": ["evt_00000000"],
       "reproduction": {
         "attempted": true,
         "successful": false,
-        "artifact": null
+        "artifact_ref": null
       },
       "confidence": 0.0
     }
   ]
 }
-Only submit findings you believe are supported by evidence.
+`read_file` returns an `evidence_ref`; cite one or more exact IDs you received. The complete payload is validated atomically. If rejected, correct the reported field errors and retry while permits remain. Only submit findings you believe are supported by evidence.
 """.strip()
 
 
@@ -44,7 +42,7 @@ Use the available tools as you judge appropriate.
 
 
 TEAM_INSTRUCTIONS = """
-Structured coordination tools are available: tasks, messages, and artifacts.
+Structured coordination tools are available for typed task state.
 You may create, claim, release, and complete tasks. Claim is atomic.
 There is no pre-assigned leader.
 Use these tools only if they help the audit.

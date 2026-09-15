@@ -2,29 +2,85 @@ from __future__ import annotations
 
 import json
 import os
-import re
+import shutil
 import subprocess
 from pathlib import Path
 from typing import Any, Callable
 
 from experiments.emergent_coordination.harness.events import EventLog
+from experiments.emergent_coordination.harness.findings import validate_evidence_refs, validate_payload
 from experiments.emergent_coordination.harness.shared_fs import SharedFilesystem, SharedFilesystemError
 from experiments.emergent_coordination.harness.task_board import CoordinationError, TaskBoard
 from experiments.emergent_coordination.harness.workspace import WorkspaceLayout, sha256_text
 
-FORBIDDEN_SHELL_MARKERS = (
-    "evaluator_private",
-    "ground_truth",
-    "datasets/synthetic",
-    "canonical_results",
-    "PT-PY-REPO",
-    "SSRF-PY-REPO",
-    "SSTI-PY-REPO",
-)
-
-
 class ToolError(Exception):
     pass
+
+
+class SandboxUnavailable(ToolError):
+    pass
+
+
+def assert_os_sandbox_ready() -> None:
+    """Fail before a live run if bubblewrap cannot form the required namespace."""
+    binary = shutil.which("bwrap")
+    if binary is None:
+        raise SandboxUnavailable("OS sandbox unavailable; shell execution is refused")
+    command = _bwrap_base(binary) + ["--dir", "/work", "--chdir", "/work", "/bin/sh", "-lc", "exit 0"]
+    try:
+        completed = subprocess.run(command, capture_output=True, text=True, timeout=10, env={})
+    except (OSError, subprocess.SubprocessError) as exc:
+        raise SandboxUnavailable("OS sandbox unavailable; shell execution is refused") from exc
+    if completed.returncode != 0:
+        raise SandboxUnavailable("OS sandbox unavailable; shell execution is refused")
+
+
+def _bwrap_base(binary: str) -> list[str]:
+    """Minimal immutable runtime mount set; agent state is added separately."""
+    command = [
+        binary,
+        "--die-with-parent",
+        "--new-session",
+        "--unshare-net",
+        "--unshare-pid",
+        "--unshare-ipc",
+        "--unshare-uts",
+        "--clearenv",
+        "--setenv",
+        "PATH",
+        "/usr/bin:/bin",
+        "--setenv",
+        "HOME",
+        "/work/scratch",
+        "--setenv",
+        "TMPDIR",
+        "/tmp",
+        "--setenv",
+        "PWD",
+        "/work",
+        "--ro-bind",
+        "/usr",
+        "/usr",
+        "--symlink",
+        "usr/bin",
+        "/bin",
+        "--symlink",
+        "usr/sbin",
+        "/sbin",
+        "--ro-bind",
+        "/lib",
+        "/lib",
+        "--ro-bind",
+        "/lib64",
+        "/lib64",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+    ]
+    return command
 
 
 class AgentSandbox:
@@ -46,6 +102,7 @@ class AgentSandbox:
         shared: SharedFilesystem | None = None,
         board: TaskBoard | None = None,
         internet: bool = False,
+        require_os_sandbox: bool = False,
         submit_callback: Callable[[str, dict[str, Any]], None] | None = None,
     ):
         self.agent_id = agent_id
@@ -54,11 +111,16 @@ class AgentSandbox:
         self.shared = shared
         self.board = board
         self.internet = internet
+        self.require_os_sandbox = require_os_sandbox
         self.submit_callback = submit_callback
         self.private_root = layout.agent_private(agent_id)
         self.target_root = layout.agent_target(agent_id)
         self.scratch_root = layout.agent_scratch(agent_id)
         self._submitted: dict[str, Any] | None = None
+        self.submission_attempts = 0
+        self.invalid_submission_attempts = 0
+        if self.require_os_sandbox:
+            assert_os_sandbox_ready()
 
     def _resolve_private(self, relative: str) -> Path:
         if not relative:
@@ -92,17 +154,19 @@ class AgentSandbox:
         )
         return entries
 
-    def read_file(self, relative: str) -> str:
+    def read_file(self, relative: str) -> dict[str, str]:
         path = self._resolve_private(relative)
         if not path.is_file():
             raise ToolError(f"not a file: {relative}")
         text = path.read_text(encoding="utf-8", errors="replace")
-        self.event_log.emit(
+        event = self.event_log.emit(
             "file_read",
             agent_id=self.agent_id,
             payload={"path": relative, "bytes": len(text.encode("utf-8")), "content_hash": sha256_text(text)},
         )
-        return text
+        # The opaque event ID is the only accepted finding evidence reference.
+        # It lets the evaluator prove the submitting agent actually saw this file.
+        return {"evidence_ref": event["event_id"], "path": relative, "content": text}
 
     def write_file(self, relative: str, content: str) -> str:
         path = self._resolve_private(relative)
@@ -119,27 +183,31 @@ class AgentSandbox:
         return relative
 
     def run_shell(self, command: str, timeout: int = 30) -> dict[str, Any]:
-        lowered = command.lower()
-        if any(marker.lower() in lowered for marker in FORBIDDEN_SHELL_MARKERS):
-            raise ToolError("command is not allowed: host/evaluator-private paths are blocked")
-        if ".." in command or re.search(r"(/home/|/etc/|/var/|/usr/|/proc/)", command):
-            raise ToolError("command is not allowed: host filesystem paths are blocked")
-        env = os.environ.copy()
-        env["HOME"] = str(self.scratch_root)
-        env["PWD"] = str(self.private_root)
-        if not self.internet:
-            env["NO_PROXY"] = "*"
-            env["no_proxy"] = "*"
-            env["HTTP_PROXY"] = ""
-            env["HTTPS_PROXY"] = ""
-            env["http_proxy"] = ""
-            env["https_proxy"] = ""
+        if timeout <= 0:
+            raise ToolError("timeout must be positive")
+        binary = shutil.which("bwrap")
+        if binary is None:
+            raise SandboxUnavailable("OS sandbox unavailable; shell execution is refused")
+        shell_command = _bwrap_base(binary) + [
+            "--dir",
+            "/work",
+            "--ro-bind",
+            str(self.target_root.resolve()),
+            "/work/target",
+            "--bind",
+            str(self.scratch_root.resolve()),
+            "/work/scratch",
+            "--chdir",
+            "/work",
+            "/bin/sh",
+            "-lc",
+            command,
+        ]
         try:
             completed = subprocess.run(
-                command,
-                shell=True,
-                cwd=self.private_root,
-                env=env,
+                shell_command,
+                cwd=self.scratch_root,
+                env={},
                 capture_output=True,
                 text=True,
                 timeout=timeout,
@@ -155,6 +223,8 @@ class AgentSandbox:
                 "stdout": (exc.stdout or "")[-8000:] if isinstance(exc.stdout, str) else "",
                 "stderr": f"timeout after {timeout}s",
             }
+        except OSError as exc:
+            raise SandboxUnavailable("OS sandbox unavailable; shell execution is refused") from exc
         self.event_log.emit(
             "tool_call",
             agent_id=self.agent_id,
@@ -212,9 +282,14 @@ class AgentSandbox:
         except CoordinationError as exc:
             raise ToolError(str(exc)) from exc
 
-    def complete_task(self, task_id: str, result_artifacts: list[str] | None = None) -> dict[str, Any]:
+    def complete_task(
+        self,
+        task_id: str,
+        result: str | None = None,
+        evidence_refs: list[str] | None = None,
+    ) -> dict[str, Any]:
         try:
-            return self._board().complete_task(self.agent_id, task_id, result_artifacts)
+            return self._board().complete_task(self.agent_id, task_id, result, evidence_refs)
         except CoordinationError as exc:
             raise ToolError(str(exc)) from exc
 
@@ -231,16 +306,57 @@ class AgentSandbox:
         return self._board().list_artifacts(self.agent_id)
 
     def submit_findings(self, findings: dict[str, Any] | list[Any]) -> dict[str, Any]:
+        self.submission_attempts += 1
         if isinstance(findings, list):
             payload = {"findings": findings}
         elif isinstance(findings, dict) and "findings" in findings:
             payload = findings
         else:
             payload = {"findings": [findings]}
-        self._submitted = payload
-        self.event_log.emit("finding_submitted", agent_id=self.agent_id, payload={"count": len(payload.get("findings", []))})
+        intake = validate_payload(payload)
+        errors = list(intake.errors)
+        if intake.accepted:
+            all_events = self.event_log.read_all()
+            file_reads = {
+                event["event_id"]: str((event.get("payload") or {}).get("path") or "")
+                for event in all_events
+                if event.get("event_type") == "file_read"
+            }
+            directly_read = {
+                event["event_id"]
+                for event in all_events
+                if event.get("agent_id") == self.agent_id and event.get("event_type") == "file_read"
+            }
+            task_observed = {
+                reference
+                for event in all_events
+                if event.get("agent_id") == self.agent_id and event.get("event_type") == "task_result_observed"
+                for reference in ((event.get("payload") or {}).get("evidence_refs") or [])
+            }
+            evidence_events = {
+                reference: file_reads[reference]
+                for reference in directly_read | task_observed
+                if reference in file_reads
+            }
+            errors.extend(validate_evidence_refs(intake.payload or {}, evidence_events))
+        if errors:
+            self.invalid_submission_attempts += 1
+            self.event_log.emit(
+                "finding_submission_rejected",
+                agent_id=self.agent_id,
+                payload={"error_count": len(errors), "errors": errors},
+                outcome="rejected",
+            )
+            return {"ok": False, "errors": errors, "retry_allowed": True}
+        self._submitted = intake.payload
+        self.event_log.emit(
+            "finding_submitted",
+            agent_id=self.agent_id,
+            payload={"count": len(payload.get("findings", []))},
+            outcome="accepted",
+        )
         if self.submit_callback:
-            self.submit_callback(self.agent_id, payload)
+            self.submit_callback(self.agent_id, intake.payload or {"findings": []})
         return {"ok": True, "count": len(payload.get("findings", []))}
 
     def _board(self) -> TaskBoard:

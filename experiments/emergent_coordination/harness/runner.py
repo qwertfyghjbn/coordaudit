@@ -12,7 +12,7 @@ from typing import Any
 from experiments.emergent_coordination.evaluator.score import evaluate_findings, load_ground_truth
 from experiments.emergent_coordination.harness.agent_loop import AgentRunner
 from experiments.emergent_coordination.harness.budget import BudgetTracker
-from experiments.emergent_coordination.harness.events import EventLog, utc_now
+from experiments.emergent_coordination.harness.events import EventLog, TranscriptLog, reconcile_run, utc_now
 from experiments.emergent_coordination.harness.llm.client import LLMClient
 from experiments.emergent_coordination.harness.paths import (
     DEFAULT_RUNS_DIR,
@@ -26,7 +26,7 @@ from experiments.emergent_coordination.harness.paths import (
 from experiments.emergent_coordination.harness.policies.base import CoordinationPolicy, get_policy
 from experiments.emergent_coordination.harness.shared_fs import SharedFilesystem
 from experiments.emergent_coordination.harness.task_board import TaskBoard
-from experiments.emergent_coordination.harness.tools.sandbox import AgentSandbox
+from experiments.emergent_coordination.harness.tools.sandbox import AgentSandbox, assert_os_sandbox_ready
 from experiments.emergent_coordination.harness.workspace import WorkspaceLayout, prepare_run_workspace
 
 
@@ -35,9 +35,12 @@ class RunConfig:
     mode: str
     agent_count: int
     model: str = "mock"
+    model_profile: dict[str, Any] | None = None
     seed: str = "0"
     budgets: dict[str, Any] | None = None
     max_steps: int = 12
+    max_provider_retries: int = 0
+    require_os_sandbox: bool = False
     run_id: str | None = None
     runs_dir: Path = DEFAULT_RUNS_DIR
     evaluate: bool = True
@@ -50,6 +53,7 @@ class RunContext:
         config: RunConfig,
         layout: WorkspaceLayout,
         event_log: EventLog,
+        transcript_log: TranscriptLog,
         budget: BudgetTracker,
         llm: LLMClient,
         policy: CoordinationPolicy,
@@ -59,6 +63,7 @@ class RunContext:
         self.config = config
         self.layout = layout
         self.event_log = event_log
+        self.transcript_log = transcript_log
         self.budget = budget
         self.llm = llm
         self.policy = policy
@@ -78,6 +83,7 @@ class RunContext:
             shared=self.shared if self.policy.enable_shared else None,
             board=self.board if self.policy.enable_board else None,
             internet=False,
+            require_os_sandbox=self.config.require_os_sandbox,
             submit_callback=self._on_submit,
         )
         runner = AgentRunner(
@@ -87,8 +93,10 @@ class RunContext:
             sandbox=sandbox,
             llm=self.llm,
             event_log=self.event_log,
+            transcript_log=self.transcript_log,
             budget=self.budget,
             max_steps=self.config.max_steps,
+            max_provider_retries=self.config.max_provider_retries,
         )
         return runner.run()
 
@@ -139,6 +147,10 @@ def run_experiment(config: RunConfig, llm: LLMClient) -> dict[str, Any]:
         raise ValueError("single mode requires agent_count=1")
     if config.agent_count < 1:
         raise ValueError("agent_count must be >= 1")
+    if config.model != "mock" and not config.require_os_sandbox:
+        raise ValueError("live runs require fail-closed OS sandbox verification")
+    if config.require_os_sandbox:
+        assert_os_sandbox_ready()
 
     run_id = config.run_id or f"{config.mode}_n{config.agent_count}_{utc_now().replace(':', '').replace('-', '')}_{uuid.uuid4().hex[:8]}"
     run_dir = Path(config.runs_dir) / run_id
@@ -152,12 +164,15 @@ def run_experiment(config: RunConfig, llm: LLMClient) -> dict[str, Any]:
         provenance=None,
     )
     event_log = EventLog(layout.logs / "events.jsonl", run_id=run_id)
+    transcript_log = TranscriptLog(layout.logs / "transcripts", run_id=run_id, event_log=event_log)
     budgets = config.budgets or {}
     budget = BudgetTracker(
         global_input_token_cap=budgets.get("global_input_token_cap"),
         global_output_token_cap=budgets.get("global_output_token_cap"),
         per_agent_token_cap=budgets.get("per_agent_token_cap"),
         max_llm_calls=budgets.get("max_llm_calls"),
+        hard_team_call_permits=budgets.get("hard_team_call_permits"),
+        token_stop_threshold=budgets.get("token_stop_threshold"),
         wall_clock_timeout=budgets.get("wall_clock_timeout"),
     )
     shared = SharedFilesystem(layout.shared, event_log, layout.artifacts / "shared_snapshots") if policy.enable_shared else None
@@ -169,8 +184,11 @@ def run_experiment(config: RunConfig, llm: LLMClient) -> dict[str, Any]:
         "mode": config.mode,
         "agent_count": config.agent_count,
         "model": config.model,
+        "model_profile": config.model_profile or {"requested_model": config.model},
         "seed": config.seed,
         "budgets": budgets,
+        "max_provider_retries": config.max_provider_retries,
+        "require_os_sandbox": config.require_os_sandbox,
         "start_time": utc_now(),
         "git_commit": git_commit(REPO_ROOT),
         "experiment_manifest": str(MANIFEST_PATH),
@@ -182,6 +200,7 @@ def run_experiment(config: RunConfig, llm: LLMClient) -> dict[str, Any]:
         config=config,
         layout=layout,
         event_log=event_log,
+        transcript_log=transcript_log,
         budget=budget,
         llm=llm,
         policy=policy,
@@ -196,18 +215,36 @@ def run_experiment(config: RunConfig, llm: LLMClient) -> dict[str, Any]:
         encoding="utf-8",
     )
 
+    invalid_submissions = sum(int(item.get("invalid_submission_attempts", 0)) for item in agent_results)
     evaluation = None
     if config.evaluate:
         gt_path = layout.evaluator_private / "ground_truth.json"
         if not gt_path.exists():
             gt_path = GROUND_TRUTH_PATH
         ground_truth = load_ground_truth(gt_path)
-        evaluation = evaluate_findings(merged, ground_truth)
+        evaluation_bundle = evaluate_findings(merged, ground_truth, invalid_submissions=invalid_submissions)
+        evaluation = evaluation_bundle["public"]
         (run_dir / "evaluation.json").write_text(
             json.dumps(evaluation, indent=2, ensure_ascii=False),
             encoding="utf-8",
         )
+        (layout.evaluator_private / "verification.json").write_text(
+            json.dumps(evaluation_bundle["private"], indent=2, ensure_ascii=False),
+            encoding="utf-8",
+        )
 
+    budget_snapshot = budget.snapshot()
+    validity = classify_infrastructure_validity(budget_snapshot, agent_results)
+    preliminary_reconciliation = reconcile_run(event_log, transcript_log, budget_snapshot)
+    validity = _combine_validity(validity, preliminary_reconciliation)
+    event_log.emit(
+        "run_finished",
+        payload={"merged_finding_count": len(merged), "run_validity": validity["status"]},
+        outcome=validity["status"],
+        budget_progress=budget_snapshot,
+    )
+    reconciliation = reconcile_run(event_log, transcript_log, budget_snapshot)
+    validity = _combine_validity(classify_infrastructure_validity(budget_snapshot, agent_results), reconciliation)
     summary = {
         "run_id": run_id,
         "run_dir": str(run_dir),
@@ -218,14 +255,74 @@ def run_experiment(config: RunConfig, llm: LLMClient) -> dict[str, Any]:
                 "agent_id": item["agent_id"],
                 "stop_reason": item["stop_reason"],
                 "finding_count": len((item.get("findings") or {}).get("findings") or []),
+                "submission_attempts": item.get("submission_attempts", 0),
+                "invalid_submission_attempts": item.get("invalid_submission_attempts", 0),
             }
             for item in agent_results
         ],
         "merged_finding_count": len(merged),
-        "budget": budget.snapshot(),
+        "invalid_submissions": invalid_submissions,
+        "budget": budget_snapshot,
+        "run_validity": validity,
+        "reconciliation": reconciliation,
         "evaluation": evaluation,
         "end_time": utc_now(),
     }
-    event_log.emit("run_finished", payload={"merged_finding_count": len(merged)})
     (run_dir / "summary.json").write_text(json.dumps(summary, indent=2, ensure_ascii=False, default=str), encoding="utf-8")
+    # Every completed run carries a machine-readable observational metric file.
+    # Imported lazily to keep the runtime/analysis dependency one-way.
+    from experiments.emergent_coordination.analysis.analyze_run import analyze_run
+
+    analyze_run(run_dir, write=True)
     return summary
+
+
+def classify_infrastructure_validity(
+    budget_snapshot: dict[str, Any], agent_results: list[dict[str, Any]]
+) -> dict[str, Any]:
+    """Apply ADR-0002's provider-failure validity rule to a completed run."""
+    ledger = budget_snapshot.get("permit_ledger") or []
+    failures = [entry for entry in ledger if entry.get("outcome") in {"timeout", "provider_error"}]
+    if not failures:
+        return {"status": "valid", "provider_failure_attempts": 0, "reasons": []}
+    if len(failures) >= 2:
+        return {
+            "status": "infrastructure_invalid",
+            "provider_failure_attempts": len(failures),
+            "reasons": ["two_or_more_provider_failure_attempts"],
+        }
+    failed = failures[0]
+    recovered = any(
+        entry.get("agent_id") == failed.get("agent_id")
+        and entry.get("outcome") == "succeeded"
+        and int(entry.get("attempt_number", 0)) > int(failed.get("attempt_number", 0))
+        for entry in ledger
+    )
+    agent_terminated = any(
+        result.get("agent_id") == failed.get("agent_id") and result.get("stop_reason") == "error" for result in agent_results
+    )
+    if not recovered or agent_terminated:
+        return {
+            "status": "infrastructure_invalid",
+            "provider_failure_attempts": 1,
+            "reasons": ["unrecovered_provider_failure_terminated_agent"],
+        }
+    return {
+        "status": "valid_with_infrastructure_warning",
+        "provider_failure_attempts": 1,
+        "reasons": ["single_recovered_provider_failure"],
+    }
+
+
+def _combine_validity(provider_validity: dict[str, Any], reconciliation: dict[str, Any]) -> dict[str, Any]:
+    """Transcript/index failures override otherwise valid provider accounting."""
+    if reconciliation.get("status") == "valid":
+        return provider_validity
+    reasons = list(provider_validity.get("reasons") or []) + [
+        f"transcript_reconciliation:{reason}" for reason in reconciliation.get("reasons") or []
+    ]
+    return {
+        "status": "infrastructure_invalid",
+        "provider_failure_attempts": provider_validity.get("provider_failure_attempts", 0),
+        "reasons": sorted(set(reasons)),
+    }
