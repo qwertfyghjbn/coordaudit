@@ -6,7 +6,7 @@ import unittest
 from types import SimpleNamespace
 from unittest import mock
 
-from experiments.emergent_coordination.harness.llm.client import OpenAICompatibleClient
+from experiments.emergent_coordination.harness.llm.client import OpenAICompatibleClient, client_from_env
 
 
 class _FakeCompletions:
@@ -75,6 +75,24 @@ class OpenAICompatibleClientTest(unittest.TestCase):
         self.assertEqual(response.model_metadata["requested_model"], "deepseek-flash")
         self.assertEqual(response.model_metadata["resolved_model"], "deepseek-flash-resolved")
         self.assertEqual(response.model_metadata["system_fingerprint"], "fp_test")
+
+    def test_client_from_env_normalizes_crlf_sourced_values(self):
+        environment = {
+            "LLM_API_KEY": "test-key\r",
+            "LLM_BASE_URL": "https://provider.example/\r",
+            "LLM_MODEL": "deepseek-flash\r",
+            "LLM_THINKING_MODE": "disabled\r",
+        }
+        with mock.patch.dict(sys.modules, {"openai": types.SimpleNamespace(OpenAI=_FakeOpenAI)}), mock.patch.dict(
+            "os.environ", environment, clear=True
+        ):
+            client = client_from_env()
+
+        self.assertIsNotNone(client)
+        self.assertEqual(client.model, "deepseek-flash")
+        self.assertEqual(client.thinking_mode, "disabled")
+        self.assertEqual(_FakeOpenAI.latest.init_kwargs["api_key"], "test-key")
+        self.assertEqual(_FakeOpenAI.latest.init_kwargs["base_url"], "https://provider.example/")
 
 
 if __name__ == "__main__":

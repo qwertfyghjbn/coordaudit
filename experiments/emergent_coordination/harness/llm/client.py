@@ -153,13 +153,22 @@ def client_from_env(
     thinking_mode: str | None = None,
     max_tokens: int = 1024,
 ) -> OpenAICompatibleClient | None:
-    api_key = os.environ.get("LLM_API_KEY") or os.environ.get("OPENAI_API_KEY")
+    api_key = _environment_value("LLM_API_KEY", "OPENAI_API_KEY")
     if not api_key:
         return None
     return OpenAICompatibleClient(
         api_key=api_key,
-        base_url=os.environ.get("LLM_BASE_URL") or os.environ.get("OPENAI_BASE_URL"),
-        model=model or os.environ.get("LLM_MODEL") or os.environ.get("OPENAI_MODEL") or "unknown",
-        thinking_mode=thinking_mode or os.environ.get("LLM_THINKING_MODE") or "disabled",
+        base_url=_environment_value("LLM_BASE_URL", "OPENAI_BASE_URL"),
+        model=(model or _environment_value("LLM_MODEL", "OPENAI_MODEL") or "unknown").strip(),
+        thinking_mode=(thinking_mode or _environment_value("LLM_THINKING_MODE") or "disabled").strip(),
         max_tokens=max_tokens,
     )
+
+
+def _environment_value(*names: str) -> str | None:
+    """Read the first configured value and tolerate CRLF-sourced env files."""
+    for name in names:
+        value = os.environ.get(name)
+        if value:
+            return value.strip()
+    return None
