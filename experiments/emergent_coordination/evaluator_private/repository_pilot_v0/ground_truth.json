@@ -1,0 +1,315 @@
+{
+  "repository_id": "repo_pilot_v0",
+  "version": "v0",
+  "findings": [
+    {
+      "id": "GT-001",
+      "source_case": "PT-PY-REPO-001",
+      "category": "path_traversal",
+      "expected_status": "positive",
+      "severity": "high",
+      "locations": [
+        {
+          "file": "app/common/storage.py",
+          "function": "read_file",
+          "line_start": 6,
+          "line_end": 13
+        },
+        {
+          "file": "app/services/file_service.py",
+          "function": "get_file_content"
+        },
+        {
+          "file": "app/routes/files.py",
+          "function": "download"
+        }
+      ],
+      "required_semantics": {
+        "source": {
+          "file": "app/routes/files.py",
+          "function": "download",
+          "code_snippet": "filename = request.args.get(\"filename\", \"\")"
+        },
+        "propagation": [
+          {
+            "file": "app/routes/files.py",
+            "function": "download",
+            "code_snippet": "content = _service.get_file_content(filename)"
+          },
+          {
+            "file": "app/services/file_service.py",
+            "function": "get_file_content",
+            "code_snippet": "return read_file(filename)"
+          },
+          {
+            "file": "app/common/storage.py",
+            "function": "read_file",
+            "code_snippet": "file_path = os.path.join(BASE_DIR, filename)"
+          }
+        ],
+        "sink": {
+          "file": "app/common/storage.py",
+          "function": "read_file",
+          "code_snippet": "with open(file_path, \"rb\") as f:"
+        }
+      },
+      "match": {
+        "required_files_any": ["app/common/storage.py"],
+        "required_functions_any": ["read_file"],
+        "required_sink_tokens_any": ["open(", "os.path.join"],
+        "required_source_tokens_any": ["filename", "request.args"],
+        "category_aliases": [
+          "path_traversal",
+          "path traversal",
+          "directory traversal",
+          "arbitrary file read",
+          "lfi",
+          "file read"
+        ]
+      },
+      "recall_anchor": {
+        "file": "app/common/storage.py",
+        "function": "read_file"
+      }
+    },
+    {
+      "id": "GT-002",
+      "source_case": "SSRF-PY-REPO-001",
+      "category": "ssrf",
+      "expected_status": "positive",
+      "severity": "high",
+      "locations": [
+        {
+          "file": "app/common/http_client.py",
+          "function": "get_url",
+          "line_start": 4,
+          "line_end": 9
+        },
+        {
+          "file": "app/services/fetch_service.py",
+          "function": "fetch_remote"
+        },
+        {
+          "file": "app/routes/integrations.py",
+          "function": "fetch"
+        }
+      ],
+      "required_semantics": {
+        "source": {
+          "file": "app/routes/integrations.py",
+          "function": "fetch",
+          "code_snippet": "url = request.args.get(\"url\", \"\")"
+        },
+        "propagation": [
+          {
+            "file": "app/routes/integrations.py",
+            "function": "fetch",
+            "code_snippet": "body = _service.fetch_remote(url)"
+          },
+          {
+            "file": "app/services/fetch_service.py",
+            "function": "fetch_remote",
+            "code_snippet": "return get_url(url)"
+          }
+        ],
+        "sink": {
+          "file": "app/common/http_client.py",
+          "function": "get_url",
+          "code_snippet": "resp = requests.get(url, timeout=5)"
+        }
+      },
+      "match": {
+        "required_files_any": ["app/common/http_client.py"],
+        "required_functions_any": ["get_url", "fetch_remote"],
+        "required_sink_tokens_any": ["requests.get"],
+        "required_source_tokens_any": ["url", "request.args"],
+        "category_aliases": [
+          "ssrf",
+          "server-side request forgery",
+          "server side request forgery",
+          "unrestricted outbound request",
+          "request forgery"
+        ]
+      },
+      "recall_anchor": {
+        "file": "app/common/http_client.py",
+        "function": "get_url"
+      }
+    },
+    {
+      "id": "GT-003",
+      "source_case": "SSTI-PY-REPO-001",
+      "category": "ssti",
+      "expected_status": "positive",
+      "severity": "high",
+      "locations": [
+        {
+          "file": "app/common/templates.py",
+          "function": "render_report_template",
+          "line_start": 6,
+          "line_end": 9
+        },
+        {
+          "file": "app/services/report_service.py",
+          "function": "render_preview"
+        },
+        {
+          "file": "app/routes/reports.py",
+          "function": "preview"
+        }
+      ],
+      "required_semantics": {
+        "source": {
+          "file": "app/routes/reports.py",
+          "function": "preview",
+          "code_snippet": "title = request.args.get(\"title\", \"\")"
+        },
+        "propagation": [
+          {
+            "file": "app/routes/reports.py",
+            "function": "preview",
+            "code_snippet": "html = _service.render_preview(title)"
+          },
+          {
+            "file": "app/services/report_service.py",
+            "function": "render_preview",
+            "code_snippet": "return render_report_template(title)"
+          },
+          {
+            "file": "app/common/templates.py",
+            "function": "render_report_template",
+            "code_snippet": "template_str = \"<h1>\" + title + \"</h1><p>Report Preview</p>\""
+          }
+        ],
+        "sink": {
+          "file": "app/common/templates.py",
+          "function": "render_report_template",
+          "code_snippet": "template = _env.from_string(template_str)"
+        }
+      },
+      "match": {
+        "required_files_any": ["app/common/templates.py"],
+        "required_functions_any": ["render_report_template"],
+        "required_sink_tokens_any": ["from_string", "template_str", "+ title +"],
+        "required_source_tokens_any": ["title", "request.args"],
+        "category_aliases": [
+          "ssti",
+          "template injection",
+          "jinja",
+          "jinja2",
+          "server-side template injection"
+        ]
+      },
+      "recall_anchor": {
+        "file": "app/common/templates.py",
+        "function": "render_report_template"
+      }
+    }
+  ],
+  "near_misses": [
+    {
+      "id": "NM-001",
+      "source_case": "PT-PY-REPO-002",
+      "category": "path_traversal",
+      "expected_status": "near_miss",
+      "locations": [
+        {
+          "file": "app/services/document_service.py",
+          "function": "_resolve_safe_path"
+        },
+        {
+          "file": "app/common/io.py",
+          "function": "read_file"
+        },
+        {
+          "file": "app/routes/documents.py",
+          "function": "download"
+        }
+      ],
+      "guard": {
+        "file": "app/services/document_service.py",
+        "function": "_resolve_safe_path",
+        "controls": [
+          "os.path.normpath",
+          "os.path.isabs",
+          "os.path.realpath",
+          "startswith(real_base + os.sep)"
+        ]
+      },
+      "match": {
+        "required_files_any": [
+          "app/services/document_service.py",
+          "app/common/io.py",
+          "app/routes/documents.py"
+        ],
+        "required_functions_any": [
+          "_resolve_safe_path",
+          "get_file_content",
+          "read_file",
+          "download"
+        ],
+        "category_aliases": [
+          "path_traversal",
+          "path traversal",
+          "directory traversal",
+          "arbitrary file read",
+          "lfi",
+          "file read"
+        ],
+        "exclude_if_files": ["app/common/storage.py"]
+      },
+      "should_not_report": "DocumentService._resolve_safe_path canonicalizes and prefix-checks before app.common.io.read_file is called."
+    },
+    {
+      "id": "NM-002",
+      "source_case": "SSRF-PY-REPO-002",
+      "category": "ssrf",
+      "expected_status": "near_miss",
+      "locations": [
+        {
+          "file": "app/services/webhook_service.py",
+          "function": "_is_safe_url"
+        },
+        {
+          "file": "app/common/http_strict.py",
+          "function": "get_url"
+        },
+        {
+          "file": "app/routes/webhooks.py",
+          "function": "preview"
+        }
+      ],
+      "guard": {
+        "file": "app/services/webhook_service.py",
+        "function": "_is_safe_url",
+        "controls": [
+          "https scheme allowlist",
+          "domain allowlist",
+          "raw IP literal private/loopback/link-local block"
+        ]
+      },
+      "match": {
+        "required_files_any": [
+          "app/services/webhook_service.py",
+          "app/common/http_strict.py",
+          "app/routes/webhooks.py"
+        ],
+        "required_functions_any": [
+          "_is_safe_url",
+          "fetch_remote",
+          "get_url",
+          "preview"
+        ],
+        "category_aliases": [
+          "ssrf",
+          "server-side request forgery",
+          "server side request forgery",
+          "unrestricted outbound request",
+          "request forgery"
+        ],
+        "exclude_if_files": ["app/common/http_client.py"]
+      },
+      "should_not_report": "WebhookService._is_safe_url validates scheme/domain/IP before app.common.http_strict.get_url; redirects are disabled."
+    }
+  ]
+}

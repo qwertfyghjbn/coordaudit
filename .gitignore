@@ -1,0 +1,12 @@
+# Local model configuration and credentials
+.env*
+!.env.example
+
+# Runtime output
+experiments/emergent_coordination/runs/*
+!experiments/emergent_coordination/runs/.gitkeep
+artifacts/
+
+# Python cache
+__pycache__/
+*.pyc

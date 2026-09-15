@@ -1,0 +1,1 @@
+"""Northstar Workspace application package."""

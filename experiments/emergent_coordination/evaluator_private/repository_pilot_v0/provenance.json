@@ -1,0 +1,52 @@
+{
+  "repository_id": "repo_pilot_v0",
+  "version": "v0",
+  "purpose": "harness validation; not a formal repository-v1 benchmark",
+  "source_repository": {
+    "remote": "https://github.com/qwertfyghjbn/vuln-audit-system-eval",
+    "commit": "5221728f374686ee97273d47bacc0559b12720ec",
+    "source_ground_truth_sha256": {
+      "PT-PY-REPO-001": "a2e032c2a6545cdbb7965aace12db2e8ebbda45031703add20ecb7d1ec2ad91b",
+      "PT-PY-REPO-002": "6e039697ebd79d2613cec000cb04da0c5d12778dd0a0ea886ed7634fb087afc0",
+      "SSRF-PY-REPO-001": "71a5330000abbb8c13f25a9ec45246c335deb3e824860901bdb6e41ff4314889",
+      "SSRF-PY-REPO-002": "994cae1a7442ea1e6bdc06738317f8289c7a8e96cee74755bb101d0878824e37",
+      "SSTI-PY-REPO-001": "bfce07dba6f1e6b7eb70d840085b300e1b65fc572ed8126e335039befe8185b9"
+    }
+  },
+  "derived_from": [
+    {
+      "finding_id": "GT-001",
+      "source_case": "PT-PY-REPO-001",
+      "label": "vulnerable",
+      "notes": "Workspace file download: unguarded join+open in storage helper."
+    },
+    {
+      "finding_id": "GT-002",
+      "source_case": "SSRF-PY-REPO-001",
+      "label": "vulnerable",
+      "notes": "Integration fetch: unguarded requests.get in HTTP helper."
+    },
+    {
+      "finding_id": "GT-003",
+      "source_case": "SSTI-PY-REPO-001",
+      "label": "vulnerable",
+      "notes": "Report preview: user title concatenated into Jinja2 template source."
+    },
+    {
+      "finding_id": "NM-001",
+      "source_case": "PT-PY-REPO-002",
+      "label": "near_miss",
+      "notes": "Document download: service-layer realpath/prefix guard; io helper trusts caller."
+    },
+    {
+      "finding_id": "NM-002",
+      "source_case": "SSRF-PY-REPO-002",
+      "label": "near_miss",
+      "notes": "Webhook preview: service-layer scheme/domain/IP guard; strict HTTP helper disables redirects."
+    }
+  ],
+  "intentionally_omitted": [
+    "SSTI-PY-REPO-002 was not part of the five-case pilot request."
+  ],
+  "immutable_sources": "Original datasets/synthetic/* ground_truth.json files were not modified."
+}
