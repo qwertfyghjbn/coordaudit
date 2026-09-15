@@ -2,24 +2,24 @@
 
 目标仓库：`/home/lqs/llm_audit_system_learning`
 
-状态：待实际迁移完成后执行。本清单本身不授权删除源文件。
+状态：已完成（2026-09-15）。CoordAudit runtime 与专属文档已迁入本项目并通过验证；原仓库已清理 runtime、更新入口和术语，并保留 relocation stub。本文保留为迁移记录与后续跨仓维护清单。
 
 ## P0：迁移完成后必须修改
 
 | 文件 | 修改内容 | 原因 |
 |---|---|---|
-| `README.md` | 从“本仓库正在设计 CoordAudit”与仓库树中移除本地 `experiments/emergent_coordination`；改为外部项目链接和一句范围说明 | 防止读者把两个仓库当作同一运行/结果线 |
-| `CONTEXT.md` | 保留 `CoordAudit`、`Raw Shared-Store Condition` 作为跨仓术语，但注明 protocol、implementation 与当前结果由独立项目维护；旧 `Architecture Attribution Experiment` 三个术语保持不变 | 既保住历史语境，又把实现权威来源移到正确仓库 |
-| `docs/research/coord_audit_task.md` | 迁出后替换为短 tombstone，链接新项目对应文档；远端 URL 未确定前不要提交本机绝对路径 | 保持旧引用可解释，同时确立新权威来源 |
-| `docs/research/multi_agent_coordination_prior_art.md` | 迁出后替换为短 tombstone 或从原仓库删除，并更新所有入口 | 避免两份长期漂移的研究设计文档 |
-| `N4_PILOT_PLAN.md` | 迁入 `docs/plans/`；原仓库删除或只留指针 | 计划描述的是新项目 harness，不属于 benchmark corpus |
-| `docs/adr/0002-separate-coordaudit-repository.md`（新增） | 记录 CoordAudit 独立成仓的决策、范围、跨仓 provenance 和不迁移旧 Architecture Attribution 的理由 | 防止未来再次把两条归因线合并 |
+| `README.md` | 已移除本地 runtime 树，改为独立项目入口和 relocation 文档 | 防止读者把两个仓库当作同一运行/结果线 |
+| `CONTEXT.md` | 已保留 `CoordAudit`、`Raw Shared-Store Condition` 为跨仓术语，并注明权威实现位置；旧 `Architecture Attribution Experiment` 术语未动 | 既保住历史语境，又把实现权威来源移到正确仓库 |
+| `docs/research/coord_audit_task.md` | 已替换为短 relocation stub | 保持旧引用可解释，同时确立新权威来源 |
+| `docs/research/multi_agent_coordination_prior_art.md` | 已替换为短 relocation stub | 避免两份长期漂移的研究设计文档 |
+| `N4_PILOT_PLAN.md` | 已迁入 `docs/plans/`，原仓库副本已删除 | 计划描述的是新项目 harness，不属于 benchmark corpus |
+| `docs/adr/0002-separate-coordaudit-repository.md`（新增） | 已记录独立成仓决策、范围、跨仓 provenance 和不迁移旧 Architecture Attribution 的理由 | 防止未来再次把两条归因线合并 |
 
 ## P0：配置而非 docs
 
 | 文件 | 修改内容 | 原因 |
 |---|---|---|
-| `.gitignore` | 删除 `experiments/emergent_coordination/runs/*` 规则；相同规则在新项目建立 | 原仓库不再拥有该 runtime output |
+| `.gitignore` | 已删除 `experiments/emergent_coordination/runs/*` 规则；相同规则已在新项目建立 | 原仓库不再拥有该 runtime output |
 | Git 状态/提交说明 | 在删除前记录源文件 hashes；迁移提交明确列出新项目 remote/commit | 当前 `experiments/` 与研究文档未跟踪，仅记原仓库 HEAD 无法复现 |
 
 ## P1：检查后修改
