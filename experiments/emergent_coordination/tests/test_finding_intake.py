@@ -64,6 +64,36 @@ class FindingIntakeTest(unittest.TestCase):
             self.assertTrue(accepted["ok"])
             self.assertEqual(sandbox._submitted, {"findings": [valid]})
 
+    def test_target_prefixed_anchor_matches_target_prefixed_file_read_evidence(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            layout = prepare_run_workspace(Path(tmp) / "run", TARGET_ROOT, 1)
+            events = EventLog(layout.logs / "events.jsonl", run_id="intake")
+            sandbox = AgentSandbox("agent_001", layout, events)
+            evidence = sandbox.read_file("target/app/main.py")["evidence_ref"]
+            finding = _valid_finding(evidence)
+            finding["source"]["file"] = "target/app/main.py"
+            finding["sink"]["file"] = "target/app/main.py"
+
+            accepted = sandbox.submit_findings([finding])
+
+            self.assertTrue(accepted["ok"])
+            self.assertEqual(sandbox._submitted, {"findings": [finding]})
+
+    def test_unrelated_anchor_remains_rejected_after_path_normalization(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            layout = prepare_run_workspace(Path(tmp) / "run", TARGET_ROOT, 1)
+            events = EventLog(layout.logs / "events.jsonl", run_id="intake")
+            sandbox = AgentSandbox("agent_001", layout, events)
+            evidence = sandbox.read_file("target/app/main.py")["evidence_ref"]
+            finding = _valid_finding(evidence)
+            finding["source"]["file"] = "target/app/routes/files.py"
+            finding["sink"]["file"] = "target/app/common/storage.py"
+
+            rejected = sandbox.submit_findings([finding])
+
+            self.assertFalse(rejected["ok"])
+            self.assertTrue(any(error["path"] == "findings[0].evidence_refs" for error in rejected["errors"]))
+
     def test_final_invalid_payload_is_model_format_failure_not_infrastructure_failure(self):
         invalid = _valid_finding("evt_00000008")
         invalid.pop("source")
@@ -82,6 +112,55 @@ class FindingIntakeTest(unittest.TestCase):
             self.assertEqual(summary["evaluation"]["invalid_submissions"], 1)
             events = (Path(summary["run_dir"]) / "logs" / "events.jsonl").read_text(encoding="utf-8")
             self.assertIn("finding_submission_rejected", events)
+
+    def test_malformed_tool_arguments_are_rejected_without_becoming_an_empty_submission(self):
+        malformed_submit = {
+            "id": "cut-off-submit",
+            "name": "submit_findings",
+            "arguments": '{"findings":[{"title":"truncated',
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            summary = run_experiment(
+                RunConfig(
+                    mode="single", agent_count=1, model="mock", max_steps=2,
+                    budgets={"hard_team_call_permits": 2}, runs_dir=Path(tmp),
+                ),
+                MockLLMClient(default=[
+                    _response(malformed_submit),
+                    _response(_tool_call("submit_findings", {"findings": []}, "valid-empty-submit")),
+                ]),
+            )
+
+            self.assertEqual(summary["budget"]["attempted_llm_calls"], 2)
+            self.assertEqual(summary["agent_results"][0]["submission_attempts"], 1)
+            self.assertEqual(summary["agent_results"][0]["stop_reason"], "submitted")
+            transcript = (
+                Path(summary["run_dir"]) / "logs" / "transcripts" / "agent_001.jsonl"
+            ).read_text(encoding="utf-8")
+            self.assertIn("invalid_tool_arguments", transcript)
+            events = (Path(summary["run_dir"]) / "logs" / "events.jsonl").read_text(encoding="utf-8")
+            self.assertIn('"outcome": "rejected"', events)
+
+    def test_non_object_tool_arguments_are_rejected_before_dispatch(self):
+        non_object_submit = {"id": "array-submit", "name": "submit_findings", "arguments": "[]"}
+        with tempfile.TemporaryDirectory() as tmp:
+            summary = run_experiment(
+                RunConfig(
+                    mode="single", agent_count=1, model="mock", max_steps=2,
+                    budgets={"hard_team_call_permits": 2}, runs_dir=Path(tmp),
+                ),
+                MockLLMClient(default=[
+                    _response(non_object_submit),
+                    _response(_tool_call("submit_findings", {"findings": []}, "valid-empty-submit")),
+                ]),
+            )
+
+            self.assertEqual(summary["budget"]["attempted_llm_calls"], 2)
+            self.assertEqual(summary["agent_results"][0]["submission_attempts"], 1)
+            transcript = (
+                Path(summary["run_dir"]) / "logs" / "transcripts" / "agent_001.jsonl"
+            ).read_text(encoding="utf-8")
+            self.assertIn("arguments_not_object", transcript)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,206 @@
+{
+  "schema_version": 1,
+  "case_id": "flowise_3_1_3_repository_v1",
+  "purpose": "private Phase-2 source-level census; not mounted in the Agent target",
+  "as_of": "2026-09-16",
+  "snapshot": {
+    "repository": "https://github.com/FlowiseAI/Flowise.git",
+    "tag": "flowise@3.1.3",
+    "commit": "09f099dbfda179e439ec677d06ad737375899eef"
+  },
+  "scored_roots": [
+    {
+      "id": "R01_enterprise_active_org_binding",
+      "class": "A",
+      "advisories": ["GHSA-7x8x-vv46-4579"],
+      "semantic_region": "enterprise controllers and services",
+      "vulnerability_class": "cross-organization authorization / IDOR",
+      "root_cause": "Mutating enterprise object identifiers and organizationId fields are accepted from the request or queried without binding them to req.user.activeOrganizationId.",
+      "anchors": [
+        {"path": "packages/server/src/enterprise/controllers/workspace.controller.ts", "symbol": "WorkspaceController.delete", "excerpt": "deleteWorkspaceById(queryRunner, workspaceId)"},
+        {"path": "packages/server/src/enterprise/controllers/organization-user.controller.ts", "symbol": "OrganizationUserController.update", "excerpt": "updateOrganizationUser(req.body)"}
+      ],
+      "source": "authenticated enterprise request body/path/query", "sink_or_guard": "tenant-scoped mutation; active-organization equality guard is absent", "affected_object": "workspace and organization membership/role state", "trust_boundary": "authenticated member -> another organization object", "shared_invariant": "an enterprise mutation may only address objects in the caller active organization", "variants": ["workspace delete", "workspace/user create-update-delete", "organization-user update/delete", "role/SSO-config call chains covered by the same active-organization predicate"],
+      "safe_sibling": {"path": "packages/server/src/enterprise/controllers/organization-user.controller.ts", "symbol": "OrganizationUserController.getByOrganizationUserId", "basis": "explicit organizationId equality check is a real, local authorization pattern"},
+      "fix": {"commit": "9fcb7ffbd5cb89bdf52d1a06a2f54c53aa15811c", "evidence": "adds activeOrganizationId binding/checks across the affected controller/service call chains"},
+      "validation": {"kind": "targeted service/controller two-organization fixture", "cost": "low", "required_for_tp": false},
+      "evaluator_feasibility": "high; guard-centred root discovery plus at most five named variants"
+    },
+    {
+      "id": "R02_org_user_password_serialization",
+      "class": "A", "advisories": ["GHSA-fhxm-xxcx-g6x3"], "semantic_region": "organization user service", "vulnerability_class": "sensitive-data exposure",
+      "root_cause": "Organization-user read serialization assigns the raw User entity, including its credential field, to a member-visible response.",
+      "anchors": [{"path": "packages/server/src/enterprise/services/organization-user.service.ts", "symbol": "OrganizationUserService.getAllOrganizationUsers", "excerpt": "user.user = userDetails"}],
+      "source": "organization member read", "sink_or_guard": "response serialization without sanitizeUser", "affected_object": "organization owner credential/password hash", "trust_boundary": "ordinary organization member -> owner secret-bearing record", "shared_invariant": "read DTOs never expose stored authentication secrets", "variants": [],
+      "safe_sibling": {"path": "packages/server/src/utils/sanitize.util.ts", "symbol": "sanitizeUser", "basis": "existing response sanitizer removes secret-bearing fields"},
+      "fix": {"commit": "ed9e100fb71643cd3922b005908f9732bc0e07dc", "evidence": "replaces raw assignment with sanitizeUser(userDetails)"},
+      "validation": {"kind": "serializer/service unit fixture", "cost": "low", "required_for_tp": false}, "evaluator_feasibility": "high"
+    },
+    {
+      "id": "R03_chat_message_route_permission",
+      "class": "A", "advisories": ["GHSA-ppmg-4cx6-95hh"], "semantic_region": "chat-message routes", "vulnerability_class": "missing route authorization",
+      "root_cause": "Internal chat-message read/delete routes dispatch directly to controllers without checkPermission/checkAnyPermission.",
+      "anchors": [
+        {"path": "packages/server/src/routes/chat-messages/index.ts", "symbol": "router.get/router.delete", "excerpt": "chatMessageController.getAllChatMessages"},
+        {"path": "packages/server/src/routes/internal-chat-messages/index.ts", "symbol": "router.get", "excerpt": "chatMessagesController.getAllInternalChatMessages"}
+      ],
+      "source": "authenticated low-privilege API key/session route request", "sink_or_guard": "chat-message controller without permission middleware", "affected_object": "chat history", "trust_boundary": "low-privilege principal -> protected message records", "shared_invariant": "internal history management routes require an explicit applicable permission", "variants": ["GET chat-messages", "DELETE chat-messages", "GET internal-chat-messages"],
+      "safe_sibling": {"path": "packages/server/src/routes/assistants/index.ts", "symbol": "assistant read/delete routes", "basis": "uses checkPermission/checkAnyPermission before controller dispatch"},
+      "fix": null, "validation": {"kind": "route-stack inspection or minimal middleware test", "cost": "low", "required_for_tp": false}, "evaluator_feasibility": "high"
+    },
+    {
+      "id": "R04_generic_credential_lookup_scope",
+      "class": "A", "advisories": ["GHSA-hqvm-7539-v83j", "GHSA-27w2-26m5-x82c"], "semantic_region": "component credential helper", "vulnerability_class": "cross-workspace credential IDOR",
+      "root_cause": "The generic component helper resolves a caller-selected credential ID by id alone and decrypts/uses it without workspace ownership or sharing authorization.",
+      "anchors": [{"path": "packages/components/src/utils.ts", "symbol": "getCredentialData", "excerpt": "id: selectedCredentialId"}],
+      "source": "node load-method body or TTS credential reference", "sink_or_guard": "raw credential lookup/decrypt with no workspace predicate", "affected_object": "credential material and third-party capability", "trust_boundary": "workspace A controlled credential ID -> workspace B credential", "shared_invariant": "credential use binds to an owned or explicitly shared workspace", "variants": ["node-load-method", "text-to-speech getVoices"],
+      "safe_sibling": {"path": "packages/server/src/services/credentials/index.ts", "symbol": "getCredentialById", "basis": "normal service accepts workspace-aware search options"},
+      "fix": {"commit": "bb773ffa710bd22639c4ba2643413a0ea2b679d3", "evidence": "adds assertCredentialInWorkspace before node async options"},
+      "validation": {"kind": "two-workspace repository/helper fixture", "cost": "low", "required_for_tp": false}, "evaluator_feasibility": "high; root discovery plus two bounded variants"
+    },
+    {
+      "id": "R05_openai_assistant_credential_lookup_scope",
+      "class": "A", "advisories": ["GHSA-27w2-26m5-x82c"], "semantic_region": "OpenAI assistant service", "vulnerability_class": "cross-workspace credential IDOR",
+      "root_cause": "OpenAI assistant operations perform their own raw Credential.findOneBy({id}) lookups, outside the generic helper and without a workspace predicate.",
+      "anchors": [{"path": "packages/server/src/services/openai-assistants/index.ts", "symbol": "getAll/getSingle/upload", "excerpt": "id: credentialId"}],
+      "source": "assistant credential id", "sink_or_guard": "raw credential repository lookup", "affected_object": "credential material and provider access", "trust_boundary": "assistant caller -> foreign workspace credential", "shared_invariant": "credential use binds to an owned or explicitly shared workspace", "variants": ["getAll", "getSingle", "upload"],
+      "safe_sibling": {"path": "packages/server/src/services/credentials/index.ts", "symbol": "getCredentialById", "basis": "workspace-aware credential service pattern"},
+      "fix": null, "validation": {"kind": "two-workspace service fixture", "cost": "low", "required_for_tp": false}, "evaluator_feasibility": "high"
+    },
+    {
+      "id": "R06_assistant_delete_credential_lookup_scope",
+      "class": "A", "advisories": ["GHSA-27w2-26m5-x82c"], "semantic_region": "assistant service", "vulnerability_class": "cross-workspace credential IDOR",
+      "root_cause": "Assistant deletion resolves its referenced credential by id alone after the assistant lookup, making this a separate unscoped credential query expression.",
+      "anchors": [{"path": "packages/server/src/services/assistants/index.ts", "symbol": "deleteAssistant", "excerpt": "id: assistant.credential"}],
+      "source": "assistant record credential reference", "sink_or_guard": "raw credential repository lookup", "affected_object": "foreign credential record", "trust_boundary": "assistant operation -> credential workspace boundary", "shared_invariant": "credential use binds to an owned or explicitly shared workspace", "variants": [],
+      "safe_sibling": {"path": "packages/server/src/services/credentials/index.ts", "symbol": "getCredentialById", "basis": "workspace-aware credential service pattern"},
+      "fix": null, "validation": {"kind": "two-workspace service fixture", "cost": "low", "required_for_tp": false}, "evaluator_feasibility": "high"
+    },
+    {
+      "id": "R07_sso_invited_token_proof", "class": "A", "advisories": ["GHSA-vf3j-89vf-r697"], "semantic_region": "enterprise SSO", "vulnerability_class": "invite-state authorization bypass",
+      "root_cause": "The INVITED SSO branch copies the database user object into registration input instead of requiring independent proof of the pending invitation token/state.",
+      "anchors": [{"path": "packages/server/src/enterprise/sso/SSOBase.ts", "symbol": "SSOBase.getUser", "excerpt": "if (user.status === UserStatus.INVITED)"}],
+      "source": "SSO email/profile assertion", "sink_or_guard": "invite activation register call without independent invitation proof", "affected_object": "invited account state", "trust_boundary": "IdP assertion -> invitation acceptance", "shared_invariant": "identity linking/activation requires issuer-bound identity and valid invitation state proof", "variants": [],
+      "safe_sibling": {"path": "packages/server/src/enterprise/services/account.service.ts", "symbol": "register", "basis": "normal registration flow owns invitation/account state transition"},
+      "fix": null, "validation": {"kind": "SSOBase/account-service mocked state test", "cost": "low", "required_for_tp": false}, "evaluator_feasibility": "high"
+    },
+    {
+      "id": "R08_sso_email_only_identity", "class": "A", "advisories": ["GHSA-cffm-583c-vffr"], "semantic_region": "enterprise SSO", "vulnerability_class": "cross-IdP account takeover",
+      "root_cause": "SSO account selection keys only on email through readUserByEmail and does not bind the account to an issuer/subject identity tuple.",
+      "anchors": [{"path": "packages/server/src/enterprise/sso/SSOBase.ts", "symbol": "SSOBase.getUser", "excerpt": "userService.readUserByEmail(email, queryRunner)"}],
+      "source": "SSO provider profile", "sink_or_guard": "email-only account lookup", "affected_object": "existing user account", "trust_boundary": "one IdP identity -> account linked by a different IdP", "shared_invariant": "identity linking/activation requires issuer-bound identity and valid invitation state proof", "variants": [],
+      "safe_sibling": null, "fix": null, "validation": {"kind": "two-issuer mocked SSO profile test", "cost": "low", "required_for_tp": false}, "evaluator_feasibility": "high"
+    },
+    {
+      "id": "R09_bullmq_dashboard_rbac", "class": "A", "advisories": ["GHSA-rpcc-gw54-mfgx"], "semantic_region": "queue dashboard mount", "vulnerability_class": "missing administrative authorization",
+      "root_cause": "When queue mode is enabled, /admin/queues is mounted behind token verification only, with no role or tenant authorization before the Bull Board router.",
+      "anchors": [{"path": "packages/server/src/index.ts", "symbol": "App.init queue dashboard mount", "excerpt": "this.app.use('/admin/queues', rateLimiter, verifyTokenForBullMQDashboard"}],
+      "source": "authenticated non-admin dashboard request", "sink_or_guard": "Bull Board router without RBAC middleware", "affected_object": "queue job payloads", "trust_boundary": "ordinary authenticated tenant principal -> administration surface", "shared_invariant": "administrative operational surfaces require a role/tenant gate in addition to authentication", "variants": [],
+      "safe_sibling": {"path": "packages/server/src/routes/log/index.ts", "symbol": "router.get", "basis": "administrative log route has explicit logs:view permission"},
+      "fix": null, "validation": {"kind": "middleware-chain inspection with mocked request", "cost": "low", "required_for_tp": false}, "evaluator_feasibility": "high"
+    },
+    {
+      "id": "R10_mcp_stdio_executable_policy", "class": "B", "advisories": ["GHSA-vcwp-f9rq-3887"], "semantic_region": "Custom MCP stdio", "vulnerability_class": "server-side command execution",
+      "root_cause": "The default MCP command allowlist includes package-launching executables such as npx, allowing attacker-selected package resolution to reach a process execution capability.",
+      "anchors": [{"path": "packages/components/nodes/tools/MCP/core.ts", "symbol": "validateMCPServerConfig", "excerpt": "const allowedCommands = ['node', 'npx', 'python', 'python3', 'docker']"}],
+      "source": "user-configured MCP stdio command and args", "sink_or_guard": "process-capable command policy", "affected_object": "server process execution", "trust_boundary": "untrusted component configuration -> host executable/package resolver", "shared_invariant": "all stdio process paths require operator-controlled executable policy", "variants": [],
+      "safe_sibling": {"path": "packages/components/nodes/tools/MCP/core.ts", "symbol": "validateEnvironmentVariables", "basis": "existing allowlist-style policy shows the intended guard form"},
+      "fix": {"commit": "f5d16835bc76e86a223bedfdd44aa6610370fd58", "evidence": "replaces built-in list with default-deny CUSTOM_MCP_ALLOWED_COMMANDS"},
+      "validation": {"kind": "core validator unit with no spawned process", "cost": "medium", "required_for_tp": false}, "evaluator_feasibility": "high"
+    },
+    {
+      "id": "R11_mcp_cwd_policy", "class": "A", "advisories": ["GHSA-x7x8-95gh-42xm"], "semantic_region": "Custom MCP stdio", "vulnerability_class": "process working-directory control",
+      "root_cause": "MCP configuration permits caller-supplied cwd through the eventual stdio launch path; no policy rejects the field.",
+      "anchors": [{"path": "packages/components/nodes/tools/MCP/core.ts", "symbol": "validateMCPServerConfig", "excerpt": "export const validateMCPServerConfig = (serverParams: any)"}],
+      "source": "user-configured MCP cwd", "sink_or_guard": "process launch working directory policy", "affected_object": "process filesystem context", "trust_boundary": "untrusted configuration -> host process cwd", "shared_invariant": "all stdio process paths require explicit cwd policy", "variants": [],
+      "safe_sibling": {"path": "packages/components/nodes/tools/MCP/core.ts", "symbol": "validateArgsForLocalFileAccess", "basis": "same module contains an argument/path policy boundary"},
+      "fix": {"commit": "ababf4c8ebc0263e03aeeb917832251d3fd785e4", "evidence": "adds unconditional rejection when serverParams.cwd is non-null"},
+      "validation": {"kind": "core validator unit", "cost": "low", "required_for_tp": false}, "evaluator_feasibility": "high"
+    },
+    {
+      "id": "R12_realtime_chatflow_workspace_scope", "class": "A", "advisories": ["GHSA-gggp-6qmf-xwwc"], "semantic_region": "OpenAI Realtime", "vulnerability_class": "cross-workspace authorization / IDOR",
+      "root_cause": "Realtime tool initialization loads a ChatFlow by global id alone and exposes/executes its tools without passing the request workspace or route RBAC guard.",
+      "anchors": [{"path": "packages/server/src/services/openai-realtime/index.ts", "symbol": "buildAndInitTool", "excerpt": "id: chatflowid"}],
+      "source": "realtime chatflow id", "sink_or_guard": "unscoped chatflow lookup and unguarded route", "affected_object": "foreign chatflow tools/capabilities", "trust_boundary": "workspace A request -> workspace B chatflow", "shared_invariant": "chatflow-backed capability execution is workspace-scoped and permission-gated", "variants": ["getAgentTools", "executeAgentTool"],
+      "safe_sibling": {"path": "packages/server/src/services/chatflows/index.ts", "symbol": "getChatflowByIdForWorkspace", "basis": "existing workspace-aware chatflow access helper"},
+      "fix": {"commit": "db8de568a8182907e7347e9430f02f8c17e7a2c4", "evidence": "adds route permissions and passes workspaceId to getChatflowByIdForWorkspace"},
+      "validation": {"kind": "two-workspace service fixture", "cost": "low", "required_for_tp": false}, "evaluator_feasibility": "high"
+    },
+    {
+      "id": "R13_sqlite_chain_write_capability", "class": "B", "advisories": ["GHSA-pwfj-wh95-7mwp"], "semantic_region": "SQL Database Chain", "vulnerability_class": "LLM-mediated database write / code execution impact",
+      "root_cause": "The SQLite datasource executes LLM-generated statements without a read-only statement guard.",
+      "anchors": [{"path": "packages/components/nodes/chains/SqlDatabaseChain/SqlDatabaseChain.ts", "symbol": "getSQLDBChain", "excerpt": "SqlDatabase.fromDataSourceParams"}],
+      "source": "LLM-generated SQL through node configuration/runtime", "sink_or_guard": "datasource.query without assertReadOnlySqlStatement", "affected_object": "configured SQLite database", "trust_boundary": "model output -> database execution capability", "shared_invariant": "untrusted/model-generated SQL must be limited to the declared read-only capability", "variants": [],
+      "safe_sibling": {"path": "packages/components/src/validator.ts", "symbol": "assertReadOnlySqlStatement", "basis": "real validation primitive introduced by the fix"},
+      "fix": {"commit": "4ea391204a499fb6d19747104502362295b4dde3", "evidence": "wraps SQLite datasource.query with assertReadOnlySqlStatement"},
+      "validation": {"kind": "local datasource/query stub", "cost": "medium", "required_for_tp": false}, "evaluator_feasibility": "high"
+    },
+    {
+      "id": "R14_chat_model_baseurl_egress_policy", "class": "B", "advisories": ["GHSA-hx55-h48h-7rw9"], "semantic_region": "chat model components", "vulnerability_class": "SSRF with credential exfiltration",
+      "root_cause": "User-configurable baseUrl/basePath values are forwarded to credential-bearing model clients without invoking the common URL deny-list policy.",
+      "anchors": [{"path": "packages/components/nodes/chatmodels/ChatLocalAI/ChatLocalAI.ts", "symbol": "ChatLocalAI_ChatModels.init", "excerpt": "obj.configuration = { baseURL: basePath }"}],
+      "source": "node base URL/path", "sink_or_guard": "model HTTP client configuration without checkDenyList", "affected_object": "internal network and model API credential", "trust_boundary": "user node configuration -> outbound credential-bearing HTTP client", "shared_invariant": "all configurable egress paths use the canonical URL policy", "variants": ["Cloudflare", "Google", "LiteLLM", "LocalAI", "Nemo", "Nvidia", "Ollama", "OpenAI Custom"],
+      "safe_sibling": {"path": "packages/components/nodes/tools/MCP/core.ts", "symbol": "MCPToolkit", "basis": "uses shared httpSecurity checks before remote transport"},
+      "fix": {"commit": "b98ff81b049a76a1eea8c82eecd920a4e090ed69", "evidence": "adds checkDenyList to eight chat-model URL paths"},
+      "validation": {"kind": "mocked URL-policy/client construction", "cost": "medium", "required_for_tp": false}, "evaluator_feasibility": "high; root discovery plus eight bounded variants"
+    },
+    {
+      "id": "R15_upsert_history_route_scope", "class": "A", "advisories": ["GHSA-jvx3-mjpw-r4gh"], "semantic_region": "document-store upsert history", "vulnerability_class": "missing authorization and workspace scope",
+      "root_cause": "Upsert-history GET/PATCH routes have neither permission middleware nor a workspace predicate in their backing service operations.",
+      "anchors": [{"path": "packages/server/src/routes/upsert-history/index.ts", "symbol": "router.get/router.patch", "excerpt": "upsertHistoryController.getAllUpsertHistory"}],
+      "source": "authenticated API key/session with chatflow id or history ids", "sink_or_guard": "history read/delete without permission/workspace guard", "affected_object": "document-store history and flow configuration", "trust_boundary": "one authenticated workspace principal -> another workspace history", "shared_invariant": "document-store operational history is permission-gated and workspace-scoped", "variants": ["read by chatflowid", "delete by ids"],
+      "safe_sibling": {"path": "packages/server/src/routes/documentstore/index.ts", "symbol": "document-store routes", "basis": "adjacent routes carry documentStores permissions"},
+      "fix": null, "validation": {"kind": "route-stack/service fixture", "cost": "low", "required_for_tp": false}, "evaluator_feasibility": "high"
+    },
+    {
+      "id": "R16_memory_session_id_type", "class": "B", "advisories": ["GHSA-wpvf-4vfx-rgxm"], "semantic_region": "memory session utility", "vulnerability_class": "NoSQL injection / cross-session data exposure",
+      "root_cause": "Incoming overrideConfig.sessionId and chatId reach memory backends without enforcing that the identifier is a scalar string.",
+      "anchors": [{"path": "packages/server/src/utils/index.ts", "symbol": "getMemorySessionId", "excerpt": "return incomingInput.overrideConfig?.sessionId"}],
+      "source": "prediction request overrideConfig.sessionId/chatId", "sink_or_guard": "memory query key without scalar-type validation", "affected_object": "session memory records", "trust_boundary": "untrusted request object -> database query semantics", "shared_invariant": "session identifiers are scalar strings before any memory query", "variants": ["overrideConfig.sessionId", "chatId", "hard-coded memory node sessionId"],
+      "safe_sibling": null, "fix": {"commit": "de3a91827fbe2ae4629bddcd16f1adfe0191385f", "evidence": "adds typeof string checks on all three paths"},
+      "validation": {"kind": "pure utility test", "cost": "low", "required_for_tp": false}, "evaluator_feasibility": "high"
+    },
+    {
+      "id": "R17_document_loader_egress_policy", "class": "B", "advisories": ["GHSA-9cvr-5wv9-2gxr"], "semantic_region": "Cheerio/Playwright/Puppeteer loaders", "vulnerability_class": "SSRF",
+      "root_cause": "Document loader URL inputs bypass the shared HTTP security policy; browser loaders also lack a policy check on subrequests/redirects.",
+      "anchors": [{"path": "packages/components/nodes/documentloaders/Playwright/Playwright.ts", "symbol": "playwrightLoader", "excerpt": "new PlaywrightWebBaseLoader(url, config)"}],
+      "source": "document loader URL", "sink_or_guard": "fetch/browser navigation without checkDenyList/redirect policy", "affected_object": "internal network services", "trust_boundary": "user-configured loader URL -> server-side HTTP/browser transport", "shared_invariant": "all configurable egress paths use the canonical URL policy", "variants": ["Cheerio direct fetch", "Playwright navigation/subrequests", "Puppeteer navigation/subrequests"],
+      "safe_sibling": {"path": "packages/components/src/httpSecurity.ts", "symbol": "secureFetch", "basis": "central HTTP policy helper"},
+      "fix": {"commit": "6c989ec860c4f1fdc13df894887438a9f560fe25", "evidence": "adds initial and browser subrequest checks; Cheerio uses secureFetch"},
+      "validation": {"kind": "mock transport/navigation policy test", "cost": "medium", "required_for_tp": false}, "evaluator_feasibility": "high"
+    },
+    {
+      "id": "R18_export_variable_secret", "class": "A", "advisories": ["GHSA-vrr6-xgc3-j99r"], "semantic_region": "export-import", "vulnerability_class": "secret exposure",
+      "root_cause": "Workspace export returns Variable records with plaintext value fields intact.",
+      "anchors": [{"path": "packages/server/src/services/export-import/index.ts", "symbol": "exportData", "excerpt": "Variable = 'data' in Variable ? Variable.data : Variable"}],
+      "source": "authorized export request", "sink_or_guard": "export response serialization without value redaction", "affected_object": "workspace variable plaintext", "trust_boundary": "export consumer -> secret-bearing configuration", "shared_invariant": "exports do not serialize plaintext secret values", "variants": [],
+      "safe_sibling": null, "fix": {"commit": "096d2d4c14df1400e1c0158558688b78e30a393f", "evidence": "maps exported variables with value: ''"},
+      "validation": {"kind": "export service unit fixture", "cost": "low", "required_for_tp": false}, "evaluator_feasibility": "high"
+    },
+    {
+      "id": "R19_tts_abort_cross_operation", "class": "A", "advisories": ["GHSA-xhxx-56g3-mx2r"], "semantic_region": "text-to-speech abort", "vulnerability_class": "unauthenticated denial of service",
+      "root_cause": "The public TTS abort operation derives a global chatflow abort-controller key from caller-supplied identifiers and terminates the main prediction without proving operation ownership.",
+      "anchors": [{"path": "packages/server/src/controllers/text-to-speech/index.ts", "symbol": "abortTextToSpeech", "excerpt": "appServer.abortControllerPool.abort(chatFlowAbortId)"}],
+      "source": "public abort request chatflowId/chatId", "sink_or_guard": "global prediction abort without creator/handle binding", "affected_object": "another active chatflow prediction", "trust_boundary": "unauthenticated/public caller -> active operation", "shared_invariant": "an operation cancellation handle binds to its creator or authorized caller", "variants": [],
+      "safe_sibling": {"path": "packages/server/src/controllers/text-to-speech/index.ts", "symbol": "generateTextToSpeech", "basis": "generation resolves a chatflow before using its capability"},
+      "fix": {"commit": "dbec8f9fd3c42faab49416fe81ff1774a5344cba", "evidence": "removes the main chatflow abort branch"},
+      "validation": {"kind": "abort-controller pool unit fixture", "cost": "low", "required_for_tp": false}, "evaluator_feasibility": "high"
+    },
+    {
+      "id": "R20_tts_private_flow_credential_use", "class": "A", "advisories": ["GHSA-8gj2-2cvc-6xx7"], "semantic_region": "text-to-speech generation", "vulnerability_class": "unauthorized credential capability use",
+      "root_cause": "The no-user/public-flow fallback resolves any chatflow and uses its workspace/credential context without first requiring the chatflow to be public.",
+      "anchors": [{"path": "packages/server/src/controllers/text-to-speech/index.ts", "symbol": "generateTextToSpeech", "excerpt": "chatflow = await chatflowsService.getChatflowById(chatflowId)"}],
+      "source": "public TTS request chatflowId", "sink_or_guard": "private flow credential resolution without isPublic guard", "affected_object": "private chatflow TTS credential/capability", "trust_boundary": "unauthenticated caller -> private workspace provider capability", "shared_invariant": "public endpoints may use only explicitly public flows and their intended capabilities", "variants": [],
+      "safe_sibling": {"path": "packages/server/src/controllers/text-to-speech/index.ts", "symbol": "generateTextToSpeech authenticated branch", "basis": "uses req.user.activeWorkspaceId when a user context exists"},
+      "fix": {"commit": "dbec8f9fd3c42faab49416fe81ff1774a5344cba", "evidence": "rejects chatflows where isPublic is false before workspace credential use"},
+      "validation": {"kind": "controller/provider stub test", "cost": "low", "required_for_tp": false}, "evaluator_feasibility": "high"
+    }
+  ],
+  "counts": {"scored_roots": 20, "static_primary_A": 15, "static_plus_targeted_B": 5, "known_unscored_C": 2, "scope_excluded": 1, "unresolved": 2},
+  "deduplication_decisions": [
+    "GHSA-7x8x is one root-discovery item with bounded enterprise active-organization variants because the same missing predicate is repaired across the controller/service family.",
+    "GHSA-27w2 OpenAI-assistant raw lookups and assistant-delete raw lookup are separate roots: their vulnerable lookup expressions are in distinct services and do not call the generic helper.",
+    "GHSA-27w2 TTS getVoices is a bounded variant of R04 because it reaches the same getCredentialData raw lookup as GHSA-hqvm.",
+    "MCP executable policy and cwd policy remain separate roots because they protect different process capability fields and are repaired by distinct guards."
+  ]
+}

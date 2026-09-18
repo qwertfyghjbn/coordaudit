@@ -80,6 +80,42 @@ _Avoid_: Agent 自报 verified、仅通过 benchmark smoke test
 可由一个 Agent 独立取得实质性审计进展、并能产生可评分证据的调查线。文件数、路由数和 Agent 自称的任务不自动构成 work front。
 _Avoid_: 文件、endpoint、task
 
+**Evidence-grounded repository audit（证据约束的仓库审计）**:
+以 repository source 中的跨文件程序语义和安全推理为主要工作对象，只在需要消除关键语义歧义时使用针对性本地验证。它不是 exploitation 或完整动态复现评测。
+_Avoid_: 纯模式匹配、每个 finding 强制 PoC、完整 exploit benchmark
+
+**Static-primary finding（静态为主 Finding）**:
+仅根据 Agent-visible target 的 source、sink、guard、trust boundary 与 safe-sibling 对照就能建立较强可利用性证据的 finding；本地验证可增强证据，但不是纳入 scored ground truth 的条件。
+_Avoid_: 未复现 finding、纯静态告警
+
+**Targeted local validation（针对性本地验证）**:
+为区分一个具体 vulnerable/safe hypothesis 而执行的最小、本地、无外网语义实验；它不包括无目标全量构建、fuzzing、完整 exploit chain 或外部服务编排。
+_Avoid_: 完整动态复现、hidden evaluator oracle、一般性运行项目
+
+**Static-plus-validation finding（静态加针对性验证 Finding）**:
+Source 已支持较强漏洞 hypothesis，但仍需一个 targeted local validation 确认关键运行时语义的 finding。验证未成功不自动使其失效，评估仍依据已冻结的证据标准。
+_Avoid_: 必须成功复现的 finding、Agent 自报 verified
+
+**Dynamic-dependent finding（动态依赖 Finding）**:
+只有依赖完整 exploit、fuzzing、race、复杂外部服务或特定 deployment/runtime state 才能合理判断的 finding。它默认不进入当前主 benchmark 的 scored ground truth。
+_Avoid_: 验证费用高的 B 类、仅缺少方便 PoC 的 finding
+
+**Root-cause cluster（根因聚类）**:
+由同一代码级安全缺陷产生的一个或多个 advisory、reachable entry 或 manifestation。主评分不把同一 root cause 的多个公开编号当作完全独立漏洞。
+_Avoid_: CVE 数、advisory 数、入口数
+
+**Independent semantic finding（独立语义 Finding）**:
+在 root cause、信任边界或安全不变式上需要独立审计证据的 scored finding。同一 root-cause cluster 的多入口覆盖可单独记录，但不人为放大主分。
+_Avoid_: advisory、variant、reachable entry
+
+**Effective active-front count（有效活跃前沿数）**:
+在给定 Agent-visible target 与团队预算内，能够被不同 Agent 独立推进、形成可评分证据，并通过共享安全不变式相互增益的 work front 数量。它必须与 repository tracked/source file 数分开报告；巨大搜索空间本身不构成 coordination opportunity。
+_Avoid_: repository size、目录数、advisory 数、Agent 数
+
+**Condition-blind target selection（条件盲目标选择）**:
+只依据 snapshot 的 root-cause independence、static discoverability、shared invariant、safe sibling、evaluator feasibility、验证费用与泄漏风险选择 target；冻结前不得依据 S/P/B/T/M 的相对成绩或某种 coordination mechanism 是否更容易获益来选取仓库。
+_Avoid_: treatment-aware selection、挑选 T 胜出的 target
+
 **Harness hardening（harness 加固）**:
 使 matched block 具备因果可比性、隔离性、预算完整性和可重建证据链所需的改造；不包括扩大 benchmark 或新增 coordination condition。
 _Avoid_: benchmark 扩充、一般性重构

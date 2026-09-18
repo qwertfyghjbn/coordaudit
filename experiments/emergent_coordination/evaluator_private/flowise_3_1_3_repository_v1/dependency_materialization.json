@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "case_id": "flowise_3_1_3_repository_v1",
+  "purpose": "offline, snapshot-matched Node 24 dependency environment for the five class-B targeted validators; package fetching happens only during this recorded trusted-control-plane materialization, validation runs with no network",
+  "as_of": "2026-09-18",
+  "environment_root": "artifacts/flowise_3_1_3_repository_v1_dependency_env",
+  "target_binding": {
+    "target_root": "experiments/emergent_coordination/repositories/flowise_3_1_3_repository_v1",
+    "target_tree_sha256": "c612819a833fc8ab3c58fe5085fb80fc0a6c4cb1d86cbb8ed41b0b431e4a1638",
+    "workspace_preinstall_tree_sha256": "c612819a833fc8ab3c58fe5085fb80fc0a6c4cb1d86cbb8ed41b0b431e4a1638",
+    "pnpm_lockfile": {
+      "path": "pnpm-lock.yaml",
+      "sha256": "e4b42fbbaaa2e01fb43cf1be4a5739b2501fa58ab5e052d8aca90fd3f959e5f4",
+      "lockfile_version": "9.0"
+    }
+  },
+  "node_runtime": {
+    "version": "24.14.1",
+    "distribution": "https://nodejs.org/dist/v24.14.1/node-v24.14.1-linux-x64.tar.xz",
+    "shasums": "https://nodejs.org/dist/v24.14.1/SHASUMS256.txt",
+    "tarball_sha256": "84d38715d449447117d05c3e71acd78daa49d5b1bfa8aacf610303920c3322be",
+    "verified_against_official_shasums": true,
+    "runtime_tree_sha256": "0ee8a17a945a299ceecaa5a64948c29f51683820a16c5ac8dae8f2ee232e00dd"
+  },
+  "pnpm": {
+    "spec": "pnpm@10.26.0",
+    "version": "10.26.0",
+    "toolchain_tree_sha256": "4b6bbb6fe70e7d9af5c2b8bed8432a696563f8b91bd8c46454a4064a3db36a4b"
+  },
+  "install": {
+    "command": "pnpm install --frozen-lockfile",
+    "build_script_policy": "frozen snapshot package.json pnpm.onlyBuiltDependencies allowlist",
+    "env_overrides": [
+      "HUSKY=0",
+      "git http.version=HTTP/1.1"
+    ],
+    "network_use": "package fetch during materialization only"
+  },
+  "node_modules_tree_sha256": "a17cad84f4c8d44bc1bcaf947939586933c151e91aa2936923b71a11cae1ff09",
+  "offline_smoke": {
+    "node_version": "v24.14.1",
+    "pnpm_offline_install": "Done in 8.2s using pnpm v10.26.0",
+    "server_module_versions": {
+      "express": "4.18.3",
+      "zod": "4.3.6",
+      "typescript": "5.5.2"
+    },
+    "components_module_versions": {
+      "@langchain/core": "1.1.20",
+      "langchain": "1.2.18",
+      "typescript": "5.5.2"
+    },
+    "components_jest_version": "29.7.0"
+  },
+  "materializer_sha256": "f61c45d21e61f4c9eb27c3c61ce54af8f405a169c66aeb6f7c752898bfe31d90"
+}

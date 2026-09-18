@@ -21,3 +21,7 @@ Accepted
 ## 实现对齐（2026-09-15）
 
 冻结 schema 拒绝缺失、额外或类型错误字段，并要求 source/sink anchor 与非空、可见的 `evidence_ref`。默认 evidence 必须来自提交者的 `file_read`；T 中已完成任务的 evidence 只有在接收者 `list_tasks` 后产生明确 `task_result_observed` 事件时才可引用。public `evaluation.json` 只给聚合结果，ground-truth assignment、anchors、per-finding verification 与 duplicate provenance 留在 `evaluator_private/verification.json`。分析器只在后续 finding 复用这类已观察 task-result evidence 时计为 evidence adoption；它不因任务列表、相邻路径或一次 shared read 推断协作。
+
+工具参数在 dispatch 前必须解析为 JSON object。malformed JSON 或非 object 参数返回结构化 `invalid_tool_arguments` 错误、记录 rejected tool call，并允许 Agent 在剩余 permits 内重试；不得将解析失败降级为 `{}`，也不得因此触发空 finding 提交。
+
+finding 的 source/sink 与 `file_read` evidence 比较统一使用 target-relative 路径：workspace 工具返回的可选 `target/` 前缀、`./` 前缀及反斜杠在 trusted control plane 中规范化后再比较；同一规则也用于 evaluator 的 target-file 比较。该别名不改变 Agent 可见 target、finding 语义或 ground truth，只消除同一文件在 workspace mount 与 target snapshot 命名空间之间的表示差异。

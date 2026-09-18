@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "case_id": "flowise_3_1_3_repository_v1",
+  "purpose": "private unresolved registry; excluded from scored denominator until evidence is sufficient",
+  "entries": [
+    {
+      "id": "U01_pprx_patch_semantic_conflict",
+      "advisory": "GHSA-pprx-4prj-35mj",
+      "reported_range": "<= 3.1.3; patched 3.1.4",
+      "conflict": "The official advisory summary describes cross-tenant organization/workspace membership APIs, while the only identified release-path patch 5ecc3c5c closes cloud registration of non-active/uninvited users. The patch does not establish the claimed object-level source/sink/guard chain.",
+      "decision": "unresolved_not_scored",
+      "required_evidence": "identify the exact vulnerable membership call chain and either a matching fix, a safe sibling, or bounded local validator before admission"
+    },
+    {
+      "id": "U02_mcp_security_check_operator_bypass",
+      "advisory": "GHSA-vrr6-xgc3-j99r",
+      "reported_range": "<= 3.1.3; metadata says patched 3.1.4",
+      "conflict": "CUSTOM_MCP_SECURITY_CHECK=false bypass is present in both 3.1.3 and 3.1.4. Its precondition is an operator-controlled environment value, not an attacker-controlled configuration field proved by the snapshot.",
+      "decision": "unresolved_not_scored",
+      "required_evidence": "prove attacker control over the environment/precondition or document a release-specific remediation independent of the retained code"
+    }
+  ]
+}

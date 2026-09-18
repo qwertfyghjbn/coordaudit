@@ -19,15 +19,17 @@ FORBIDDEN_TARGET_NAMES = {
 
 class WorkspaceLayout:
     def __init__(self, run_dir: Path, agent_count: int):
-        self.run_dir = run_dir
+        # CLI callers may pass a relative --runs-dir. Tool resolution uses
+        # absolute paths, so the workspace root must use the same convention.
+        self.run_dir = Path(run_dir).resolve()
         self.agent_count = agent_count
-        self.runtime = run_dir / "runtime"
+        self.runtime = self.run_dir / "runtime"
         self.shared = self.runtime / "shared"
         self.private_root = self.runtime / "private"
         self.target_root = self.runtime / "target"
-        self.evaluator_private = run_dir / "evaluator_private"
-        self.logs = run_dir / "logs"
-        self.artifacts = run_dir / "artifacts"
+        self.evaluator_private = self.run_dir / "evaluator_private"
+        self.logs = self.run_dir / "logs"
+        self.artifacts = self.run_dir / "artifacts"
 
     def agent_private(self, agent_id: str) -> Path:
         return self.private_root / agent_id
@@ -50,7 +52,7 @@ def _copy_tree(src: Path, dst: Path, *, ignore_names: Iterable[str] = ()) -> Non
         dirs[:] = [
             name
             for name in dirs
-            if name not in ignore and name != "__pycache__" and not name.startswith(".")
+            if name not in ignore and name != "__pycache__" and name != ".git"
         ]
         target_dir = dst / rel
         target_dir.mkdir(parents=True, exist_ok=True)

@@ -21,3 +21,7 @@ Accepted
 ## 实现对齐（2026-09-15）
 
 `EventLog` 写入顺序化 `events.jsonl`，将命令、参数、模型/工具正文和错误正文移到 append-only `logs/artifacts/*.jsonl`；`TranscriptLog` 按 Agent 写入实际 request messages、tool schema、response 与截断后的 tool result。三者在落盘前使用同一确定性脱敏器，检测到 hidden evaluator/private 标记会把 run 标记为 `infrastructure_invalid`。`reconcile_run()` 校验事件和转录序号、父引用、artifact/transcript hash 与每一 permit 对应的 call/request/response 记录。这里的“可重放”是指可由保存的模型可见输入重建上下文与审计 lineage，并不承诺重新调用 provider 会得到相同响应。
+
+每个成功 provider response 的 `model_metadata` 还保留原始 `choices[0].finish_reason`（provider 未提供时为 `null`）；该字段同时进入 model-visible transcript 与对应的 `llm_call` event，用于区分正常停止、tool call 和 output-length 截断，不改变调用预算或 Agent 可见 prompt。
+
+宿主绝对路径脱敏不得破坏 JSON 编码字符串的转义边界；对工具结果等嵌套 JSON 文本替换路径后，持久化的文本仍必须可解析。

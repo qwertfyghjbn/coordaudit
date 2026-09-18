@@ -10,3 +10,7 @@ artifacts/
 # Python cache
 __pycache__/
 *.pyc
+
+# Flowise repository-v1 target: rebuilt from pinned upstream by
+# scripts/materialize_flowise_3_1_3_repository_v1.py (never committed)
+experiments/emergent_coordination/repositories/flowise_3_1_3_repository_v1/

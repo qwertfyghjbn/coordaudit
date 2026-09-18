@@ -6,6 +6,38 @@ from dataclasses import dataclass, field
 from typing import Any
 
 
+BUDGET_SCHEMA_VERSION = 2
+LEGACY_BUDGET_KEYS = frozenset(
+    {"global_input_token_cap", "global_output_token_cap", "per_agent_token_cap", "max_llm_calls"}
+)
+
+
+def validate_budget_config(budgets: dict[str, Any]) -> None:
+    legacy = sorted(LEGACY_BUDGET_KEYS & set(budgets))
+    if legacy:
+        joined = ", ".join(legacy)
+        raise ValueError(
+            f"legacy budget fields are not supported by the runtime permit path: {joined}; "
+            "use hard_team_call_permits and optional token_stop_threshold"
+        )
+
+
+def describe_budget_semantics(budgets: dict[str, Any]) -> dict[str, Any]:
+    threshold = budgets.get("token_stop_threshold")
+    return {
+        "schema_version": BUDGET_SCHEMA_VERSION,
+        "primary_budget_unit": "attempted_model_call",
+        "token_usage_role": "observed_outcome",
+        "retry_attempts_consume_permits": True,
+        "token_stop": {
+            "kind": "soft_post_response",
+            "threshold": threshold,
+            "basis": "provider_reported_input_plus_output",
+            "max_in_flight_calls": 1 if threshold is not None else None,
+        },
+    }
+
+
 class BudgetExhausted(Exception):
     def __init__(self, reason: str, snapshot: dict[str, Any]):
         super().__init__(reason)
@@ -55,10 +87,6 @@ class CallPermit:
 
 @dataclass
 class BudgetTracker:
-    global_input_token_cap: int | None = None
-    global_output_token_cap: int | None = None
-    per_agent_token_cap: int | None = None
-    max_llm_calls: int | None = None
     hard_team_call_permits: int | None = None
     token_stop_threshold: int | None = None
     wall_clock_timeout: float | None = None
@@ -70,20 +98,14 @@ class BudgetTracker:
     per_agent: dict[str, dict[str, int]] = field(default_factory=dict)
     permit_ledger: list[dict[str, Any]] = field(default_factory=list)
     _lock: threading.RLock = field(default_factory=threading.RLock, repr=False)
+    _condition: threading.Condition = field(init=False, repr=False)
 
     def __post_init__(self) -> None:
         if self.hard_team_call_permits is not None and self.hard_team_call_permits < 0:
             raise ValueError("hard_team_call_permits must be non-negative")
-        if self.max_llm_calls is not None and self.max_llm_calls < 0:
-            raise ValueError("max_llm_calls must be non-negative")
         if self.token_stop_threshold is not None and self.token_stop_threshold <= 0:
             raise ValueError("token_stop_threshold must be positive")
-        if (
-            self.hard_team_call_permits is not None
-            and self.max_llm_calls is not None
-            and self.hard_team_call_permits != self.max_llm_calls
-        ):
-            raise ValueError("max_llm_calls and hard_team_call_permits disagree")
+        self._condition = threading.Condition(self._lock)
 
     def _agent_bucket(self, agent_id: str) -> dict[str, int]:
         bucket = self.per_agent.setdefault(
@@ -101,22 +123,27 @@ class BudgetTracker:
     def snapshot(self) -> dict[str, Any]:
         with self._lock:
             return {
-                "global_input_tokens": self.global_input_tokens,
-                "global_output_tokens": self.global_output_tokens,
-                "global_cached_input_tokens": self.global_cached_input_tokens,
-                "global_reasoning_tokens": self.global_reasoning_tokens,
+                "schema_version": BUDGET_SCHEMA_VERSION,
                 "llm_calls": self.llm_calls,
                 "attempted_llm_calls": self.llm_calls,
                 "per_agent": {key: dict(value) for key, value in self.per_agent.items()},
                 "permit_ledger": [dict(entry) for entry in self.permit_ledger],
-                "caps": {
-                    "global_input_token_cap": self.global_input_token_cap,
-                    "global_output_token_cap": self.global_output_token_cap,
-                    "per_agent_token_cap": self.per_agent_token_cap,
-                    "max_llm_calls": self.max_llm_calls,
-                    "hard_team_call_permits": self._permit_limit(),
+                "enforced_limits": {
+                    "hard_team_call_permits": self.hard_team_call_permits,
+                },
+                "runtime_limits": {
+                    "wall_clock_timeout_seconds": self.wall_clock_timeout,
+                },
+                "soft_stops": {
                     "token_stop_threshold": self.token_stop_threshold,
-                    "wall_clock_timeout": self.wall_clock_timeout,
+                    "basis": "provider_reported_input_plus_output",
+                    "max_in_flight_calls": 1 if self.token_stop_threshold is not None else None,
+                },
+                "observed_usage": {
+                    "input_tokens": self.global_input_tokens,
+                    "cached_input_tokens": self.global_cached_input_tokens,
+                    "output_tokens": self.global_output_tokens,
+                    "reasoning_tokens": self.global_reasoning_tokens,
                 },
             }
 
@@ -127,19 +154,21 @@ class BudgetTracker:
         out or errors.  A retry is always a fresh permit and can optionally
         point at the permit it replaces.
         """
-        with self._lock:
-            limit = self._permit_limit()
-            if limit is not None and self.llm_calls >= limit:
-                raise BudgetExhausted("hard_team_call_permits", self.snapshot())
-            if self.token_stop_threshold is not None:
+        with self._condition:
+            while True:
+                if self.hard_team_call_permits is not None and self.llm_calls >= self.hard_team_call_permits:
+                    raise BudgetExhausted("hard_team_call_permits", self.snapshot())
+                if self.token_stop_threshold is None:
+                    break
                 observed_tokens = self.global_input_tokens + self.global_output_tokens
                 if observed_tokens >= self.token_stop_threshold:
                     raise BudgetExhausted("token_stop_threshold", self.snapshot())
-                # Usage is authoritative only after a response. Restricting a
-                # threshold-enabled budget to one request in flight gives the
-                # soft stop its stated one-call maximum overshoot guarantee.
-                if any(entry["outcome"] == "granted" for entry in self.permit_ledger):
-                    raise BudgetExhausted("token_stop_in_flight", self.snapshot())
+                # Provider usage is authoritative only after a response.  A
+                # threshold-enabled run therefore serializes provider calls.
+                # Temporary in-flight occupancy waits; it is not exhaustion.
+                if not any(entry["outcome"] == "granted" for entry in self.permit_ledger):
+                    break
+                self._condition.wait()
             if retry_of is not None and not any(entry["permit_id"] == retry_of for entry in self.permit_ledger):
                 raise ValueError(f"retry refers to unknown permit: {retry_of}")
 
@@ -164,7 +193,7 @@ class BudgetTracker:
         """
         if outcome not in {"succeeded", "timeout", "provider_error"}:
             raise ValueError(f"unsupported provider outcome: {outcome}")
-        with self._lock:
+        with self._condition:
             ledger_entry = next((entry for entry in self.permit_ledger if entry["permit_id"] == permit.permit_id), None)
             if ledger_entry is None:
                 raise ValueError(f"unknown permit: {permit.permit_id}")
@@ -174,11 +203,7 @@ class BudgetTracker:
             self._record_usage(permit.agent_id, token_usage)
             ledger_entry["outcome"] = outcome
             ledger_entry["token_usage"] = token_usage.as_dict()
-
-    def _permit_limit(self) -> int | None:
-        if self.hard_team_call_permits is not None:
-            return self.hard_team_call_permits
-        return self.max_llm_calls
+            self._condition.notify_all()
 
     def check_wall_clock(self, elapsed_seconds: float) -> None:
         if self.wall_clock_timeout is None:
@@ -188,47 +213,6 @@ class BudgetTracker:
                 "wall_clock_timeout",
                 {**self.snapshot(), "elapsed_seconds": elapsed_seconds},
             )
-
-    def charge(self, agent_id: str, usage: TokenUsage) -> None:
-        """Legacy test/helper API with pre-known usage.
-
-        Live callers must use acquire_call_permit() followed by
-        settle_call_permit(); provider usage is unavailable before a request.
-        """
-        with self._lock:
-            limit = self._permit_limit()
-            if limit is not None and self.llm_calls + 1 > limit:
-                raise BudgetExhausted("max_llm_calls", self.snapshot())
-
-            input_tokens = _as_int(usage.input_tokens)
-            output_tokens = _as_int(usage.output_tokens)
-            cached = _as_int(usage.cached_input_tokens)
-            reasoning = _as_int(usage.reasoning_tokens)
-
-            if (
-                self.global_input_token_cap is not None
-                and self.global_input_tokens + input_tokens > self.global_input_token_cap
-            ):
-                raise BudgetExhausted("global_input_token_cap", self.snapshot())
-            if (
-                self.global_output_token_cap is not None
-                and self.global_output_tokens + output_tokens > self.global_output_token_cap
-            ):
-                raise BudgetExhausted("global_output_token_cap", self.snapshot())
-
-            bucket = self._agent_bucket(agent_id)
-            agent_total = (
-                bucket["input_tokens"]
-                + bucket["output_tokens"]
-                + input_tokens
-                + output_tokens
-            )
-            if self.per_agent_token_cap is not None and agent_total > self.per_agent_token_cap:
-                raise BudgetExhausted("per_agent_token_cap", self.snapshot())
-
-            self.llm_calls += 1
-            bucket["llm_calls"] += 1
-            self._record_usage(agent_id, usage)
 
     def _record_usage(self, agent_id: str, usage: TokenUsage) -> None:
         input_tokens = _as_int(usage.input_tokens)

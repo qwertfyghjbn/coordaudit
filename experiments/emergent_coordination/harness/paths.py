@@ -17,3 +17,13 @@ def agent_id_for(index: int) -> str:
     if index < 1:
         raise ValueError("agent index is 1-based")
     return f"agent_{index:03d}"
+
+
+def normalize_target_relative_path(value: object) -> str:
+    """Canonicalize an Agent-visible path for target-relative comparisons.
+
+    Workspace tools expose the mounted snapshot under ``target/`` while the
+    finding schema names locations relative to that snapshot.  Both spellings
+    therefore identify the same target file for trusted-plane comparisons.
+    """
+    return str(value or "").strip().replace("\\", "/").removeprefix("./").removeprefix("target/")

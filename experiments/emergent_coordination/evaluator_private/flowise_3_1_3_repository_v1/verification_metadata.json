@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "case_id": "flowise_3_1_3_repository_v1",
+  "policy": "Agent verification claims are never a scored TP prerequisite. This file records control-plane validator status only.",
+  "as_of": "2026-09-18",
+  "environment": {
+    "target_node_modules": "materialized workspace copy (artifacts/flowise_3_1_3_repository_v1_dependency_env); frozen target itself remains dependency-free",
+    "local_node": "v24.14.1 (materialized runtime, official distribution verified against SHASUMS256.txt)",
+    "target_server_engines": "^24",
+    "network": "disabled for target validation (dead proxy)"
+  },
+  "results": [
+    {
+      "root": "R10_mcp_stdio_executable_policy",
+      "status": "passed",
+      "evidence_strength": "static_plus_targeted",
+      "reason": "Offline targeted validation passed (2026-09-18): validateMCPServerConfig rejects allowlist-external commands with the hardcoded allowlist enumerated, while npx with a bare attacker-chosen package name is accepted (no dangerous flags needed), confirming package-launching executables reach the process execution gate. No process spawned. See validation_recipes.json evidence for fixture and log digest."
+    },
+    {
+      "root": "R13_sqlite_chain_write_capability",
+      "status": "passed",
+      "evidence_strength": "static_plus_targeted",
+      "reason": "Offline targeted validation passed (2026-09-18): driving the real frozen SqlDatabaseChain with a recording datasource stub and a fake LLM, the generated non-SELECT statement reaches datasource.query() verbatim alongside the normal schema-introspection SELECTs, with no read-only statement guard on the wrapper. See validation_recipes.json evidence for fixture and log digest."
+    },
+    {
+      "root": "R14_chat_model_baseurl_egress_policy",
+      "status": "passed",
+      "evidence_strength": "static_plus_targeted",
+      "reason": "Offline targeted validation passed (2026-09-18): ChatLocalAI init assigns a user-configured basePath verbatim as the credential-bearing client clientConfig.baseURL with zero calls to the shared deny-list policy; no-network by construction (lazy client). See validation_recipes.json evidence for fixture and log digest."
+    },
+    {
+      "root": "R16_memory_session_id_type",
+      "status": "passed",
+      "evidence_strength": "static_plus_targeted",
+      "reason": "Offline targeted validation passed (2026-09-18): getMemorySessionId returns an object-valued overrideConfig.sessionId (and chatId) reference-identical without scalar-string enforcement; string control behaves as intended. See validation_recipes.json evidence for fixture and log digest."
+    },
+    {
+      "root": "R17_document_loader_egress_policy",
+      "status": "passed",
+      "evidence_strength": "static_plus_targeted",
+      "reason": "Offline targeted validation passed (2026-09-18): the Playwright loader path constructs browser navigation with the user-supplied URL verbatim, config carries no deny/redirect policy, and the deny-list policy spy records zero calls; transport fully mocked, no browser or network. See validation_recipes.json evidence for fixture and log digest."
+    }
+  ],
+  "non_network_preflight": "safe sibling excerpts and recipe coverage checked by repository-v1 private asset test"
+}

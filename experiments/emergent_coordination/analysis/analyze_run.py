@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Any, Iterable, Mapping
 
 
-METRICS_SCHEMA_VERSION = 1
+METRICS_SCHEMA_VERSION = 2
 BLOCK_COMPARISON_SCHEMA_VERSION = 1
 _SEARCH_COMMANDS = frozenset({"rg", "grep", "git-grep", "ag", "ack"})
 _TEST_COMMANDS = frozenset({"pytest", "unittest", "tox", "nox"})
@@ -35,8 +35,9 @@ def analyze_run(run_dir: Path, *, write: bool = True) -> dict[str, Any]:
 
     duplicate_work = _duplicate_work(events, artifacts, findings)
     allocation = _resource_allocation(events, summary, agent_ids)
-    blackboard = _blackboard_metrics(events)
-    structured_team = _structured_team_metrics(events, artifacts, findings)
+    mode = str(summary.get("mode") or "")
+    blackboard = _blackboard_metrics(events, mode=mode)
+    structured_team = _structured_team_metrics(events, artifacts, findings, mode=mode)
     result = {
         "schema_version": METRICS_SCHEMA_VERSION,
         "run_id": summary.get("run_id"),
@@ -265,8 +266,8 @@ def _resource_allocation(events: list[dict[str, Any]], summary: dict[str, Any], 
             "actual_tokens": _int(usage.get("input_tokens")) + _int(usage.get("output_tokens")),
             "active_wall_seconds": active_seconds,
         }
-    caps = budget.get("caps") or {}
-    permit_cap = caps.get("hard_team_call_permits")
+    enforced_limits = budget.get("enforced_limits") or budget.get("caps") or {}
+    permit_cap = enforced_limits.get("hard_team_call_permits")
     permit_values = [item["permits_acquired"] for item in agents.values()]
     token_values = [item["actual_tokens"] for item in agents.values()]
     active_values = [item["active_wall_seconds"] or 0.0 for item in agents.values()]
@@ -289,10 +290,29 @@ def _resource_allocation(events: list[dict[str, Any]], summary: dict[str, Any], 
     }
 
 
-def _blackboard_metrics(events: list[dict[str, Any]]) -> dict[str, Any]:
+def _model_tool_invocations(events: list[dict[str, Any]], tool_names: Iterable[str]) -> dict[str, int]:
+    """Count model-selected tool calls once, before tool-side event fan-out.
+
+    A single tool invocation can legitimately produce both the dispatch
+    ``tool_call`` event and a tool-specific event.  The dispatch event is the
+    one carrying the model-generated arguments, so it is the only safe source
+    for invocation counts.
+    """
+    names = {str(name) for name in tool_names}
+    counts = Counter()
+    for event in _events_of(events, "tool_call"):
+        payload = event.get("payload") or {}
+        tool = str(payload.get("tool") or "")
+        if tool in names and isinstance(payload.get("arguments"), dict):
+            counts[tool] += 1
+    return {name: counts[name] for name in sorted(names)}
+
+
+def _blackboard_metrics(events: list[dict[str, Any]], *, mode: str) -> dict[str, Any]:
     started = _timestamp(next(iter(_events_of(events, "run_started")), {}))
     writes = _events_of(events, "shared_create")
     reads = _events_of(events, "shared_read")
+    tool_invocations = _model_tool_invocations(events, ("shared_list", "shared_read", "shared_mkdir", "shared_create"))
     lineage: dict[str, dict[str, Any]] = {}
     for event in sorted(writes + reads, key=lambda item: _int(item.get("sequence"))):
         payload = event.get("payload") or {}
@@ -314,7 +334,11 @@ def _blackboard_metrics(events: list[dict[str, Any]]) -> dict[str, Any]:
     first_write = _timestamp(writes[0]) if writes else None
     first_read = _timestamp(reads[0]) if reads else None
     return {
-        "available": bool(writes or reads),
+        "available": mode == "raw_blackboard",
+        "availability_note": "available 表示该 condition 向 Agent 暴露 generic shared-store 工具，不表示发生了共享活动。",
+        "model_tool_invocations": tool_invocations,
+        "tool_activity_observed": any(tool_invocations.values()),
+        "content_exchange_observed": bool(writes or reads),
         "first_write_latency_seconds": _duration_seconds(started, first_write),
         "first_read_latency_seconds": _duration_seconds(started, first_read),
         "write_count": len(writes),
@@ -325,13 +349,36 @@ def _blackboard_metrics(events: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
-def _structured_team_metrics(events: list[dict[str, Any]], artifacts: dict[tuple[str, str], Any], findings: list[dict[str, Any]]) -> dict[str, Any]:
+def _structured_team_metrics(
+    events: list[dict[str, Any]],
+    artifacts: dict[tuple[str, str], Any],
+    findings: list[dict[str, Any]],
+    *,
+    mode: str,
+) -> dict[str, Any]:
     created = _events_of(events, "task_created")
     completed = _events_of(events, "task_completed")
     claimed = _events_of(events, "task_claimed")
     released = _events_of(events, "task_released")
     conflicts = _events_of(events, "task_claim_conflict")
     observed = _events_of(events, "task_result_observed")
+    tool_invocations = _model_tool_invocations(
+        events,
+        ("list_tasks", "create_task", "claim_task", "release_task", "complete_task"),
+    )
+    task_list_dispatches = {
+        event.get("event_id")
+        for event in _events_of(events, "tool_call")
+        if (event.get("payload") or {}).get("tool") == "list_tasks"
+        and isinstance((event.get("payload") or {}).get("arguments"), dict)
+    }
+    task_list_results = [
+        event
+        for event in _events_of(events, "tool_call")
+        if (event.get("payload") or {}).get("tool") == "list_tasks"
+        and "count" in (event.get("payload") or {})
+        and bool(task_list_dispatches & set(event.get("parent_event_ids") or []))
+    ]
     created_by_id = {(event.get("payload") or {}).get("id"): event for event in created}
     completed_by_id = {(event.get("payload") or {}).get("task_id"): event for event in completed}
     claimed_by_id = {(event.get("payload") or {}).get("task_id"): event for event in claimed}
@@ -359,7 +406,18 @@ def _structured_team_metrics(events: list[dict[str, Any]], artifacts: dict[tuple
             state = "claimed_without_completion" if task_id in claimed_by_id and task_id not in released_ids else "open_or_released_without_completion"
             unfinished.append({"task_id": task_id, "state_at_run_end": state, "creator": event.get("agent_id")})
     return {
-        "available": bool(created or claimed or conflicts or completed or observed),
+        "available": mode == "structured_team",
+        "availability_note": "available 表示该 condition 向 Agent 暴露 typed task 工具，不表示发生了任务生命周期活动。",
+        "model_tool_invocations": tool_invocations,
+        "tool_activity_observed": any(tool_invocations.values()),
+        "lifecycle_activity_observed": bool(created or claimed or conflicts or completed or observed),
+        "task_list_reads": {
+            "invocation_count": tool_invocations["list_tasks"],
+            "observed_result_count": len(task_list_results),
+            "empty_result_count": sum((event.get("payload") or {}).get("count") == 0 for event in task_list_results),
+            "nonempty_result_count": sum(_int((event.get("payload") or {}).get("count")) > 0 for event in task_list_results),
+            "result_note": "结果计数只关联到对应 model-selected list_tasks dispatch 的工具侧事件，避免把一次调用的双重日志误计为两次调用。",
+        },
         "tasks_created": len(created),
         "tasks_claimed": len(claimed),
         "claim_conflicts": {"count": len(conflicts), "events": [event.get("event_id") for event in conflicts]},
@@ -398,8 +456,8 @@ def _comparison_projection(metrics: dict[str, Any]) -> dict[str, Any]:
         "duplicates": evaluation.get("duplicates"),
         "duplicate_work": (metrics.get("duplicate_work") or {}).get("aggregate"),
         "resource": (allocation.get("team") or {}),
-        "blackboard": {key: (metrics.get("blackboard") or {}).get(key) for key in ("write_count", "read_count", "cross_agent_read_count", "first_write_latency_seconds", "first_read_latency_seconds")},
-        "structured_team": {key: (metrics.get("structured_team") or {}).get(key) for key in ("tasks_created", "tasks_claimed", "tasks_completed", "claim_conflicts", "task_result_evidence_adoption")},
+        "blackboard": {key: (metrics.get("blackboard") or {}).get(key) for key in ("available", "tool_activity_observed", "model_tool_invocations", "write_count", "read_count", "cross_agent_read_count", "first_write_latency_seconds", "first_read_latency_seconds")},
+        "structured_team": {key: (metrics.get("structured_team") or {}).get(key) for key in ("available", "tool_activity_observed", "lifecycle_activity_observed", "model_tool_invocations", "task_list_reads", "tasks_created", "tasks_claimed", "tasks_completed", "claim_conflicts", "task_result_evidence_adoption")},
     }
 
 

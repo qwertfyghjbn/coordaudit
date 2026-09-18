@@ -20,6 +20,9 @@ EVENT_TYPES = (
     "llm_retry_scheduled", "tool_call", "file_read", "file_write",
     "shared_list", "shared_read", "shared_create", "shared_mkdir",
     "task_created", "task_claimed", "task_claim_conflict", "task_released", "task_completed", "task_result_observed",
+    "manager_task_created", "manager_task_assigned", "manager_task_listed", "manager_task_cancelled",
+    "manager_task_reassigned", "manager_assignment_observed", "manager_worker_reported",
+    "manager_report_observed", "manager_worker_requested_more",
     "message_sent", "message_read", "artifact_published", "finding_submitted", "finding_submission_rejected",
     "budget_exhausted", "timeout", "error", "run_started", "run_finished",
 )
@@ -33,7 +36,7 @@ _SECRET_KEYS = frozenset({
     "access_token", "refresh_token", "client_secret", "x_api_key",
 })
 _HIDDEN_MARKERS = ("evaluator_private", "ground_truth.json", "provenance.json")
-_HOST_PATH = re.compile(r"(?<![\w<])/(?:home|users|private|var|tmp)/[^\s\"']+", re.IGNORECASE)
+_HOST_PATH = re.compile(r"(?<![\w<])/(?:home|users|private|var|tmp)/[^\s\"'\\]+", re.IGNORECASE)
 _HEADER_SECRET = re.compile(
     r"(?i)\b(authorization|proxy-authorization|x-api-key|api[_-]?key|access[_-]?token|"
     r"refresh[_-]?token|client[_-]?secret|password)\b(\s*[:=]\s*)(?:bearer\s+)?[^\s,;\"'}]+"

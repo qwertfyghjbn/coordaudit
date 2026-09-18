@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "case_id": "flowise_3_1_3_repository_v1",
+  "purpose": "private bounded local validation recipes; none is a TP prerequisite",
+  "network_policy": "no external network; use unit stubs, mocked transport, temporary local paths, or a fake process only",
+  "recipes": [
+    {
+      "root": "R10_mcp_stdio_executable_policy",
+      "class": "B",
+      "recipe": "Call validateMCPServerConfig with a non-operator-allowed command and assert rejection; do not spawn a process.",
+      "cost": "medium",
+      "status": "passed",
+      "reason": "targeted local validation executed offline on 2026-09-18 in the materialized Node 24 dependency environment",
+      "evidence": {
+        "executed_on": "2026-09-18",
+        "environment_root": "artifacts/flowise_3_1_3_repository_v1_dependency_env",
+        "node": "v24.14.1",
+        "network": "disabled (dead proxy) during validation; no process spawned",
+        "fixture": "evaluator_private/flowise_3_1_3_repository_v1/validators/r10_mcp_stdio_executable_policy.test.ts",
+        "runner": "jest 29.7.0 from the frozen server package, ts-jest transpile-only",
+        "assertions": [
+          "command 'curl' rejected with the hardcoded allowlist enumerated in the error ('node, npx, python, python3, docker')",
+          "command 'npx' with args ['attacker-package'] accepted: attacker-chosen package resolution passes the gate (vulnerable semantics)",
+          "negative control: flag machinery active, node -e rejected",
+          "control: allowlisted command with benign arguments accepted"
+        ],
+        "result": "4 passed, 0 failed",
+        "log": "artifacts/flowise_3_1_3_repository_v1_dependency_env/logs/r10-validation.log",
+        "log_sha256": "da03bcb63f7c4da02f6d9e6586b3465c71e99c21ab3b9bae19d3690d185d03a0",
+        "required_for_tp": false
+      }
+    },
+    {
+      "root": "R13_sqlite_chain_write_capability",
+      "class": "B",
+      "recipe": "Use a local datasource query stub and assert a non-SELECT statement reaches the unguarded wrapper in 3.1.3; no database server or exploit payload.",
+      "cost": "medium",
+      "status": "passed",
+      "reason": "targeted local validation executed offline on 2026-09-18 in the materialized Node 24 dependency environment",
+      "evidence": {
+        "executed_on": "2026-09-18",
+        "environment_root": "artifacts/flowise_3_1_3_repository_v1_dependency_env",
+        "node": "v24.14.1",
+        "network": "disabled (dead proxy) during validation; recording datasource stub, no database file or server",
+        "fixture": "evaluator_private/flowise_3_1_3_repository_v1/validators/r13_sqlite_chain_write_capability.test.ts",
+        "runner": "jest 29.7.0 from the frozen server package, ts-jest transpile-only",
+        "assertions": [
+          "real frozen node init + real @langchain/classic SqlDatabaseChain executed; only the datasource is a recording stub (typeorm.shim.ts) and the LLM a fake emitting one benign UPDATE statement",
+          "control: sqlite_master schema-introspection SELECTs reached datasource.query() normally",
+          "vulnerable semantics: the LLM-generated non-SELECT statement (\"UPDATE users SET name = 'validator' WHERE id = 1\") reached datasource.query() verbatim with no read-only guard rejecting it"
+        ],
+        "result": "1 passed, 0 failed",
+        "log": "artifacts/flowise_3_1_3_repository_v1_dependency_env/logs/r13-validation.log",
+        "log_sha256": "3700f3f7b0f6dd8d5c1d96414d5987ae548be745d5f8b64f9151c911f62a5b41",
+        "required_for_tp": false
+      }
+    },
+    {
+      "root": "R14_chat_model_baseurl_egress_policy",
+      "class": "B",
+      "recipe": "Inject a mocked checkDenyList/HTTP client and verify the vulnerable init path assigns baseURL without calling the policy; no DNS or network.",
+      "cost": "medium",
+      "status": "passed",
+      "reason": "targeted local validation executed offline on 2026-09-18 in the materialized Node 24 dependency environment",
+      "evidence": {
+        "executed_on": "2026-09-18",
+        "environment_root": "artifacts/flowise_3_1_3_repository_v1_dependency_env",
+        "node": "v24.14.1",
+        "network": "disabled (dead proxy) during validation; LangChain client is lazy / browser transport fully mocked",
+        "runner": "jest 29.7.0 from the frozen server package, ts-jest transpile-only",
+        "required_for_tp": false,
+        "fixture": "evaluator_private/flowise_3_1_3_repository_v1/validators/r14_chat_model_baseurl_egress_policy.test.ts",
+        "assertions": [
+          "user-configured basePath http://169.254.169.254/latest/meta-data/ assigned verbatim as the lazy client clientConfig.baseURL (vulnerable semantics)",
+          "shared deny-list policy spy (components src/httpSecurity checkDenyList, same module instance as paths that do use it) invoked zero times during init",
+          "control: without basePath no baseURL is injected"
+        ],
+        "result": "2 passed, 0 failed",
+        "log": "artifacts/flowise_3_1_3_repository_v1_dependency_env/logs/r14-validation.log",
+        "log_sha256": "e463e1b14bb00c8b6ad44e2eac4ca7fef53dfda2b200ffe612602e4ebd631f64"
+      }
+    },
+    {
+      "root": "R16_memory_session_id_type",
+      "class": "B",
+      "recipe": "Call getMemorySessionId with an object-valued overrideConfig.sessionId and observe the value is returned; no database needed.",
+      "cost": "low",
+      "status": "passed",
+      "reason": "targeted local validation executed offline on 2026-09-18 in the materialized Node 24 dependency environment",
+      "evidence": {
+        "executed_on": "2026-09-18",
+        "environment_root": "artifacts/flowise_3_1_3_repository_v1_dependency_env",
+        "node": "v24.14.1",
+        "network": "disabled (dead proxy) during validation",
+        "fixture": "evaluator_private/flowise_3_1_3_repository_v1/validators/r16_memory_session_id_type.test.ts",
+        "runner": "jest 29.7.0 from the frozen server package, ts-jest transpile-only",
+        "assertions": [
+          "object-valued overrideConfig.sessionId returned reference-identical, typeof is not string (vulnerable semantics)",
+          "object-valued incomingInput.chatId also returned unchecked (secondary path)",
+          "control: string sessionId passes through unchanged"
+        ],
+        "result": "3 passed, 0 failed",
+        "log": "artifacts/flowise_3_1_3_repository_v1_dependency_env/logs/r16-validation.log",
+        "log_sha256": "334303b08083538ab774f08c128a2240af8eda734f6b2f2e67483c359747538d",
+        "required_for_tp": false
+      }
+    },
+    {
+      "root": "R17_document_loader_egress_policy",
+      "class": "B",
+      "recipe": "Mock the loader transport/navigation and record that vulnerable code creates navigation without invoking a redirect-aware policy; no browser download or network.",
+      "cost": "medium",
+      "status": "passed",
+      "reason": "targeted local validation executed offline on 2026-09-18 in the materialized Node 24 dependency environment",
+      "evidence": {
+        "executed_on": "2026-09-18",
+        "environment_root": "artifacts/flowise_3_1_3_repository_v1_dependency_env",
+        "node": "v24.14.1",
+        "network": "disabled (dead proxy) during validation; LangChain client is lazy / browser transport fully mocked",
+        "runner": "jest 29.7.0 from the frozen server package, ts-jest transpile-only",
+        "required_for_tp": false,
+        "fixture": "evaluator_private/flowise_3_1_3_repository_v1/validators/r17_document_loader_egress_policy.test.ts",
+        "assertions": [
+          "PlaywrightWebBaseLoader (mocked transport, no browser) constructed exactly once with the user-supplied URL http://169.254.169.254/latest/meta-data/ verbatim",
+          "navigation config contains launchOptions only; no deny/policy/redirect field; deny-list policy spy invoked zero times",
+          "document output preserves metadata.source equal to the attacker URL (data flowed through the mocked navigation)"
+        ],
+        "result": "1 passed, 0 failed",
+        "log": "artifacts/flowise_3_1_3_repository_v1_dependency_env/logs/r17-validation.log",
+        "log_sha256": "5d184d047570a11550417d93a16e4d662997dd9500b20c897abcf8a586fdfbb5"
+      }
+    }
+  ]
+}

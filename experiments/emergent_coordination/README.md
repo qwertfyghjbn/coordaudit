@@ -80,6 +80,7 @@ All modes use the same `AgentRunner`. Mode differences are a `CoordinationPolicy
 | `parallel` (`Pn`) | `--mode parallel --agents N` | none | none |
 | `raw_blackboard` (`Bn`) | `--mode raw_blackboard --agents N` | none by default | raw `/shared` filesystem |
 | `structured_team` (`Tn`) | `--mode structured_team --agents N` | typed task state | structured board |
+| `manager_worker` (`Mn`) | `--mode manager_worker --agents N` | manager↔worker task/report channel only | role-restricted star board |
 
 `N` can be `2`, `4`, `8` now. The same runner accepts `16` and `32` without code changes. Do **not** start those expensive runs from this pilot.
 
@@ -103,7 +104,9 @@ The B-mode prompt does **not** tell agents they are a team, to cooperate, to ele
 
 The primary N=4 treatment exposes only `create_task`, `list_tasks`, `claim_task`, `release_task`, and `complete_task`. A completed task records its result and evidence references. No pre-assigned team lead, messaging, or artifact channel is exposed.
 
-The interface is intentionally small so later modes (`manager_worker`, `fixed_roles`, `fixed_graph`) can be added as new policies.
+### M — Manager–worker
+
+`agent_001` is the manager; the other `N-1` agents are workers. The manager alone can create, cancel, and reassign tasks and sees worker reports; a worker sees only its own assignment and reports results plus evidence references back to the manager. Workers have no worker-to-worker channel, claim, or broadcast primitive. Manager and workers draw on the same team permit pool, and the manager may submit only evidence it read itself or explicitly observed via `manager_list_tasks`. Sizing and the M16 manager-bottleneck diagnostics are planned in [`docs/plans/M4_M8_M16_MANAGER_WORKER_PLAN.md`](../../docs/plans/M4_M8_M16_MANAGER_WORKER_PLAN.md). The policy interface stays minimal so later modes (`fixed_roles`, `fixed_graph`) can still be added as new policies.
 
 ## 冻结的 N=4 实验合同
 
@@ -168,6 +171,10 @@ Every run has a **shared global** resource contract:
 
 `token_stop_threshold`（如配置）只在 provider 回报实际 input/output usage 后阻止后续调用，不退还已发放 permit；为保证最多一次 in-flight overshoot，启用该阈值时只允许一条未结算 provider 请求。它不是精确的 token admission budget。
 
+等待该唯一 in-flight 请求的 Agent 会在请求结算后重新参与 permit 仲裁；等待本身不是 `BudgetExhausted`。由于这种串行化会改变并发条件，正式 P/B/T matched block 默认将 `token_stop_threshold` 保持为 `null`。
+
+当前 runner 配置拒绝历史字段 `global_input_token_cap`、`global_output_token_cap`、`per_agent_token_cap` 与 `max_llm_calls`。budget snapshot schema v2 使用 `enforced_limits`、`runtime_limits`、`soft_stops` 和 `observed_usage` 区分硬 admission、运行边界、软停机与实际资源结果；历史 artifact 仍按原 schema 只读解析。
+
 Token fields that a provider does not expose are stored as `null`. Dollar prices are not written into run history.
 
 ## Reproducibility
@@ -216,6 +223,8 @@ python3 -m experiments.emergent_coordination.analysis.analyze_run runs/<run_id>
 ```
 
 每个完成的 run 会自动写入 `metrics.json`。它包含规范化的文件/search/source→sink hypothesis/test 指纹、跨 Agent 重复工作、permit/token/active-time/并发/Gini、B 的 shared 路径和内容 hash lineage，以及 T 的 claim conflict、未完成任务、重复任务和显式 evidence adoption。
+
+metrics schema v2 将“能力暴露”与“实际活动”分开：`blackboard.available` 与 `structured_team.available` 仅表示对应 condition 的工具是否向 Agent 暴露；`tool_activity_observed`、`model_tool_invocations` 和（T 的）`lifecycle_activity_observed` 描述实际行为。`task_list_reads` 进一步记录模型实际发起的 `list_tasks` 及其空/非空结果。一次模型 tool call 可能产生一个工具侧子事件，因此 invocation 只从带模型参数的 dispatch event 计数，避免双计。工具被调用、任务被列出或时间相邻本身都不证明协作或采纳。
 
 对冻结 block 可显式绑定各 condition 的 run，再生成 `block_comparison.json`：
 

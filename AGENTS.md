@@ -21,3 +21,17 @@
 
 - Python imports 当前保留 `experiments.emergent_coordination` 以降低首次迁移风险；包名重构必须作为单独变更。
 - 所有文档以中文为主；跨仓引用使用 remote、commit、case ID 与 hash，避免把 `/home/lqs/...` 当作可移植运行依赖。
+
+## Agent skills
+
+### Issue tracker
+
+本仓库的 issue 与 PRD 使用 GitHub Issues：`qwertfyghjbn/coordaudit`。参见 `docs/agents/issue-tracker.md`。
+
+### Triage labels
+
+使用默认的五个 triage 标签。参见 `docs/agents/triage-labels.md`。
+
+### Domain docs
+
+本仓库为 single-context：根级 `CONTEXT.md` 与 `docs/adr/` 是领域语言和决策的来源。参见 `docs/agents/domain.md`。

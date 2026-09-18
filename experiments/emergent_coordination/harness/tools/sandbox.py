@@ -8,8 +8,12 @@ from pathlib import Path
 from typing import Any, Callable
 
 from experiments.emergent_coordination.harness.events import EventLog
-from experiments.emergent_coordination.harness.findings import validate_evidence_refs, validate_payload
+from experiments.emergent_coordination.harness.findings import validate_evidence_refs as validate_v0_evidence_refs
+from experiments.emergent_coordination.harness.findings import validate_payload as validate_v0_payload
+from experiments.emergent_coordination.harness.repository_v1_findings import validate_evidence_refs as validate_v1_evidence_refs
+from experiments.emergent_coordination.harness.repository_v1_findings import validate_payload as validate_v1_payload
 from experiments.emergent_coordination.harness.shared_fs import SharedFilesystem, SharedFilesystemError
+from experiments.emergent_coordination.harness.manager_board import ManagerBoard, ManagerCoordinationError
 from experiments.emergent_coordination.harness.task_board import CoordinationError, TaskBoard
 from experiments.emergent_coordination.harness.workspace import WorkspaceLayout, sha256_text
 
@@ -101,8 +105,10 @@ class AgentSandbox:
         *,
         shared: SharedFilesystem | None = None,
         board: TaskBoard | None = None,
+        manager_board: ManagerBoard | None = None,
         internet: bool = False,
         require_os_sandbox: bool = False,
+        finding_schema: str = "repository_pilot_v0",
         submit_callback: Callable[[str, dict[str, Any]], None] | None = None,
     ):
         self.agent_id = agent_id
@@ -110,8 +116,10 @@ class AgentSandbox:
         self.event_log = event_log
         self.shared = shared
         self.board = board
+        self.manager_board = manager_board
         self.internet = internet
         self.require_os_sandbox = require_os_sandbox
+        self.finding_schema = finding_schema
         self.submit_callback = submit_callback
         self.private_root = layout.agent_private(agent_id)
         self.target_root = layout.agent_target(agent_id)
@@ -305,6 +313,48 @@ class AgentSandbox:
     def list_artifacts(self) -> list[dict[str, Any]]:
         return self._board().list_artifacts(self.agent_id)
 
+    def manager_create_task(self, worker_id: str, description: str) -> dict[str, Any]:
+        try:
+            return self._manager_board().create_task(self.agent_id, worker_id, description)
+        except ManagerCoordinationError as exc:
+            raise ToolError(str(exc)) from exc
+
+    def manager_list_tasks(self) -> list[dict[str, Any]]:
+        try:
+            return self._manager_board().list_tasks(self.agent_id)
+        except ManagerCoordinationError as exc:
+            raise ToolError(str(exc)) from exc
+
+    def manager_cancel_task(self, task_id: str, reason: str) -> dict[str, Any]:
+        try:
+            return self._manager_board().cancel_task(self.agent_id, task_id, reason)
+        except ManagerCoordinationError as exc:
+            raise ToolError(str(exc)) from exc
+
+    def manager_reassign_task(self, task_id: str, worker_id: str) -> dict[str, Any]:
+        try:
+            return self._manager_board().reassign_task(self.agent_id, task_id, worker_id)
+        except ManagerCoordinationError as exc:
+            raise ToolError(str(exc)) from exc
+
+    def worker_get_assignment(self) -> dict[str, Any] | None:
+        try:
+            return self._manager_board().get_assignment(self.agent_id)
+        except ManagerCoordinationError as exc:
+            raise ToolError(str(exc)) from exc
+
+    def worker_report_task(self, task_id: str, result: str, evidence_refs: list[str]) -> dict[str, Any]:
+        try:
+            return self._manager_board().report_task(self.agent_id, task_id, result, evidence_refs)
+        except ManagerCoordinationError as exc:
+            raise ToolError(str(exc)) from exc
+
+    def worker_request_more(self) -> dict[str, Any]:
+        try:
+            return self._manager_board().request_more(self.agent_id)
+        except ManagerCoordinationError as exc:
+            raise ToolError(str(exc)) from exc
+
     def submit_findings(self, findings: dict[str, Any] | list[Any]) -> dict[str, Any]:
         self.submission_attempts += 1
         if isinstance(findings, list):
@@ -313,7 +363,14 @@ class AgentSandbox:
             payload = findings
         else:
             payload = {"findings": [findings]}
-        intake = validate_payload(payload)
+        if self.finding_schema == "repository_pilot_v0":
+            intake = validate_v0_payload(payload)
+            validate_evidence_refs = validate_v0_evidence_refs
+        elif self.finding_schema == "repository_v1":
+            intake = validate_v1_payload(payload)
+            validate_evidence_refs = validate_v1_evidence_refs
+        else:
+            raise ToolError("unsupported finding schema")
         errors = list(intake.errors)
         if intake.accepted:
             all_events = self.event_log.read_all()
@@ -333,9 +390,15 @@ class AgentSandbox:
                 if event.get("agent_id") == self.agent_id and event.get("event_type") == "task_result_observed"
                 for reference in ((event.get("payload") or {}).get("evidence_refs") or [])
             }
+            manager_report_observed = {
+                reference
+                for event in all_events
+                if event.get("agent_id") == self.agent_id and event.get("event_type") == "manager_report_observed"
+                for reference in ((event.get("payload") or {}).get("evidence_refs") or [])
+            }
             evidence_events = {
                 reference: file_reads[reference]
-                for reference in directly_read | task_observed
+                for reference in directly_read | task_observed | manager_report_observed
                 if reference in file_reads
             }
             errors.extend(validate_evidence_refs(intake.payload or {}, evidence_events))
@@ -363,3 +426,8 @@ class AgentSandbox:
         if self.board is None:
             raise ToolError("structured coordination APIs are not available in this mode")
         return self.board
+
+    def _manager_board(self) -> ManagerBoard:
+        if self.manager_board is None:
+            raise ToolError("manager-worker coordination is not available in this mode")
+        return self.manager_board

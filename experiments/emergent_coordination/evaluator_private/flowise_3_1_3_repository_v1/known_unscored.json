@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "case_id": "flowise_3_1_3_repository_v1",
+  "purpose": "private known-unscored registry; never part of scored denominator",
+  "entries": [
+    {
+      "id": "KU01_mcp_tool_description_instruction_confusion",
+      "advisory": "GHSA-vrr6-xgc3-j99r",
+      "class": "C",
+      "reason": "Remote MCP tool description reaches an LLM-facing Tool description, but security impact requires model-specific instruction following; 3.1.4 sanitization is not a deterministic proof of exploit prevention.",
+      "anchor": {"path": "packages/components/nodes/tools/MCP/core.ts", "symbol": "MCPToolkit.getTools", "excerpt": "description: tool.description || tool.name"},
+      "validation_cost": "high; model/runtime dependent",
+      "disposition": "known_unscored_dynamic_dependent"
+    },
+    {
+      "id": "KU02_nodevm_dependency_escape_chain",
+      "advisory": "GHSA-vrr6-xgc3-j99r",
+      "class": "C",
+      "reason": "The reported sandbox escape depends on concrete dependency/package/runtime behavior. The observed release delta is dependency-oriented and does not yield a bounded static capability proof.",
+      "anchor": {"path": "packages/components/src/", "symbol": "NodeVM/sandbox dependency path", "excerpt": "environment-controlled dependency expansion"},
+      "validation_cost": "high; full sandbox/runtime chain",
+      "disposition": "known_unscored_dynamic_dependent"
+    }
+  ]
+}

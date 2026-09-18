@@ -19,136 +19,146 @@ class AgentRunner:
         agent_id: str,
         mode: str,
         agent_count: int,
+        role: str | None = None,
         sandbox: AgentSandbox,
         llm: LLMClient,
         event_log: EventLog,
         transcript_log: TranscriptLog,
         budget: BudgetTracker,
+        prompt_profile: str = "repository_pilot_v0",
+        finding_schema: str = "repository_pilot_v0",
         max_steps: int = 12,
         max_provider_retries: int = 0,
     ):
         self.agent_id = agent_id
         self.mode = mode
         self.agent_count = agent_count
+        self.role = role
         self.sandbox = sandbox
         self.llm = llm
         self.event_log = event_log
         self.transcript_log = transcript_log
         self.budget = budget
+        self.prompt_profile = prompt_profile
+        self.finding_schema = finding_schema
         self.max_steps = max_steps
         self.max_provider_retries = max_provider_retries
-        self._allowed_tools = frozenset(item["function"]["name"] for item in tools_for_mode(mode))
+        self._allowed_tools = frozenset(item["function"]["name"] for item in tools_for_mode(mode, finding_schema, role))
+        self._started = False
+        self._finished = False
+        self._step = 0
+        self._last_event_id: str | None = None
+        self._messages: list[dict[str, Any]] = []
+        self._tools = tools_for_mode(mode, finding_schema, role)
+        self._stop_reason = "completed"
 
     def run(self) -> dict[str, Any]:
-        started = self.event_log.emit("agent_started", agent_id=self.agent_id, payload={"mode": self.mode})
-        last_event_id = started["event_id"]
-        messages: list[dict[str, Any]] = [
-            {"role": "system", "content": system_prompt(self.mode, self.agent_id)},
-            {"role": "user", "content": user_prompt(self.mode, self.agent_id, self.agent_count)},
-        ]
-        tools = tools_for_mode(self.mode)
-        stop_reason = "completed"
+        while not self._finished:
+            self.advance()
+        return self.result()
+
+    def advance(self) -> dict[str, Any]:
+        """Execute at most one model call while preserving model-visible context.
+
+        Policies that need lifecycle-aware scheduling use this method; the
+        legacy runner path simply calls it until terminal state.
+        """
+        if self._finished:
+            return self.result()
+        if not self._started:
+            started = self.event_log.emit("agent_started", agent_id=self.agent_id, payload={"mode": self.mode, "role": self.role})
+            self._last_event_id = started["event_id"]
+            self._messages = [
+                {"role": "system", "content": system_prompt(self.mode, self.agent_id, self.prompt_profile, self.role)},
+                {"role": "user", "content": user_prompt(self.mode, self.agent_id, self.agent_count, self.prompt_profile, self.role)},
+            ]
+            self._started = True
+        if self._step >= self.max_steps:
+            self._finish("max_steps")
+            return self.result()
         try:
-            for _step in range(self.max_steps):
-                response, response_transcript, call_event_id = self._complete_with_permit(
-                    messages, tools, step=_step + 1, parent_event_id=last_event_id
+            response, response_transcript, call_event_id = self._complete_with_permit(
+                self._messages, self._tools, step=self._step + 1, parent_event_id=self._last_event_id or ""
+            )
+            self._step += 1
+            if response.tool_calls:
+                self._messages.append(
+                    {
+                        "role": "assistant",
+                        "content": response.content or "",
+                        "tool_calls": [
+                            {"id": call["id"], "type": "function", "function": {"name": call["name"], "arguments": call["arguments"]}}
+                            for call in response.tool_calls
+                        ],
+                    }
                 )
-                if response.tool_calls:
-                    messages.append(
-                        {
-                            "role": "assistant",
-                            "content": response.content or "",
-                            "tool_calls": [
-                                {
-                                    "id": call["id"],
-                                    "type": "function",
-                                    "function": {
-                                        "name": call["name"],
-                                        "arguments": call["arguments"],
-                                    },
-                                }
-                                for call in response.tool_calls
-                            ],
-                        }
+                for call in response.tool_calls:
+                    result = self._dispatch(call["name"], call.get("arguments") or "{}", parent_event_id=call_event_id)
+                    self._messages.append({"role": "tool", "tool_call_id": call["id"], "name": call["name"], "content": _truncate(result)})
+                    self.transcript_log.tool_result(
+                        agent_id=self.agent_id, tool_call_id=call["id"], name=call["name"], content=_truncate(result),
+                        parent_refs=[response_transcript["transcript_id"]],
                     )
-                    for call in response.tool_calls:
-                        result = self._dispatch(
-                            call["name"], call.get("arguments") or "{}", parent_event_id=call_event_id
-                        )
-                        messages.append(
-                            {
-                                "role": "tool",
-                                "tool_call_id": call["id"],
-                                "name": call["name"],
-                                "content": _truncate(result),
-                            }
-                        )
-                        self.transcript_log.tool_result(
-                            agent_id=self.agent_id,
-                            tool_call_id=call["id"],
-                            name=call["name"],
-                            content=_truncate(result),
-                            parent_refs=[response_transcript["transcript_id"]],
-                        )
-                        last_event_id = call_event_id
-                    if self.sandbox._submitted is not None:
-                        stop_reason = "submitted"
-                        break
-                    continue
-                if response.content:
-                    maybe = _extract_findings(response.content)
-                    if maybe is not None:
-                        submission = self.sandbox.submit_findings(maybe)
-                        if submission.get("ok"):
-                            stop_reason = "submitted"
-                            break
-                        messages.append({"role": "assistant", "content": response.content})
-                        messages.append(
-                            {
-                                "role": "user",
-                                "content": "Your finding payload was rejected. Correct it and call submit_findings again: "
-                                + json.dumps(submission.get("errors") or [], ensure_ascii=False),
-                            }
-                        )
-                        last_event_id = call_event_id
-                        continue
-                    messages.append({"role": "assistant", "content": response.content})
-                    messages.append(
-                        {
-                            "role": "user",
-                            "content": "If you have finished, call submit_findings with your JSON findings.",
-                        }
-                    )
-                    last_event_id = call_event_id
-            else:
-                stop_reason = "max_steps"
+                    self._last_event_id = call_event_id
+                if self.sandbox._submitted is not None:
+                    self._finish("submitted")
+            elif response.content:
+                maybe = _extract_findings(response.content)
+                if maybe is not None:
+                    submission = self.sandbox.submit_findings(maybe)
+                    if submission.get("ok"):
+                        self._finish("submitted")
+                    else:
+                        self._messages.append({"role": "assistant", "content": response.content})
+                        self._messages.append({"role": "user", "content": "Your finding payload was rejected. Correct it and call submit_findings again: " + json.dumps(submission.get("errors") or [], ensure_ascii=False)})
+                        self._last_event_id = call_event_id
+                else:
+                    self._messages.append({"role": "assistant", "content": response.content})
+                    self._messages.append({"role": "user", "content": "If you have finished, call submit_findings with your JSON findings."})
+                    self._last_event_id = call_event_id
         except BudgetExhausted as exc:
-            stop_reason = "budget_exhausted"
             self.event_log.emit(
                 "budget_exhausted",
                 agent_id=self.agent_id,
                 payload={"reason": exc.reason, "snapshot": exc.snapshot},
             )
+            self._finish("budget_exhausted")
         except Exception as exc:  # noqa: BLE001 - run must record unexpected failures
-            stop_reason = "error"
             self.event_log.emit(
                 "error",
                 agent_id=self.agent_id,
                 payload={"error": str(exc), "type": type(exc).__name__},
             )
+            self._finish("error")
+        if not self._finished and self._step >= self.max_steps:
+            self._finish("max_steps")
+        return self.result()
+
+    def stop_waiting(self, reason: str = "waiting_for_assignment") -> dict[str, Any]:
+        """Finish an idle worker without inventing a model-format failure."""
+        if not self._started:
+            started = self.event_log.emit("agent_started", agent_id=self.agent_id, payload={"mode": self.mode, "role": self.role})
+            self._last_event_id = started["event_id"]
+            self._started = True
+        if not self._finished:
+            self._finish(reason)
+        return self.result()
+
+    def _finish(self, stop_reason: str) -> None:
+        if self._finished:
+            return
         findings = self.sandbox._submitted or {"findings": []}
-        if self.sandbox._submitted is None and (
-            stop_reason in {"completed", "max_steps"} or self.sandbox.invalid_submission_attempts > 0
-        ):
+        if self.sandbox._submitted is None and (stop_reason in {"completed", "max_steps"} or self.sandbox.invalid_submission_attempts > 0):
             stop_reason = "model_format_failure"
-        self.event_log.emit(
-            "agent_finished",
-            agent_id=self.agent_id,
-            payload={"reason": stop_reason, "finding_count": len(findings.get("findings", []))},
-        )
+        self._stop_reason = stop_reason
+        self._finished = True
+        self.event_log.emit("agent_finished", agent_id=self.agent_id, payload={"reason": stop_reason, "finding_count": len(findings.get("findings", []))})
+
+    def result(self) -> dict[str, Any]:
+        findings = self.sandbox._submitted or {"findings": []}
         return {
             "agent_id": self.agent_id,
-            "stop_reason": stop_reason,
+            "stop_reason": self._stop_reason,
             "findings": findings,
             "submission_attempts": self.sandbox.submission_attempts,
             "invalid_submission_attempts": self.sandbox.invalid_submission_attempts,
@@ -262,8 +272,20 @@ class AgentRunner:
     def _dispatch(self, name: str, raw_arguments: str, *, parent_event_id: str) -> str:
         try:
             args = json.loads(raw_arguments) if raw_arguments else {}
-        except json.JSONDecodeError:
-            args = {}
+        except json.JSONDecodeError as exc:
+            return self._reject_tool_arguments(
+                name,
+                parent_event_id=parent_event_id,
+                reason="invalid_json",
+                details={"line": exc.lineno, "column": exc.colno},
+            )
+        if not isinstance(args, dict):
+            return self._reject_tool_arguments(
+                name,
+                parent_event_id=parent_event_id,
+                reason="arguments_not_object",
+                details={"received_type": type(args).__name__},
+            )
         dispatched = self.event_log.emit(
             "tool_call",
             agent_id=self.agent_id,
@@ -279,6 +301,30 @@ class AgentRunner:
         except Exception as exc:  # noqa: BLE001
             return json.dumps({"error": str(exc), "type": type(exc).__name__})
 
+    def _reject_tool_arguments(
+        self,
+        name: str,
+        *,
+        parent_event_id: str,
+        reason: str,
+        details: dict[str, Any],
+    ) -> str:
+        error = {
+            "code": "invalid_tool_arguments",
+            "tool": name,
+            "message": "Tool arguments must be a valid JSON object. Correct the arguments and retry.",
+            "reason": reason,
+            **details,
+        }
+        self.event_log.emit(
+            "tool_call",
+            agent_id=self.agent_id,
+            payload={"tool": name, "argument_error": error},
+            parent_event_ids=[parent_event_id],
+            outcome="rejected",
+        )
+        return json.dumps({"ok": False, "error": error}, ensure_ascii=False)
+
     def _call(self, name: str, args: dict[str, Any]) -> Any:
         if name not in self._allowed_tools:
             raise ToolError(f"tool is not authorized for coordination condition {self.mode}: {name}")
@@ -287,7 +333,9 @@ class AgentRunner:
             "read_file": lambda: self.sandbox.read_file(args["path"]),
             "write_file": lambda: self.sandbox.write_file(args["path"], args.get("content", "")),
             "run_shell": lambda: self.sandbox.run_shell(args["command"], int(args.get("timeout", 30))),
-            "submit_findings": lambda: self.sandbox.submit_findings(args.get("findings", [])),
+            "submit_findings": lambda: self.sandbox.submit_findings(
+                args if self.finding_schema == "repository_v1" else args.get("findings", [])
+            ),
             "shared_list": lambda: self.sandbox.shared_list(args.get("path", ".")),
             "shared_read": lambda: self.sandbox.shared_read(args["path"]),
             "shared_mkdir": lambda: self.sandbox.shared_mkdir(args["path"]),
@@ -305,6 +353,15 @@ class AgentRunner:
             "list_messages": lambda: self.sandbox.list_messages(),
             "publish_artifact": lambda: self.sandbox.publish_artifact(args["name"], args["content"]),
             "list_artifacts": lambda: self.sandbox.list_artifacts(),
+            "manager_create_task": lambda: self.sandbox.manager_create_task(args["worker_id"], args["description"]),
+            "manager_list_tasks": lambda: self.sandbox.manager_list_tasks(),
+            "manager_cancel_task": lambda: self.sandbox.manager_cancel_task(args["task_id"], args["reason"]),
+            "manager_reassign_task": lambda: self.sandbox.manager_reassign_task(args["task_id"], args["worker_id"]),
+            "worker_get_assignment": lambda: self.sandbox.worker_get_assignment(),
+            "worker_report_task": lambda: self.sandbox.worker_report_task(
+                args["task_id"], args["result"], args["evidence_refs"]
+            ),
+            "worker_request_more": lambda: self.sandbox.worker_request_more(),
         }
         if name not in mapping:
             raise ToolError(f"unknown tool: {name}")

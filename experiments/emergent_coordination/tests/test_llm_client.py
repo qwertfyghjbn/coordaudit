@@ -31,7 +31,7 @@ class _FakeCompletions:
             completion_tokens_details=SimpleNamespace(reasoning_tokens=None),
         )
         return SimpleNamespace(
-            choices=[SimpleNamespace(message=message)],
+            choices=[SimpleNamespace(message=message, finish_reason="length")],
             usage=usage,
             model="deepseek-flash-resolved",
             system_fingerprint="fp_test",
@@ -75,6 +75,7 @@ class OpenAICompatibleClientTest(unittest.TestCase):
         self.assertEqual(response.model_metadata["requested_model"], "deepseek-flash")
         self.assertEqual(response.model_metadata["resolved_model"], "deepseek-flash-resolved")
         self.assertEqual(response.model_metadata["system_fingerprint"], "fp_test")
+        self.assertEqual(response.model_metadata["finish_reason"], "length")
 
     def test_client_from_env_normalizes_crlf_sourced_values(self):
         environment = {
@@ -86,11 +87,12 @@ class OpenAICompatibleClientTest(unittest.TestCase):
         with mock.patch.dict(sys.modules, {"openai": types.SimpleNamespace(OpenAI=_FakeOpenAI)}), mock.patch.dict(
             "os.environ", environment, clear=True
         ):
-            client = client_from_env()
+            client = client_from_env(max_tokens=2048)
 
         self.assertIsNotNone(client)
         self.assertEqual(client.model, "deepseek-flash")
         self.assertEqual(client.thinking_mode, "disabled")
+        self.assertEqual(client.max_tokens, 2048)
         self.assertEqual(_FakeOpenAI.latest.init_kwargs["api_key"], "test-key")
         self.assertEqual(_FakeOpenAI.latest.init_kwargs["base_url"], "https://provider.example/")
 

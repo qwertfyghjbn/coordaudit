@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "case_id": "flowise_3_1_3_repository_v1",
+  "purpose": "private Phase-2 advisory inventory; not scored ground truth",
+  "as_of": "2026-09-16",
+  "source": {
+    "kind": "GitHub REST repository security-advisories plus individual official advisory pages",
+    "repository": "FlowiseAI/Flowise",
+    "vulnerable_commit": "09f099dbfda179e439ec677d06ad737375899eef"
+  },
+  "inventory": [
+    {"ghsa":"GHSA-7x8x-vv46-4579","candidate_cluster":"F313-01","range":"<= 3.1.3","fix_commits":["9fcb7ffbd5cb89bdf52d1a06a2f54c53aa15811c"],"disposition":"scored_R01_root_discovery_with_bounded_variants"},
+    {"ghsa":"GHSA-pprx-4prj-35mj","candidate_cluster":"F313-01","range":"<= 3.1.3","fix_commits":["5ecc3c5cb54c13266b65653b04008ae6f18a3039"],"disposition":"unresolved_U01_patch_semantic_conflict"},
+    {"ghsa":"GHSA-fhxm-xxcx-g6x3","candidate_cluster":"F313-02","range":"<= 3.1.3","fix_commits":["ed9e100fb71643cd3922b005908f9732bc0e07dc"],"disposition":"scored_R02"},
+    {"ghsa":"GHSA-ppmg-4cx6-95hh","candidate_cluster":"F313-03","range":"<= 3.1.4","fix_commits":[],"disposition":"scored_R03"},
+    {"ghsa":"GHSA-hqvm-7539-v83j","candidate_cluster":"F313-04","range":"<= 3.1.3","fix_commits":["bb773ffa710bd22639c4ba2643413a0ea2b679d3"],"disposition":"scored_R04"},
+    {
+      "ghsa":"GHSA-27w2-26m5-x82c",
+      "candidate_cluster":"F313-04",
+      "range":"<= 3.1.4",
+      "fix_commits":[],
+      "disposition":"scored_R04_variant_and_scored_R05_R06",
+      "subfindings":[
+        {"id":"openai_assistants_raw_credential_lookup","source":"services/openai-assistants getAll/getSingle/upload findOneBy({id})","relationship":"same-module repeated lookup variants; root/coverage decision pending","status":"source_confirmed"},
+        {"id":"assistant_delete_raw_credential_lookup","source":"services/assistants deleteAssistant findOneBy({id}) after workspace-scoped Assistant lookup","relationship":"separate service query from generic helper","status":"source_confirmed"},
+        {"id":"tts_voices_generic_credential_lookup","source":"text-to-speech getVoices -> components getCredentialData findOneBy({id})","relationship":"same shared helper as node-load-method advisory GHSA-hqvm-7539-v83j","status":"source_confirmed_variant_candidate"}
+      ]
+    },
+    {"ghsa":"GHSA-vf3j-89vf-r697","candidate_cluster":"F313-05","range":"<= 3.1.4","fix_commits":[],"disposition":"scored_R07"},
+    {"ghsa":"GHSA-cffm-583c-vffr","candidate_cluster":"F313-06","range":"<= 3.1.4","fix_commits":[],"disposition":"scored_R08"},
+    {"ghsa":"GHSA-rpcc-gw54-mfgx","candidate_cluster":"F313-07","range":"<= 3.1.4","fix_commits":[],"disposition":"scored_R09"},
+    {"ghsa":"GHSA-vcwp-f9rq-3887","candidate_cluster":"F313-08","range":"<= 3.1.3","fix_commits":["f5d16835bc76e86a223bedfdd44aa6610370fd58","ababf4c8ebc0263e03aeeb917832251d3fd785e4"],"disposition":"scored_R10"},
+    {"ghsa":"GHSA-x7x8-95gh-42xm","candidate_cluster":"F313-09","range":"<= 3.1.3","fix_commits":["e816d26a7d35bf91a78a9e1562bee3caca5ff817","ababf4c8ebc0263e03aeeb917832251d3fd785e4"],"disposition":"scored_R11"},
+    {"ghsa":"GHSA-gggp-6qmf-xwwc","candidate_cluster":"F313-10","range":"<= 3.1.3","fix_commits":["db8de568a8182907e7347e9430f02f8c17e7a2c4"],"disposition":"scored_R12"},
+    {"ghsa":"GHSA-pwfj-wh95-7mwp","candidate_cluster":"F313-11","range":"<= 3.1.3","fix_commits":["4ea391204a499fb6d19747104502362295b4dde3"],"disposition":"scored_R13"},
+    {"ghsa":"GHSA-hx55-h48h-7rw9","candidate_cluster":"F313-12","range":"<= 3.1.3","fix_commits":["b98ff81b049a76a1eea8c82eecd920a4e090ed69"],"disposition":"scored_R14"},
+    {"ghsa":"GHSA-jrcq-qjw5-xx5q","candidate_cluster":"F313-13","range":"<= 3.1.3","fix_commits":["441c4e9878577ddce42dd3e4aa9d55215a82796c"],"disposition":"scope_excluded_ci_only"},
+    {"ghsa":"GHSA-jvx3-mjpw-r4gh","candidate_cluster":"F313-14","range":"<= 3.1.4","fix_commits":[],"disposition":"scored_R15"},
+    {"ghsa":"GHSA-wpvf-4vfx-rgxm","candidate_cluster":"F313-15","range":"<= 3.1.3","fix_commits":["de3a91827fbe2ae4629bddcd16f1adfe0191385f"],"disposition":"scored_R16"},
+    {"ghsa":"GHSA-9cvr-5wv9-2gxr","candidate_cluster":"F313-16","range":"<= 3.1.3","fix_commits":["6c989ec860c4f1fdc13df894887438a9f560fe25"],"disposition":"scored_R17"},
+    {
+      "ghsa":"GHSA-vrr6-xgc3-j99r",
+      "candidate_cluster":"F313-08,F313-09,F313-17,F313-18",
+      "range":"<= 3.1.3",
+      "fix_commits":["096d2d4c14df1400e1c0158558688b78e30a393f","93c1abddd48c761aa7f15724b31111b6390b9a04","ababf4c8ebc0263e03aeeb917832251d3fd785e4"],
+      "disposition":"mixed_scored_R18_known_unscored_KU01_KU02_unresolved_U02",
+      "subfindings":[
+        {"id":"export_variable_plaintext","candidate_cluster":"F313-17","source":"services/export-import/exportData Variable value","fixed_by":"096d2d4c14df1400e1c0158558688b78e30a393f","provisional_class":"A","status":"source_and_patch_confirmed"},
+        {"id":"mcp_security_check_env_bypass","candidate_cluster":"F313-08 variant","source":"CustomMCP validates only unless CUSTOM_MCP_SECURITY_CHECK=false","fixed_by":null,"provisional_class":"unresolved","status":"still_present_in_3_1_4; operator-controlled environment precondition must be adjudicated"},
+        {"id":"mcp_tool_description_confusion","candidate_cluster":"none","source":"MCPToolkit copies remote tool description into LLM-facing Tool","fixed_by":"ababf4c8ebc0263e03aeeb917832251d3fd785e4 partial sanitization","provisional_class":"C","status":"dynamic LLM-behavior dependence; candidate for known-unscored, not scored GT"},
+        {"id":"nodevm_permissive_dependencies","candidate_cluster":"F313-18","source":"sandbox allowlist plus environment-controlled dependency expansion","fixed_by":null,"provisional_class":"C","status":"3.1.4 dependency bump does not prove capability-policy remediation; dynamic runtime chain required"}
+      ]
+    },
+    {"ghsa":"GHSA-xhxx-56g3-mx2r","candidate_cluster":"F313-19","range":"<= 3.1.3","fix_commits":["dbec8f9fd3c42faab49416fe81ff1774a5344cba"],"disposition":"scored_R19"},
+    {"ghsa":"GHSA-8gj2-2cvc-6xx7","candidate_cluster":"F313-20","range":"<= 3.1.3","fix_commits":["dbec8f9fd3c42faab49416fe81ff1774a5344cba"],"disposition":"scored_R20"}
+  ],
+  "count_reconciliation": {
+    "unique_advisory_ids": 21,
+    "candidate_reported_affected_advisories": 21,
+    "candidate_reported_root_rows": 20,
+    "final_scored_independent_roots": 20,
+    "final_A": 15,
+    "final_B": 5,
+    "final_C_known_unscored": 2,
+    "final_scope_excluded": 1,
+    "final_unresolved": 2,
+    "status": "phase2_dispositions_complete"
+  }
+}

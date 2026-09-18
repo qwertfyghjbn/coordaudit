@@ -103,7 +103,8 @@ class OpenAICompatibleClient:
         if tool_choice is not None:
             kwargs["tool_choice"] = tool_choice
         response = self.client.chat.completions.create(**kwargs)
-        message = response.choices[0].message
+        choice = response.choices[0]
+        message = choice.message
         usage = getattr(response, "usage", None)
         details = getattr(usage, "completion_tokens_details", None) if usage else None
         prompt_details = getattr(usage, "prompt_tokens_details", None) if usage else None
@@ -133,6 +134,7 @@ class OpenAICompatibleClient:
                 "resolved_model": getattr(response, "model", None),
                 "system_fingerprint": getattr(response, "system_fingerprint", None),
                 "provider_response_id": getattr(response, "id", None),
+                "finish_reason": getattr(choice, "finish_reason", None),
                 "thinking_mode": self.thinking_mode,
             },
         )

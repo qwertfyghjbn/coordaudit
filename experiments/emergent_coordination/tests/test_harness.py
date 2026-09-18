@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import tempfile
 import threading
@@ -21,7 +22,7 @@ from experiments.emergent_coordination.harness.tools.sandbox import (
     assert_os_sandbox_ready,
 )
 from experiments.emergent_coordination.harness.workspace import prepare_run_workspace
-from experiments.emergent_coordination.harness.paths import TARGET_ROOT, GROUND_TRUTH_PATH, PROVENANCE_PATH
+from experiments.emergent_coordination.harness.paths import MANIFEST_PATH, TARGET_ROOT, GROUND_TRUTH_PATH, PROVENANCE_PATH
 
 
 def _tool_call(name: str, arguments: dict, call_id: str = "c1") -> dict:
@@ -156,20 +157,46 @@ class IsolationAndSharedTest(unittest.TestCase):
         self.assertNotIn("ground_truth.json", names)
         self.assertTrue((self.layout.evaluator_private / "ground_truth.json").exists())
 
+    def test_list_files_accepts_a_relative_run_directory(self):
+        """CLI --runs-dir may be relative, but tool paths must remain coherent."""
+        with tempfile.TemporaryDirectory() as tmp:
+            absolute_run_dir = Path(tmp) / "run"
+            relative_run_dir = Path(os.path.relpath(absolute_run_dir, Path.cwd()))
+            layout = prepare_run_workspace(relative_run_dir, TARGET_ROOT, agent_count=1)
+            log = EventLog(layout.logs / "events.jsonl", run_id="relative-run-dir")
+            sandbox = AgentSandbox("agent_001", layout, log)
+
+            entries = sandbox.list_files("target")
+
+        self.assertTrue(layout.run_dir.is_absolute())
+        self.assertIn("target/README.md", entries)
+
 
 class BudgetTest(unittest.TestCase):
-    def test_global_cap_is_shared(self):
-        tracker = BudgetTracker(global_input_token_cap=10, max_llm_calls=100)
-        tracker.charge("agent_001", TokenUsage(input_tokens=6, output_tokens=1))
-        with self.assertRaises(BudgetExhausted) as ctx:
-            tracker.charge("agent_002", TokenUsage(input_tokens=6, output_tokens=1))
-        self.assertEqual(ctx.exception.reason, "global_input_token_cap")
+    def test_snapshot_separates_enforced_limits_soft_stops_and_observed_usage(self):
+        tracker = BudgetTracker(hard_team_call_permits=2, token_stop_threshold=10, wall_clock_timeout=30)
+        permit = tracker.acquire_call_permit("agent_001")
+        tracker.settle_call_permit(
+            permit,
+            outcome="succeeded",
+            usage=TokenUsage(input_tokens=3, cached_input_tokens=2, output_tokens=1, reasoning_tokens=1),
+        )
 
-    def test_max_llm_calls(self):
-        tracker = BudgetTracker(max_llm_calls=1)
-        tracker.charge("agent_001", TokenUsage(input_tokens=1, output_tokens=1))
-        with self.assertRaises(BudgetExhausted):
-            tracker.charge("agent_002", TokenUsage(input_tokens=1, output_tokens=1))
+        snapshot = tracker.snapshot()
+
+        self.assertEqual(snapshot["schema_version"], 2)
+        self.assertEqual(snapshot["enforced_limits"], {"hard_team_call_permits": 2})
+        self.assertEqual(snapshot["runtime_limits"], {"wall_clock_timeout_seconds": 30})
+        self.assertEqual(snapshot["soft_stops"]["token_stop_threshold"], 10)
+        self.assertEqual(snapshot["soft_stops"]["basis"], "provider_reported_input_plus_output")
+        self.assertEqual(
+            snapshot["observed_usage"],
+            {"input_tokens": 3, "cached_input_tokens": 2, "output_tokens": 1, "reasoning_tokens": 1},
+        )
+        self.assertNotIn("caps", snapshot)
+
+    def test_production_tracker_has_no_legacy_charge_api(self):
+        self.assertFalse(hasattr(BudgetTracker(hard_team_call_permits=1), "charge"))
 
     def test_pre_call_permits_are_atomic_and_failures_are_not_refunded(self):
         tracker = BudgetTracker(hard_team_call_permits=2)
@@ -218,6 +245,86 @@ class BudgetTest(unittest.TestCase):
         with self.assertRaises(BudgetExhausted) as ctx:
             tracker.acquire_call_permit("agent_002")
         self.assertEqual(ctx.exception.reason, "token_stop_threshold")
+
+    def test_token_stop_threshold_waits_for_inflight_call_then_continues_below_threshold(self):
+        tracker = BudgetTracker(hard_team_call_permits=3, token_stop_threshold=10)
+        first = tracker.acquire_call_permit("agent_001")
+        started = threading.Event()
+        result: dict[str, object] = {}
+
+        def request() -> None:
+            started.set()
+            try:
+                result["permit"] = tracker.acquire_call_permit("agent_002")
+            except BudgetExhausted as exc:
+                result["error"] = exc
+
+        thread = threading.Thread(target=request)
+        thread.start()
+        self.assertTrue(started.wait(timeout=1))
+        thread.join(timeout=0.05)
+        self.assertTrue(thread.is_alive())
+
+        tracker.settle_call_permit(first, outcome="succeeded", usage=TokenUsage(input_tokens=3, output_tokens=2))
+        thread.join(timeout=1)
+
+        self.assertFalse(thread.is_alive())
+        self.assertIn("permit", result)
+        self.assertNotIn("error", result)
+        tracker.settle_call_permit(result["permit"], outcome="succeeded", usage=TokenUsage())
+
+    def test_token_stop_threshold_waiter_stops_after_inflight_call_crosses_threshold(self):
+        tracker = BudgetTracker(hard_team_call_permits=3, token_stop_threshold=5)
+        first = tracker.acquire_call_permit("agent_001")
+        started = threading.Event()
+        result: dict[str, object] = {}
+
+        def request() -> None:
+            started.set()
+            try:
+                result["permit"] = tracker.acquire_call_permit("agent_002")
+            except BudgetExhausted as exc:
+                result["error"] = exc
+
+        thread = threading.Thread(target=request)
+        thread.start()
+        self.assertTrue(started.wait(timeout=1))
+        thread.join(timeout=0.05)
+        self.assertTrue(thread.is_alive())
+
+        tracker.settle_call_permit(first, outcome="succeeded", usage=TokenUsage(input_tokens=3, output_tokens=2))
+        thread.join(timeout=1)
+
+        self.assertFalse(thread.is_alive())
+        self.assertNotIn("permit", result)
+        self.assertEqual(result["error"].reason, "token_stop_threshold")
+        self.assertEqual(tracker.snapshot()["attempted_llm_calls"], 1)
+
+
+class BudgetConfigurationTest(unittest.TestCase):
+    def test_repository_manifest_omits_legacy_token_caps(self):
+        manifest = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
+        legacy_keys = {"global_input_token_cap", "global_output_token_cap", "per_agent_token_cap", "max_llm_calls"}
+
+        for budget_name in ("default_budgets", "smoke_budgets"):
+            self.assertEqual(legacy_keys & set(manifest[budget_name]), set())
+
+    def test_runner_rejects_legacy_budget_keys_before_creating_a_run(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            runs_dir = Path(tmp)
+            with self.assertRaisesRegex(ValueError, "legacy budget fields"):
+                run_experiment(
+                    RunConfig(
+                        mode="single",
+                        agent_count=1,
+                        model="mock",
+                        budgets={"hard_team_call_permits": 1, "global_input_token_cap": 100},
+                        runs_dir=runs_dir,
+                        max_steps=1,
+                    ),
+                    MockLLMClient(),
+                )
+            self.assertEqual(list(runs_dir.iterdir()), [])
 
 
 class MockedHarnessTest(unittest.TestCase):
@@ -283,7 +390,7 @@ class MockedHarnessTest(unittest.TestCase):
                     mode="single",
                     agent_count=1,
                     model="mock",
-                    budgets={"max_llm_calls": 20, "global_input_token_cap": 1000, "global_output_token_cap": 1000},
+                    budgets={"hard_team_call_permits": 20},
                     runs_dir=Path(tmp),
                     max_steps=6,
                 ),
@@ -300,6 +407,13 @@ class MockedHarnessTest(unittest.TestCase):
             self.assertIn("finding_submitted", events)
             self.assertIn("agent_finished", events)
             self.assertIn("llm_call", events)
+            run_manifest = json.loads((Path(summary["run_dir"]) / "run_manifest.json").read_text(encoding="utf-8"))
+            self.assertEqual(run_manifest["budget_semantics"]["schema_version"], 2)
+            self.assertEqual(run_manifest["budget_semantics"]["primary_budget_unit"], "attempted_model_call")
+            self.assertEqual(run_manifest["budget_semantics"]["token_usage_role"], "observed_outcome")
+            self.assertEqual(run_manifest["max_steps"], 6)
+            self.assertEqual(summary["budget"]["enforced_limits"]["hard_team_call_permits"], 20)
+            self.assertNotIn("caps", summary["budget"])
 
     def test_parallel_no_shared_tools(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -319,7 +433,7 @@ class MockedHarnessTest(unittest.TestCase):
                     mode="parallel",
                     agent_count=2,
                     model="mock",
-                    budgets={"max_llm_calls": 20},
+                    budgets={"hard_team_call_permits": 20},
                     runs_dir=Path(tmp),
                     max_steps=4,
                 ),
@@ -352,7 +466,7 @@ class MockedHarnessTest(unittest.TestCase):
                     mode="raw_blackboard",
                     agent_count=2,
                     model="mock",
-                    budgets={"max_llm_calls": 20},
+                    budgets={"hard_team_call_permits": 20},
                     runs_dir=Path(tmp),
                     max_steps=6,
                 ),
@@ -383,7 +497,7 @@ class MockedHarnessTest(unittest.TestCase):
                     mode="structured_team",
                     agent_count=2,
                     model="mock",
-                    budgets={"max_llm_calls": 20},
+                    budgets={"hard_team_call_permits": 20},
                     runs_dir=Path(tmp),
                     max_steps=6,
                 ),
@@ -407,7 +521,7 @@ class MockedHarnessTest(unittest.TestCase):
                     mode="structured_team",
                     agent_count=1,
                     model="mock",
-                    budgets={"max_llm_calls": 20},
+                    budgets={"hard_team_call_permits": 20},
                     runs_dir=Path(tmp),
                     max_steps=4,
                 ),

@@ -7,19 +7,63 @@ from pathlib import Path
 
 from experiments.emergent_coordination.harness.llm.client import LLMResponse, MockLLMClient
 from experiments.emergent_coordination.harness.budget import TokenUsage
+from experiments.emergent_coordination.harness.events import sanitize_for_persistence
 from experiments.emergent_coordination.harness.runner import RunConfig, run_experiment
 
 
-def _response(*, content: str | None = None, tool_calls: list[dict[str, str]] | None = None) -> LLMResponse:
+def _response(
+    *,
+    content: str | None = None,
+    tool_calls: list[dict[str, str]] | None = None,
+    model_metadata: dict[str, object] | None = None,
+) -> LLMResponse:
     return LLMResponse(
         content=content,
         tool_calls=tool_calls or [],
         usage=TokenUsage(input_tokens=3, output_tokens=2, model="mock"),
         raw={"mock": True},
+        model_metadata=model_metadata or {},
     )
 
 
 class TranscriptTest(unittest.TestCase):
+    def test_host_path_redaction_preserves_embedded_tool_result_json(self):
+        raw_tool_result = json.dumps(
+            {
+                "evidence_ref": "evt_00000001",
+                "path": "target/app/common/storage.py",
+                "content": 'BASE_DIR = "/home/lqs/private/data"\n',
+            }
+        )
+
+        persisted = sanitize_for_persistence(raw_tool_result).value
+
+        self.assertNotIn("/home/lqs/private/data", persisted)
+        self.assertEqual(json.loads(persisted)["content"], 'BASE_DIR = "<HOST_PATH>"\n')
+
+    def test_persists_provider_finish_reason_in_transcript_and_llm_event(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            summary = run_experiment(
+                RunConfig(
+                    mode="single", agent_count=1, model="mock",
+                    budgets={"hard_team_call_permits": 1}, runs_dir=Path(tmp), max_steps=1,
+                ),
+                MockLLMClient(default=[_response(
+                    content=json.dumps({"findings": []}), model_metadata={"finish_reason": "length"}
+                )]),
+            )
+            run_dir = Path(summary["run_dir"])
+            events = [json.loads(line) for line in (run_dir / "logs" / "events.jsonl").read_text(encoding="utf-8").splitlines()]
+            transcript = [
+                json.loads(line)
+                for line in (run_dir / "logs" / "transcripts" / "agent_001.jsonl").read_text(encoding="utf-8").splitlines()
+            ]
+
+            response_record = next(record for record in transcript if record["kind"] == "model_response")
+            llm_event = next(event for event in events if event["event_type"] == "llm_call")
+            self.assertEqual(response_record["content"]["model_metadata"]["finish_reason"], "length")
+            self.assertEqual(llm_event["payload"]["model_metadata"]["finish_reason"], "length")
+
     def test_records_replayable_model_context_and_reconciles_permit_ledger(self):
         with tempfile.TemporaryDirectory() as tmp:
             llm = MockLLMClient(

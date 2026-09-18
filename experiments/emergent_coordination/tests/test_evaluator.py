@@ -40,6 +40,15 @@ class EvaluatorTest(unittest.TestCase):
         self.assertFalse(public["semantic_judge_used"])
         self.assertNotIn("matched_ground_truth", public)
 
+    def test_target_prefixed_anchor_matches_the_same_canonical_target_file(self):
+        finding = _finding(self.gt["findings"][0])
+        finding["source"]["file"] = "target/" + finding["source"]["file"]
+        finding["sink"]["file"] = "target/" + finding["sink"]["file"]
+
+        result = evaluate_findings([finding], self.gt)
+
+        self.assertEqual(result["public"]["positive_recall"]["true_positives"], 1)
+
     def test_near_miss_is_known_false_positive_and_unmatched_is_not_asserted_false(self):
         near = self.gt["near_misses"][0]
         finding = _finding(self.gt["findings"][0])

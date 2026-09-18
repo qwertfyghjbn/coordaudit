@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "case_id": "flowise_3_1_3_repository_v1",
+  "as_of": "2026-09-16",
+  "purpose": "private per-root decision on whether an actual 3.1.3 path is safe enough for a definite known-near-miss FP",
+  "decisions": [
+    {"root":"R01_enterprise_active_org_binding","status":"qualified","sibling":"SS01_loaded_role_org_guard","near_miss":"NM01_scoped_role_read","limit":"read of an already loaded Role only; role update remains vulnerable"},
+    {"root":"R02_org_user_password_serialization","status":"qualified","sibling":"SS02_sanitized_login_user","near_miss":"NM02_sanitized_login_user","limit":"User.credential and invitation token fields in login response only"},
+    {"root":"R03_chat_message_route_permission","status":"qualified","sibling":"SS03_guarded_workspace_assistant_read","near_miss":"NM03_guarded_assistant_read","limit":"assistant detail read only; route guard plus workspace-scoped service lookup"},
+    {"root":"R04_generic_credential_lookup_scope","status":"qualified","sibling":"SS04_workspace_scoped_credential_read","near_miss":"NM04_scoped_credential_read","limit":"getCredentialById owned-record branch only"},
+    {"root":"R05_openai_assistant_credential_lookup_scope","status":"qualified","sibling":"SS04_workspace_scoped_credential_read","near_miss":"NM04_scoped_credential_read","limit":"getCredentialById owned-record branch only"},
+    {"root":"R06_assistant_delete_credential_lookup_scope","status":"qualified","sibling":"SS04_workspace_scoped_credential_read","near_miss":"NM04_scoped_credential_read","limit":"getCredentialById owned-record branch only"},
+    {"root":"R07_sso_invited_token_proof","status":"excluded","candidate":"AccountService.verify / SSOBase","reason":"The token acceptance path is not a safe SSO sibling: it does not bind an IdP issuer/subject to the pending invitation, and the reviewed readUserByToken path alone does not prove expiry checking."},
+    {"root":"R08_sso_email_only_identity","status":"excluded","candidate":"SSOBase and account verification","reason":"No 3.1.3 SSO callback path was found that binds the selected account to an issuer/subject tuple. Email or token checks alone are incomplete."},
+    {"root":"R09_bullmq_dashboard_rbac","status":"excluded","candidate":"routes/log/index.ts logs:view","reason":"The log route has permission middleware, but that does not prove role and tenant scoping for the BullMQ job dashboard or its payloads."},
+    {"root":"R10_mcp_stdio_executable_policy","status":"excluded","candidate":"SS07_mcp_environment_allowlist","reason":"An env-name allowlist and command flag checks do not constrain attacker-selectable npx package execution under the built-in executable list."},
+    {"root":"R11_mcp_cwd_policy","status":"excluded","candidate":"SS07_mcp_environment_allowlist / validateArgsForLocalFileAccess","reason":"Neither guard checks the cwd field that is passed through to the final stdio process launch."},
+    {"root":"R12_realtime_chatflow_workspace_scope","status":"qualified","sibling":"SS05_required_workspace_chatflow_read","near_miss":"NM05_required_workspace_chatflow_read","limit":"workspace-scoped lookup helper only; not a claim about Realtime tool execution"},
+    {"root":"R13_sqlite_chain_write_capability","status":"excluded","candidate":"SS08_sqlite_path_containment","reason":"Path containment does not prevent write or extension-bearing SQL from reaching datasource.query."},
+    {"root":"R14_chat_model_baseurl_egress_policy","status":"excluded","candidate":"SS06_secure_fetch_policy","reason":"secureFetch is a different HTTP client path; the model client does not call it, and HTTP_SECURITY_CHECK=false can remove its default deny list."},
+    {"root":"R15_upsert_history_route_scope","status":"excluded","candidate":"routes/documentstore/index.ts permission middleware","reason":"An adjacent route permission does not bind the upsert-history id or chatflowid to principal/workspace at the service sink."},
+    {"root":"R16_memory_session_id_type","status":"excluded","candidate":"TypeScript sessionId annotations","reason":"A compile-time string type is not a runtime check for a JSON object reaching MongoDBMemory queries."},
+    {"root":"R17_document_loader_egress_policy","status":"excluded","candidate":"SS06_secure_fetch_policy","reason":"The helper is not called by the vulnerable browser loader; initial URL filtering alone would not cover redirects and browser subrequests."},
+    {"root":"R18_export_variable_secret","status":"excluded","candidate":"SS02_sanitized_login_user","reason":"User credential sanitization does not redact Variable.value in exportData; the snapshot has no proven variable-export redaction sibling."},
+    {"root":"R19_tts_abort_cross_operation","status":"excluded","candidate":"TTS-specific abort-controller key","reason":"The request identifiers and derived key do not bind the caller to the creator of the main prediction being aborted."},
+    {"root":"R20_tts_private_flow_credential_use","status":"excluded","candidate":"authenticated generateTextToSpeech branch","reason":"An authenticated workspace path does not establish that the public fallback only accepts public chatflows; the fallback has no isPublic guard."}
+  ]
+}

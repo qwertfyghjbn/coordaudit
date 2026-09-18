@@ -6,6 +6,8 @@ import re
 from dataclasses import dataclass
 from typing import Any
 
+from experiments.emergent_coordination.harness.paths import normalize_target_relative_path
+
 
 CANONICAL_CATEGORIES = frozenset(
     {
@@ -68,10 +70,13 @@ def validate_evidence_refs(payload: dict[str, Any], available_event_paths: dict[
                 )
         if all(reference in available_event_paths for reference in finding.get("evidence_refs") or []):
             anchor_files = {
-                str((finding.get("source") or {}).get("file") or ""),
-                str((finding.get("sink") or {}).get("file") or ""),
+                normalize_target_relative_path((finding.get("source") or {}).get("file")),
+                normalize_target_relative_path((finding.get("sink") or {}).get("file")),
             }
-            evidence_files = {_normalize_evidence_path(available_event_paths[reference]) for reference in finding.get("evidence_refs") or []}
+            evidence_files = {
+                normalize_target_relative_path(available_event_paths[reference])
+                for reference in finding.get("evidence_refs") or []
+            }
             if not anchor_files & evidence_files:
                 errors.append(
                     _error(
@@ -156,7 +161,3 @@ def _string(value: Any, path: str, errors: list[dict[str, str]], minimum: int, m
 
 def _error(path: str, message: str) -> dict[str, str]:
     return {"path": path, "message": message}
-
-
-def _normalize_evidence_path(path: str) -> str:
-    return path.removeprefix("target/").replace("\\", "/")

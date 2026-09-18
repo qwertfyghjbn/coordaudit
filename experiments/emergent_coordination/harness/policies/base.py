@@ -18,6 +18,7 @@ class CoordinationPolicy(ABC):
     name: str
     enable_shared: bool = False
     enable_board: bool = False
+    enable_manager_board: bool = False
 
     @abstractmethod
     def run_agents(self, context: "RunContext") -> list[dict[str, Any]]:
@@ -60,11 +61,52 @@ class StructuredTeamPolicy(CoordinationPolicy):
         return _run_parallel(context)
 
 
+class ManagerWorkerPolicy(CoordinationPolicy):
+    """Single-manager, single-layer star with task-triggered worker turns."""
+
+    name = "manager_worker"
+    enable_manager_board = True
+
+    def run_agents(self, context: "RunContext") -> list[dict[str, Any]]:
+        if context.config.agent_count < 2:
+            raise ValueError("manager_worker mode requires one manager and at least one worker")
+        manager_id, *worker_ids = context.agent_ids
+        manager = context.make_session(manager_id, role="manager")
+        workers = {agent_id: context.make_session(agent_id, role="worker") for agent_id in worker_ids}
+        board = context.manager_board
+        if board is None:  # defensive: policy contract should make this unreachable
+            raise RuntimeError("manager-worker board was not initialized")
+
+        # The manager receives the first turn. Afterwards it is resumed only
+        # when it must make a new allocation decision or reports are ready.
+        manager.advance()
+        while not manager._finished:
+            ready = [agent_id for agent_id in board.ready_workers() if not workers[agent_id]._finished]
+            if ready:
+                for agent_id in ready:
+                    workers[agent_id].advance()
+                if board.has_unobserved_reports():
+                    manager.advance()
+                continue
+            if board.has_unobserved_reports():
+                manager.advance()
+                continue
+            # No worker can make progress. The manager needs another turn to
+            # assign work, inspect its latest tool result, or finish.
+            manager.advance()
+
+        for worker in workers.values():
+            if not worker._finished:
+                worker.stop_waiting()
+        return [manager.result(), *(workers[agent_id].result() for agent_id in worker_ids)]
+
+
 POLICIES: dict[str, CoordinationPolicy] = {
     "single": SequentialPolicy(),
     "parallel": ParallelPolicy(),
     "raw_blackboard": RawBlackboardPolicy(),
     "structured_team": StructuredTeamPolicy(),
+    "manager_worker": ManagerWorkerPolicy(),
 }
 
 

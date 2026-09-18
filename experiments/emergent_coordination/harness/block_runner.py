@@ -17,8 +17,9 @@ from pathlib import Path
 from typing import Any
 
 from experiments.emergent_coordination.harness.contract import BlockConfig
-from experiments.emergent_coordination.harness.paths import EVALUATOR_PRIVATE, EXPERIMENT_ROOT, REPO_ROOT, TARGET_ROOT
-from experiments.emergent_coordination.harness.prompts import COMMON_INSTRUCTIONS, FINDING_SCHEMA, system_prompt, user_prompt
+from experiments.emergent_coordination.harness.cases import load_case
+from experiments.emergent_coordination.harness.paths import EXPERIMENT_ROOT, REPO_ROOT
+from experiments.emergent_coordination.harness.prompts import base_prompt, system_prompt, user_prompt
 from experiments.emergent_coordination.harness.tools.specs import tools_for_mode
 
 
@@ -55,28 +56,30 @@ class BlockRunner:
         return FrozenBlock(block_dir=block_dir, manifest_path=manifest_path, manifest_hash=manifest["manifest_hash"])
 
     def _build_manifest(self, block_id: str) -> dict[str, Any]:
+        case = load_case(self.config.repository_id)
         condition_hashes: dict[str, dict[str, str]] = {}
         for condition in self.config.conditions:
-            system = system_prompt(condition.mode, "agent_001")
-            user = user_prompt(condition.mode, "agent_001", condition.agent_count)
+            system = system_prompt(condition.mode, "agent_001", case.prompt_profile)
+            user = user_prompt(condition.mode, "agent_001", condition.agent_count, case.prompt_profile)
             condition_hashes[condition.id] = {
                 "system_prompt": _sha256_text(system),
                 "user_prompt": _sha256_text(user),
-                "tool_schema": _sha256_json(tools_for_mode(condition.mode)),
+                "tool_schema": _sha256_json(tools_for_mode(condition.mode, case.finding_schema)),
             }
+        common, schema = base_prompt(case.prompt_profile)
         return {
             "schema_version": 1,
             "block_id": block_id,
             "frozen_at": datetime.now(timezone.utc).isoformat(),
             "contract": self.config.as_dict(),
             "hashes": {
-                "common_prompt": _sha256_text(COMMON_INSTRUCTIONS + "\n" + FINDING_SCHEMA),
+                "common_prompt": _sha256_text(common + "\n" + schema),
                 "conditions": condition_hashes,
                 "source_config": _sha256_json(self.config.as_dict()),
             },
             "digests": {
-                "target_tree": tree_digest(TARGET_ROOT),
-                "evaluator_private_tree": tree_digest(EVALUATOR_PRIVATE),
+                "target_tree": tree_digest(case.target_root),
+                "evaluator_private_tree": tree_digest(case.evaluator_private_root),
                 "runtime_tree": runtime_source_digest(EXPERIMENT_ROOT),
                 "git_commit": _git_commit(REPO_ROOT),
                 "git_status": _git_status_digest(REPO_ROOT),

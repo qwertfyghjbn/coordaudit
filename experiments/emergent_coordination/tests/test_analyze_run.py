@@ -64,7 +64,13 @@ class AnalyzeRunTest(unittest.TestCase):
                     "run_id": "r-metrics", "mode": "structured_team", "agent_count": 2,
                     "run_validity": {"status": "valid"},
                     "budget": {
-                        "caps": {"hard_team_call_permits": 4},
+                        "enforced_limits": {"hard_team_call_permits": 4},
+                        "runtime_limits": {"wall_clock_timeout_seconds": 60},
+                        "soft_stops": {"token_stop_threshold": None},
+                        "observed_usage": {
+                            "input_tokens": 6, "cached_input_tokens": 0,
+                            "output_tokens": 4, "reasoning_tokens": 0,
+                        },
                         "permit_ledger": [
                             {"agent_id": "agent_001", "outcome": "succeeded"},
                             {"agent_id": "agent_002", "outcome": "succeeded"},
@@ -84,9 +90,54 @@ class AnalyzeRunTest(unittest.TestCase):
             self.assertEqual(result["duplicate_work"]["categories"]["searches"]["cross_agent_repeated_observations"], 1)
             self.assertEqual(result["resource_allocation"]["team"]["unused_permits"], 2)
             self.assertEqual(result["blackboard"]["cross_agent_read_count"], 1)
+            self.assertTrue(result["structured_team"]["available"])
+            self.assertTrue(result["structured_team"]["lifecycle_activity_observed"])
             self.assertEqual(result["structured_team"]["claim_conflicts"]["count"], 1)
             self.assertEqual(result["structured_team"]["task_result_evidence_adoption"]["count"], 1)
             self.assertIn("does not prove", result["blackboard"]["lineage_note"])
+
+    def test_distinguishes_coordination_tool_exposure_from_activity_and_deduplicates_list_events(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            run_dir = Path(tmp)
+            log = EventLog(run_dir / "logs" / "events.jsonl", run_id="r-list-tasks")
+            log.emit("run_started")
+            dispatch = log.emit(
+                "tool_call",
+                agent_id="agent_001",
+                payload={"tool": "list_tasks", "arguments": {}},
+            )
+            # TaskBoard records the observable result as a child event.  It is
+            # evidence about the one dispatch above, not a second invocation.
+            log.emit(
+                "tool_call",
+                agent_id="agent_001",
+                payload={"tool": "list_tasks", "count": 0},
+                parent_event_ids=[dispatch["event_id"]],
+            )
+            (run_dir / "summary.json").write_text(
+                json.dumps({"run_id": "r-list-tasks", "mode": "structured_team", "agent_count": 1}),
+                encoding="utf-8",
+            )
+
+            result = analyze_run(run_dir, write=False)
+
+            structured = result["structured_team"]
+            self.assertEqual(result["schema_version"], 2)
+            self.assertTrue(structured["available"])
+            self.assertTrue(structured["tool_activity_observed"])
+            self.assertFalse(structured["lifecycle_activity_observed"])
+            self.assertEqual(structured["model_tool_invocations"]["list_tasks"], 1)
+            self.assertEqual(structured["task_list_reads"]["invocation_count"], 1)
+            self.assertEqual(structured["task_list_reads"]["observed_result_count"], 1)
+            self.assertEqual(structured["task_list_reads"]["empty_result_count"], 1)
+
+            (run_dir / "summary.json").write_text(
+                json.dumps({"run_id": "r-blackboard", "mode": "raw_blackboard", "agent_count": 1}),
+                encoding="utf-8",
+            )
+            blackboard = analyze_run(run_dir, write=False)["blackboard"]
+            self.assertTrue(blackboard["available"])
+            self.assertFalse(blackboard["tool_activity_observed"])
 
     def test_matched_block_reports_complete_and_incomplete_conditions_without_causal_claims(self):
         with tempfile.TemporaryDirectory() as tmp:

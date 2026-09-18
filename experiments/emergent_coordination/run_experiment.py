@@ -11,18 +11,37 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from experiments.emergent_coordination.analysis.analyze_run import analyze_run
-from experiments.emergent_coordination.harness.llm.client import MockLLMClient, client_from_env
-from experiments.emergent_coordination.harness.paths import DEFAULT_RUNS_DIR, MANIFEST_PATH
+from experiments.emergent_coordination.harness.budget import TokenUsage
+from experiments.emergent_coordination.harness.llm.client import LLMResponse, MockLLMClient, client_from_env
+from experiments.emergent_coordination.harness.cases import available_case_ids, load_case
+from experiments.emergent_coordination.harness.paths import DEFAULT_RUNS_DIR
 from experiments.emergent_coordination.harness.runner import RunConfig, run_experiment
 
 
-def load_manifest() -> dict:
-    return json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
+def load_manifest(case_id: str = "repo_pilot_v0") -> dict:
+    return load_case(case_id).manifest
+
+
+def mock_client_for_case(experiment: dict) -> MockLLMClient:
+    """Provide a schema-valid no-op response for deterministic CLI smoke runs."""
+    if experiment.get("finding_schema") == "repository_v1":
+        return MockLLMClient(
+            default=[
+                LLMResponse(
+                    content=json.dumps({"schema_version": "repository-v1", "findings": []}),
+                    tool_calls=[],
+                    usage=TokenUsage(input_tokens=1, output_tokens=1, model="mock"),
+                    raw={"mock": True},
+                )
+            ]
+        )
+    return MockLLMClient()
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Run repository-pilot-v0 coordination experiment.")
-    parser.add_argument("--mode", required=True, choices=["single", "parallel", "raw_blackboard", "structured_team"])
+    parser = argparse.ArgumentParser(description="Run a registered repository coordination experiment.")
+    parser.add_argument("--case", default="repo_pilot_v0", choices=available_case_ids())
+    parser.add_argument("--mode", required=True, choices=["single", "parallel", "raw_blackboard", "structured_team", "manager_worker"])
     parser.add_argument("--agents", type=int, required=True)
     parser.add_argument("--model", help="Requested provider model; overrides LLM_MODEL for this run.")
     parser.add_argument(
@@ -31,23 +50,44 @@ def main() -> int:
         help="Explicit provider thinking mode; overrides LLM_THINKING_MODE for this run.",
     )
     parser.add_argument("--seed", default="0")
+    parser.add_argument(
+        "--max-output-tokens",
+        type=int,
+        default=1024,
+        help="Per-provider-response output ceiling; defaults to the frozen 1024-token contract.",
+    )
     parser.add_argument("--mock", action="store_true", help="Use the scripted mock LLM client.")
     parser.add_argument("--live", action="store_true", help="Use LLM credentials from the environment.")
     parser.add_argument("--max-steps", type=int, default=8)
+    parser.add_argument(
+        "--hard-team-call-permits",
+        type=int,
+        help="Override the manifest team call-permit cap for a non-formal calibration run.",
+    )
     parser.add_argument("--runs-dir", default=str(DEFAULT_RUNS_DIR))
     parser.add_argument("--smoke-budget", action="store_true")
     args = parser.parse_args()
+    if args.max_output_tokens <= 0:
+        parser.error("--max-output-tokens must be positive")
+    if args.hard_team_call_permits is not None and args.hard_team_call_permits <= 0:
+        parser.error("--hard-team-call-permits must be positive")
 
-    experiment = load_manifest()
-    budgets = experiment["smoke_budgets"] if args.smoke_budget else experiment["default_budgets"]
+    experiment = load_manifest(args.case)
+    budgets = dict(experiment["smoke_budgets"] if args.smoke_budget else experiment["default_budgets"])
+    if args.hard_team_call_permits is not None:
+        budgets["hard_team_call_permits"] = args.hard_team_call_permits
     if args.live and not args.mock:
-        llm = client_from_env(model=args.model, thinking_mode=args.thinking_mode)
+        llm = client_from_env(
+            model=args.model,
+            thinking_mode=args.thinking_mode,
+            max_tokens=args.max_output_tokens,
+        )
         if llm is None:
             print("No LLM credentials found; refusing to start a live run.", file=sys.stderr)
             return 2
         model = llm.model
     else:
-        llm = MockLLMClient()
+        llm = mock_client_for_case(experiment)
         model = "mock"
 
     summary = run_experiment(
@@ -72,6 +112,7 @@ def main() -> int:
             max_provider_retries=int(budgets.get("max_provider_retries", 0)),
             require_os_sandbox=bool(args.live and not args.mock),
             runs_dir=Path(args.runs_dir),
+            case_id=args.case,
         ),
         llm,
     )

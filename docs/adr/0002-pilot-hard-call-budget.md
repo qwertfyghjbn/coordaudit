@@ -12,6 +12,19 @@ N=4 pilot 的每个 condition 共享 32 个原子 model-call permits，不设置
 
 Provider 只能在响应后给出权威 token usage，无法用它实现精确的调用前 token admission。固定 per-agent 配额又会压平 T 的自发综合分工，并在未来结构性惩罚 manager/aggregator；团队共享 permit 能冻结总调用机会，同时把各 Agent 的实际资源分配保留为 coordination outcome。
 
+## 运行表示
+
+自 budget snapshot schema v2 起，运行产物将预算状态明确分为：
+
+- `enforced_limits`：只包含实际参与调用前 admission 的 `hard_team_call_permits`；
+- `runtime_limits`：记录 wall-clock 等运行安全边界，不把它伪装成 token budget；
+- `soft_stops`：记录 `token_stop_threshold`、统计口径与允许的在途调用数；
+- `observed_usage`：记录 provider 回报的 input、cached input、output 与 reasoning tokens。
+
+历史 `global_input_token_cap`、`global_output_token_cap`、`per_agent_token_cap` 与 `max_llm_calls` 不属于 live permit path。当前配置入口拒绝这些字段；旧 run artifact 保持不可变，并按其原 schema 解释。
+
+启用 `token_stop_threshold` 时，provider 调用被串行化以保证最多一次 in-flight overshoot。已有在途请求只会让其他 Agent 等待；请求结算后，等待者重新检查 threshold 与 permits。临时占用不是预算耗尽，不得终止 Agent。
+
 ## 后果
 
 - S1、P4、B4、T4 使用同一个 32-permit contract；Agent 循环上限可设为 32，但不构成额外配额。

@@ -3,6 +3,12 @@
   "version": "v0",
   "display_name": "Northstar Workspace",
   "target_root": "experiments/emergent_coordination/repositories/repository_pilot_v0",
+  "evaluator_private": "experiments/emergent_coordination/evaluator_private/repository_pilot_v0",
+  "ground_truth_file": "ground_truth.json",
+  "provenance_file": "provenance.json",
+  "prompt_profile": "repository_pilot_v0",
+  "finding_schema": "repository_pilot_v0",
+  "evaluator": "repository_pilot_v0",
   "ground_truth": "experiments/emergent_coordination/evaluator_private/repository_pilot_v0/ground_truth.json",
   "provenance": "experiments/emergent_coordination/evaluator_private/repository_pilot_v0/provenance.json",
   "purpose": "harness validation for repository-level multi-agent coordination",
@@ -13,16 +19,14 @@
   "supported_modes": ["single", "parallel", "raw_blackboard", "structured_team"],
   "supported_agent_counts": [1, 2, 4, 8, 16, 32],
   "default_budgets": {
-    "global_input_token_cap": 200000,
-    "global_output_token_cap": 80000,
     "hard_team_call_permits": 32,
+    "token_stop_threshold": null,
     "max_provider_retries": 1,
     "wall_clock_timeout": 600
   },
   "smoke_budgets": {
-    "global_input_token_cap": 4000,
-    "global_output_token_cap": 2000,
     "hard_team_call_permits": 4,
+    "token_stop_threshold": null,
     "max_provider_retries": 1,
     "wall_clock_timeout": 60
   },

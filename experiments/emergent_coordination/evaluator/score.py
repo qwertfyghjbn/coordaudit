@@ -8,6 +8,8 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
+from experiments.emergent_coordination.harness.paths import normalize_target_relative_path
+
 
 def load_ground_truth(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
@@ -18,7 +20,7 @@ def _norm(value: Any) -> str:
 
 
 def _file_match(value: str, expected: str) -> bool:
-    return _norm(value).replace("\\", "/") == _norm(expected).replace("\\", "/")
+    return _norm(normalize_target_relative_path(value)) == _norm(normalize_target_relative_path(expected))
 
 
 def _anchor_match(reported: dict[str, Any], expected: dict[str, Any]) -> bool:

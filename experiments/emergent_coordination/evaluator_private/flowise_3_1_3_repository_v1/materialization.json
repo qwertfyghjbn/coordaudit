@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "case_id": "flowise_3_1_3_repository_v1",
+  "source_repository": {
+    "remote": "https://github.com/FlowiseAI/Flowise.git",
+    "vulnerable_tag": "flowise@3.1.3",
+    "vulnerable_commit": "09f099dbfda179e439ec677d06ad737375899eef"
+  },
+  "comparison_release": {
+    "tag": "flowise@3.1.4",
+    "commit": "a65f81bb43ef66d3ce734bf0dff4223ae8041c95",
+    "tree": "3e07ac0996ce57ace81f49e93eb804cb3e0a2980"
+  },
+  "vulnerable_tree": "4da2b4977634b3bb238155430a79bd3dbef775c8",
+  "raw_tracked_file_count": 2444,
+  "materialized_file_count": 2433,
+  "materialized_source_file_count": 1877,
+  "target_tree_sha256": "c612819a833fc8ab3c58fe5085fb80fc0a6c4cb1d86cbb8ed41b0b431e4a1638",
+  "preserved_licenses": [
+    "LICENSE.md",
+    "packages/server/src/enterprise/LICENSE.md"
+  ],
+  "excluded_prefixes": [
+    ".github/"
+  ],
+  "security_reference_redaction": {
+    "strategy": "replace GHSA/CVE tokens in comments/test descriptions without changing executable semantics",
+    "affected_files": [
+      "packages/components/src/httpSecurity.test.ts",
+      "packages/components/src/validator.test.ts",
+      "packages/components/src/validator.ts",
+      "packages/server/src/utils/createAttachment.ts",
+      "packages/server/src/utils/fileValidation.ts"
+    ]
+  },
+  "leakage_scan": {
+    "passed": true,
+    "patterns": [
+      "CVE",
+      "GHSA",
+      "build_root",
+      "case_id",
+      "evaluator_private",
+      "fixed_commit",
+      "ground_truth",
+      "vulnerable_commit"
+    ]
+  },
+  "materializer_sha256": "b57898a8c8315423d743ccf9df2814fb13a06ad6e5bdabcdf7ff35b41e4e5350"
+}
