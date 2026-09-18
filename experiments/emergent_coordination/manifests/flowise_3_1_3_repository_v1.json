@@ -19,7 +19,8 @@
         "single",
         "parallel",
         "raw_blackboard",
-        "structured_team"
+        "structured_team",
+        "manager_worker"
     ],
     "matched_conditions": [
         {
@@ -40,6 +41,11 @@
         {
             "id": "T4",
             "mode": "structured_team",
+            "agent_count": 4
+        },
+        {
+            "id": "M4",
+            "mode": "manager_worker",
             "agent_count": 4
         }
     ],
@@ -70,12 +76,12 @@
         "evaluator_private_tree_sha256": "76aaef174369769e70b8ef61cda454d96a503fc033e1437a6b6efba934915e12",
         "base_prompt_sha256": "a63820831f9ab8864eb318444cfc8ad0b126043161833f145f8840e68c9581ec",
         "finding_schema_sha256": "97ad0335dde33ffd45a2056d7b8e15b79375fbea5a40c2e82d7f774ba7999c48",
-        "tool_surface_sha256": "3522153c128829670809a62908d356d1a7ce270e9ecb642da8833d35959a013e"
+        "tool_surface_sha256": "fd50774151b621069f3a82aeaf76a3355227318efafcec085c5ca58d72c2e1f0"
     },
     "leakage_notes": [
         "The target is isolated from evaluator-private assets and source-case provenance.",
         "Upstream branding and version strings are residual source-identity leakage and are not semantically rewritten.",
-        "No M condition is defined or enabled."
+        "M4 (manager_worker, 1 manager + 3 workers, agent_001 is the manager) is defined per the pre-registered M4/M8/M16 manager-worker plan; its role-restricted tool surfaces and team budget match the S/P/B/T conditions and add no audit-specific knowledge or tools."
     ],
     "live_gate": "open"
 }

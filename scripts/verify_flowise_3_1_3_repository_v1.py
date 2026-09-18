@@ -24,7 +24,27 @@ from experiments.emergent_coordination.harness.tools.specs import tools_for_mode
 
 
 CASE_ID = "flowise_3_1_3_repository_v1"
-_MODES = ("single", "parallel", "raw_blackboard", "structured_team")
+_MODES = ("single", "parallel", "raw_blackboard", "structured_team", "manager_worker")
+
+
+def _tool_surface(finding_schema: str) -> dict[str, Any]:
+    """Canonical per-mode tool surface for the case digest.
+
+    manager_worker exposes role-restricted surfaces (tools_for_mode requires
+    an explicit role for it), so its canonical entry carries both the
+    manager and the worker surface; any change on either side is visible in
+    the digest.
+    """
+    surface: dict[str, Any] = {
+        mode: tools_for_mode(mode, finding_schema)
+        for mode in _MODES
+        if mode != "manager_worker"
+    }
+    surface["manager_worker"] = {
+        role: tools_for_mode("manager_worker", finding_schema, role=role)
+        for role in ("manager", "worker")
+    }
+    return surface
 _LEAK_NEEDLES = (
     "ghsa-",
     "cve-",
@@ -55,9 +75,7 @@ def verify() -> dict[str, Any]:
         "finding_schema_sha256": hashlib.sha256(
             Path("experiments/emergent_coordination/harness/repository_v1_findings.py").read_bytes()
         ).hexdigest(),
-        "tool_surface_sha256": hashlib.sha256(
-            canonical({mode: tools_for_mode(mode, case.finding_schema) for mode in _MODES}).encode()
-        ).hexdigest(),
+        "tool_surface_sha256": hashlib.sha256(canonical(_tool_surface(case.finding_schema)).encode()).hexdigest(),
     }
     _require(actual_digests == manifest_digests, "manifest digest mismatch")
     _require(not (case.target_root / ".git").exists(), "target contains .git")

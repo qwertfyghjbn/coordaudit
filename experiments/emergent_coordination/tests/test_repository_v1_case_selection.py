@@ -53,6 +53,11 @@ class RepositoryV1CaseSelectionTest(unittest.TestCase):
         common, schema = base_prompt("repository_v1")
         canonical = lambda value: json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
         tool_surface = {mode: tools_for_mode(mode, "repository_v1") for mode in ("single", "parallel", "raw_blackboard", "structured_team")}
+        # manager_worker is role-restricted, so its canonical entry carries
+        # both role surfaces; this must mirror the verifier's digest shape.
+        tool_surface["manager_worker"] = {
+            role: tools_for_mode("manager_worker", "repository_v1", role=role) for role in ("manager", "worker")
+        }
         self.assertEqual(digests["target_tree_sha256"], tree_digest(case.target_root))
         self.assertEqual(digests["evaluator_private_tree_sha256"], tree_digest(case.evaluator_private_root))
         self.assertEqual(digests["base_prompt_sha256"], hashlib.sha256((common + "\n" + schema).encode()).hexdigest())
@@ -76,6 +81,14 @@ class RepositoryV1CaseSelectionTest(unittest.TestCase):
                 self.assertFalse({"shared_create", "send_message", "list_messages"} & names)
             else:
                 self.assertFalse({"shared_create", "claim_task", "send_message", "list_messages"} & names)
+        # The M condition is role-restricted and neither role may carry the
+        # blackboard or structured-team primitives (M plan §2).
+        for role in ("manager", "worker"):
+            submit_tools = tools_for_mode("manager_worker", "repository_v1", role=role)
+            submit = next(item for item in submit_tools if item["function"]["name"] == "submit_findings")
+            self.assertEqual(submit["function"]["parameters"]["required"], ["schema_version", "findings"])
+            names = {item["function"]["name"] for item in submit_tools}
+            self.assertFalse({"shared_create", "claim_task", "send_message", "list_messages"} & names)
 
     def test_cli_mock_default_uses_selected_case_schema(self):
         response = mock_client_for_case(load_case(CASE_ID).manifest).complete([], [], agent_id="agent_001")

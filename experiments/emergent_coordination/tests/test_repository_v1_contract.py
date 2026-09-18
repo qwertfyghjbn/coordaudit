@@ -193,6 +193,48 @@ class RepositoryV1ContractTest(unittest.TestCase):
         self.assertIn("findings[0].guard", paths)
         self.assertIn("findings[0].verification.status", paths)
 
+    def test_m4_amendment_matches_preregistered_manager_worker_plan(self):
+        manifest = json.loads(
+            Path("experiments/emergent_coordination/manifests/flowise_3_1_3_repository_v1.json").read_text(encoding="utf-8")
+        )
+        self.assertIn("manager_worker", manifest["supported_modes"])
+        conditions = {item["id"]: item for item in manifest["matched_conditions"]}
+        self.assertIn("M4", conditions)
+        # M4 must be same-N with the P/B/T baselines (1 manager + 3 workers
+        # is runtime role derivation, not extra agents).
+        self.assertEqual(conditions["M4"]["mode"], "manager_worker")
+        self.assertEqual(
+            {conditions[cid]["agent_count"] for cid in ("P4", "B4", "T4", "M4")}, {4}
+        )
+        # The four pre-existing surfaces are pinned to their pre-amendment
+        # digests: adding M4 must not change any other condition's tools.
+        canonical = lambda value: json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+        pinned = {
+            "single": "a23e7c51301dc20dec7574b490aaf72f8b24c63b6148e25d36c8650e4f8ee26b",
+            "parallel": "a23e7c51301dc20dec7574b490aaf72f8b24c63b6148e25d36c8650e4f8ee26b",
+            "raw_blackboard": "e52063f3679bf7c73130a8381f994bd9152a175bcfde175a8351c5372200380e",
+            "structured_team": "81707c840e64c97540da11f856ff1b7ca56b2c0b0d5ab073a44f0c4c52ac29d9",
+        }
+        from experiments.emergent_coordination.harness.tools.specs import tools_for_mode
+
+        for mode, expected in pinned.items():
+            actual = hashlib.sha256(canonical(tools_for_mode(mode, "repository_v1")).encode()).hexdigest()
+            self.assertEqual(actual, expected, f"{mode} tool surface drifted")
+        # The audit task itself is untouched by the amendment.
+        self.assertEqual(
+            manifest["digests"]["target_tree_sha256"],
+            "c612819a833fc8ab3c58fe5085fb80fc0a6c4cb1d86cbb8ed41b0b431e4a1638",
+        )
+        self.assertEqual(
+            manifest["digests"]["base_prompt_sha256"],
+            "a63820831f9ab8864eb318444cfc8ad0b126043161833f145f8840e68c9581ec",
+        )
+        self.assertEqual(
+            manifest["digests"]["finding_schema_sha256"],
+            "97ad0335dde33ffd45a2056d7b8e15b79375fbea5a40c2e82d7f774ba7999c48",
+        )
+        self.assertEqual(manifest["default_budgets"]["hard_team_call_permits"], 64)
+
     def test_private_phase4_recipes_cover_every_B_root_without_network(self):
         census = json.loads((PRIVATE / "census.json").read_text(encoding="utf-8"))
         recipes = json.loads((PRIVATE / "validation_recipes.json").read_text(encoding="utf-8"))
