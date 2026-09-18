@@ -16,8 +16,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from experiments.emergent_coordination.harness.contract import BlockConfig
-from experiments.emergent_coordination.harness.cases import load_case
+from experiments.emergent_coordination.harness.cases import CaseDefinition, load_case
+from experiments.emergent_coordination.harness.contract import BlockConfig, ConditionSpec
 from experiments.emergent_coordination.harness.paths import EXPERIMENT_ROOT, REPO_ROOT
 from experiments.emergent_coordination.harness.prompts import base_prompt, system_prompt, user_prompt
 from experiments.emergent_coordination.harness.tools.specs import tools_for_mode
@@ -25,6 +25,36 @@ from experiments.emergent_coordination.harness.tools.specs import tools_for_mode
 
 class BlockRunnerError(RuntimeError):
     pass
+
+
+def condition_hashes(condition: ConditionSpec, case: CaseDefinition) -> dict[str, Any]:
+    """Hash the frozen per-condition prompt and tool surfaces.
+
+    Prompt hashes use a sentinel agent identity. The actual identity mapping is
+    recorded separately, so the manifest proves the prompt template and the
+    deterministic identity assignment without duplicating hashes per agent.
+    """
+    if condition.mode == "manager_worker":
+        return {role: _role_hashes(condition, case, role) for role in ("manager", "worker")}
+    return _role_hashes(condition, case, None)
+
+
+def _role_hashes(condition: ConditionSpec, case: CaseDefinition, role: str | None) -> dict[str, str]:
+    agent_id = "__AGENT_ID__"
+    system = system_prompt(condition.mode, agent_id, case.prompt_profile, role=role)
+    user = user_prompt(condition.mode, agent_id, condition.agent_count, case.prompt_profile, role=role)
+    if role == "manager":
+        identity_rule = "agent_001"
+    elif role == "worker":
+        identity_rule = "agent_002..agent_N"
+    else:
+        identity_rule = "agent_001..agent_N"
+    return {
+        "system_prompt_template": _sha256_text(system),
+        "user_prompt_template": _sha256_text(user),
+        "tool_schema": _sha256_json(tools_for_mode(condition.mode, case.finding_schema, role=role)),
+        "identity_rule": identity_rule,
+    }
 
 
 @dataclass(frozen=True)
@@ -57,24 +87,19 @@ class BlockRunner:
 
     def _build_manifest(self, block_id: str) -> dict[str, Any]:
         case = load_case(self.config.repository_id)
-        condition_hashes: dict[str, dict[str, str]] = {}
-        for condition in self.config.conditions:
-            system = system_prompt(condition.mode, "agent_001", case.prompt_profile)
-            user = user_prompt(condition.mode, "agent_001", condition.agent_count, case.prompt_profile)
-            condition_hashes[condition.id] = {
-                "system_prompt": _sha256_text(system),
-                "user_prompt": _sha256_text(user),
-                "tool_schema": _sha256_json(tools_for_mode(condition.mode, case.finding_schema)),
-            }
+        self._check_case_contract_consistency(case)
+        per_condition_hashes = {
+            condition.id: condition_hashes(condition, case) for condition in self.config.conditions
+        }
         common, schema = base_prompt(case.prompt_profile)
         return {
-            "schema_version": 1,
+            "schema_version": 2,
             "block_id": block_id,
             "frozen_at": datetime.now(timezone.utc).isoformat(),
             "contract": self.config.as_dict(),
             "hashes": {
                 "common_prompt": _sha256_text(common + "\n" + schema),
-                "conditions": condition_hashes,
+                "conditions": per_condition_hashes,
                 "source_config": _sha256_json(self.config.as_dict()),
             },
             "digests": {
@@ -123,6 +148,38 @@ class BlockRunner:
                 ],
             },
         }
+
+    def _check_case_contract_consistency(self, case: CaseDefinition) -> None:
+        """Keep a block contract from drifting away from its case manifest.
+
+        When the case declares matched_conditions (repository-v1 cases), every
+        contract condition must be declared with the same mode and agent count;
+        this is what keeps the five-condition M block un-freezable until the
+        case amendment adds M4. Declared defaults pin the team permit pool.
+        """
+        manifest = case.manifest
+        declared = manifest.get("matched_conditions")
+        if declared is not None:
+            by_id = {str(item["id"]): item for item in declared}
+            for condition in self.config.conditions:
+                match = by_id.get(condition.id)
+                if (
+                    match is None
+                    or str(match.get("mode")) != condition.mode
+                    or int(match.get("agent_count", -1)) != condition.agent_count
+                ):
+                    raise BlockRunnerError(
+                        f"contract condition {condition.id} is not declared by the "
+                        f"{self.config.repository_id} case matched_conditions"
+                    )
+        defaults = manifest.get("default_budgets")
+        if isinstance(defaults, dict) and "hard_team_call_permits" in defaults:
+            case_permits = int(defaults["hard_team_call_permits"])
+            if case_permits != self.config.hard_team_call_permits:
+                raise BlockRunnerError(
+                    f"block permits ({self.config.hard_team_call_permits}) disagree with the "
+                    f"case default budget ({case_permits})"
+                )
 
 
 def tree_digest(root: Path) -> str:

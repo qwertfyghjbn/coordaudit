@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Freeze an N=4 matched-block contract without executing model calls."""
+"""Freeze a preregistered matched-block contract without executing model calls."""
 
 from __future__ import annotations
 
@@ -13,13 +13,16 @@ from experiments.emergent_coordination.harness.paths import DEFAULT_RUNS_DIR, EX
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Freeze the preregistered S1/P4/B4/T4 N=4 block contract.")
+    parser = argparse.ArgumentParser(description="Freeze a preregistered matched-block contract.")
     parser.add_argument("--block-id", required=True, help="New immutable block directory name.")
     parser.add_argument(
         "--config",
         type=Path,
         default=EXPERIMENT_ROOT / "manifests" / "n4_pilot_v0.json",
-        help="N=4 block contract JSON.",
+        help=(
+            "Preregistered block contract JSON; the contract_id field selects the family "
+            "(legacy pilot JSON without contract_id maps to n4_pilot_v0)."
+        ),
     )
     parser.add_argument("--runs-dir", type=Path, default=DEFAULT_RUNS_DIR, help="Parent directory for the block artifact.")
     args = parser.parse_args()
