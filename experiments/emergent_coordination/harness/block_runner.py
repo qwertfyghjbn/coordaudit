@@ -85,12 +85,41 @@ class BlockRunner:
                 "git_status": _git_status_digest(REPO_ROOT),
             },
             "live_gate": {
-                "status": "blocked",
-                "required_before_execution": [
-                    "pre_call_permit_ledger",
-                    "fail_closed_os_sandbox",
-                    "model_visible_transcript_and_reconciliation",
-                    "strict_finding_schema_dedup_and_private_verification",
+                "status": "open",
+                "opened_on": "2026-09-18",
+                "satisfied_before_execution": [
+                    {
+                        "requirement": "pre_call_permit_ledger",
+                        "evidence": (
+                            "harness/budget.py acquire_call_permit reserves a hard team permit before "
+                            "provider dispatch and a retry always consumes a fresh permit; covered by "
+                            "harness unit tests and exercised live by the S1 smoke of 2026-09-15"
+                        ),
+                    },
+                    {
+                        "requirement": "fail_closed_os_sandbox",
+                        "evidence": (
+                            "harness/tools/sandbox.py assert_os_sandbox_ready fails closed when bwrap is "
+                            "missing (local bwrap 0.6.1); live bwrap self-check and real tool calls passed "
+                            "in the S1 smoke of 2026-09-15"
+                        ),
+                    },
+                    {
+                        "requirement": "model_visible_transcript_and_reconciliation",
+                        "evidence": (
+                            "harness/events.py TranscriptLog records model-visible messages and "
+                            "reconcile_run runs after every condition; the S1 smoke of 2026-09-15 closed "
+                            "the loop with run_validity=valid and reconciliation=valid"
+                        ),
+                    },
+                    {
+                        "requirement": "strict_finding_schema_dedup_and_private_verification",
+                        "evidence": (
+                            "harness/findings.py and repository_v1_findings.py reject duplicate evidence "
+                            "refs and anchor reuse; evaluator/repository_v1_score.py records "
+                            "evaluator_verification separately from agent verification claims"
+                        ),
+                    },
                 ],
             },
         }

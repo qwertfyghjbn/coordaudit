@@ -57,7 +57,19 @@ class N4PilotContractTest(unittest.TestCase):
             self.assertIn("evaluator_private_tree", manifest["digests"])
             self.assertIn("common_prompt", manifest["hashes"])
             self.assertEqual(set(manifest["hashes"]["conditions"]), {condition.id for condition in N4_PILOT_CONDITIONS})
-            self.assertEqual(manifest["live_gate"]["status"], "blocked")
+            self.assertEqual(manifest["live_gate"]["status"], "open")
+            self.assertEqual(
+                {item["requirement"] for item in manifest["live_gate"]["satisfied_before_execution"]},
+                {
+                    "pre_call_permit_ledger",
+                    "fail_closed_os_sandbox",
+                    "model_visible_transcript_and_reconciliation",
+                    "strict_finding_schema_dedup_and_private_verification",
+                },
+            )
+            self.assertTrue(
+                all(item["evidence"].strip() for item in manifest["live_gate"]["satisfied_before_execution"])
+            )
             self.assertEqual(frozen.block_dir, Path(tmp) / "n4-contract-test")
 
             with self.assertRaises(BlockRunnerError):
