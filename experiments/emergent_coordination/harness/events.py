@@ -24,7 +24,7 @@ EVENT_TYPES = (
     "manager_task_reassigned", "manager_assignment_observed", "manager_worker_reported",
     "manager_report_observed", "manager_worker_requested_more",
     "message_sent", "message_read", "artifact_published", "finding_submitted", "finding_submission_rejected",
-    "budget_exhausted", "timeout", "error", "run_started", "run_finished",
+    "completion_phase_started", "prohibited_tool_attempt", "budget_exhausted", "timeout", "error", "run_started", "run_finished",
 )
 
 _CONTENT_FIELDS = frozenset({

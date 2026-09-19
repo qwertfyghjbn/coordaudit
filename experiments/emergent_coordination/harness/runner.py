@@ -37,6 +37,7 @@ class RunConfig:
     budgets: dict[str, Any] | None = None
     max_steps: int = 12
     max_provider_retries: int = 0
+    completion_policy: str | None = None
     require_os_sandbox: bool = False
     run_id: str | None = None
     runs_dir: Path = DEFAULT_RUNS_DIR
@@ -102,6 +103,7 @@ class RunContext:
             budget=self.budget,
             prompt_profile=self.case.prompt_profile,
             finding_schema=self.case.finding_schema,
+            completion_policy=self.config.completion_policy,
             max_steps=self.config.max_steps,
             max_provider_retries=self.config.max_provider_retries,
         )
@@ -204,6 +206,7 @@ def run_experiment(config: RunConfig, llm: LLMClient) -> dict[str, Any]:
         "budget_semantics": describe_budget_semantics(budgets),
         "max_steps": config.max_steps,
         "max_provider_retries": config.max_provider_retries,
+        "completion_policy": config.completion_policy,
         "require_os_sandbox": config.require_os_sandbox,
         "start_time": utc_now(),
         "git_commit": git_commit(REPO_ROOT),
@@ -274,6 +277,7 @@ def run_experiment(config: RunConfig, llm: LLMClient) -> dict[str, Any]:
                 "finding_count": len((item.get("findings") or {}).get("findings") or []),
                 "submission_attempts": item.get("submission_attempts", 0),
                 "invalid_submission_attempts": item.get("invalid_submission_attempts", 0),
+                "invalid_submission_arguments": item.get("invalid_submission_arguments", 0),
             }
             for item in agent_results
         ],

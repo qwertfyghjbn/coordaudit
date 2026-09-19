@@ -36,6 +36,8 @@ class MockLLMClient:
         self.scripts = scripts or {}
         self.default = default or []
         self.calls: dict[str, int] = {}
+        # Mirrors OpenAICompatibleClient so per-call ceiling logging is uniform.
+        self.max_tokens = 1024
 
     def complete(
         self,

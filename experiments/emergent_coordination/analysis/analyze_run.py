@@ -6,16 +6,28 @@ import argparse
 import json
 import re
 import shlex
+import statistics
+import sys
 from collections import Counter, defaultdict
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Iterable, Mapping
+
+_REPO_ROOT = Path(__file__).resolve().parents[3]
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
+
+from experiments.emergent_coordination.harness.call_role import CALL_ROLES, COORDINATION_TOOLS, classify_call_role
+from experiments.emergent_coordination.harness.completion import FINALIZATION_POLICIES, FINALIZATION_RESERVE, HARD_FINALIZATION_POLICIES
 
 
 METRICS_SCHEMA_VERSION = 2
 BLOCK_COMPARISON_SCHEMA_VERSION = 1
 _SEARCH_COMMANDS = frozenset({"rg", "grep", "git-grep", "ag", "ack"})
 _TEST_COMMANDS = frozenset({"pytest", "unittest", "tox", "nox"})
+_CEILING_FINISH_REASONS = frozenset({"length"})
+_EXPLORATION_TOOL_NAMES = frozenset({"read_file", "list_files", "run_shell"}) | COORDINATION_TOOLS
+_CEILING_FINISH_REASONS = frozenset({"length"})
 
 
 def load_events(run_dir: Path) -> list[dict[str, Any]]:
@@ -38,6 +50,8 @@ def analyze_run(run_dir: Path, *, write: bool = True) -> dict[str, Any]:
     mode = str(summary.get("mode") or "")
     blackboard = _blackboard_metrics(events, mode=mode)
     structured_team = _structured_team_metrics(events, artifacts, findings, mode=mode)
+    output_ceiling = _output_ceiling(events, run_dir)
+    completion = _completion_metrics(events, run_dir)
     result = {
         "schema_version": METRICS_SCHEMA_VERSION,
         "run_id": summary.get("run_id"),
@@ -51,6 +65,8 @@ def analyze_run(run_dir: Path, *, write: bool = True) -> dict[str, Any]:
         "resource_allocation": allocation,
         "blackboard": blackboard,
         "structured_team": structured_team,
+        "output_ceiling": output_ceiling,
+        "completion": completion,
         "event_counts": dict(sorted(counts.items())),
         # Compatibility fields retained for the small existing analyzer API.
         "agents_started": len(_events_of(events, "agent_started")),
@@ -166,6 +182,329 @@ def analyze_matched_block(
     if write:
         _write_json(block_dir / "block_comparison.json", comparison)
     return comparison
+
+
+def _output_ceiling(events: list[dict[str, Any]], run_dir: Path) -> dict[str, Any]:
+    """Per-call output-ceiling pressure by call role.
+
+    Runtime ``llm_call`` events carry ``call_role``/``output_tokens``/
+    ``max_output_tokens``/``finish_reason`` directly.  Older runs are backfilled
+    from ``tool_call`` children, ``token_usage``, ``completion_phase_started``,
+    and the run manifest, using the same classifier as the runtime path.
+    """
+    manifest = _read_json(Path(run_dir) / "run_manifest.json", {})
+    finalization_first_step = _finalization_first_step(events, manifest)
+    tools_by_call: dict[str, set[str]] = defaultdict(set)
+    for event in _events_of(events, "tool_call"):
+        tool = str((event.get("payload") or {}).get("tool") or "")
+        if not tool:
+            continue
+        for parent in event.get("parent_event_ids") or []:
+            tools_by_call[str(parent)].add(tool)
+    calls: list[dict[str, Any]] = []
+    for event in _events_of(events, "llm_call"):
+        payload = event.get("payload") or {}
+        if payload.get("outcome") != "succeeded":
+            continue
+        event_id = str(event.get("event_id"))
+        role = payload.get("call_role")
+        role_source = "payload"
+        if role not in CALL_ROLES:
+            role = classify_call_role(
+                tools_by_call.get(event_id, set()),
+                finalization_active=finalization_first_step is not None
+                and _int(payload.get("step")) >= finalization_first_step,
+            )
+            role_source = "derived"
+        token_usage = event.get("token_usage") or {}
+        calls.append(
+            {
+                "role": role,
+                "output_tokens": payload.get("output_tokens", token_usage.get("output_tokens")),
+                "finish_reason": payload.get("finish_reason")
+                or (payload.get("model_metadata") or {}).get("finish_reason"),
+            }
+        )
+    max_output_tokens = None
+    for event in _events_of(events, "llm_call"):
+        value = (event.get("payload") or {}).get("max_output_tokens")
+        if value is not None:
+            max_output_tokens = value
+            break
+    if max_output_tokens is None:
+        max_output_tokens = (manifest.get("model_profile") or {}).get("max_output_tokens")
+    calls_by_role = Counter(call["role"] for call in calls)
+    hits_by_role = Counter(
+        call["role"] for call in calls if str(call.get("finish_reason")) in _CEILING_FINISH_REASONS
+    )
+
+    def _hit_rate(role: str | None) -> float | None:
+        total = sum(calls_by_role.values()) if role is None else calls_by_role.get(role, 0)
+        hits = sum(hits_by_role.values()) if role is None else hits_by_role.get(role, 0)
+        return hits / total if total else None
+
+    def _percentiles(values: list[int]) -> dict[str, int | None]:
+        if not values:
+            return {"p50": None, "p90": None, "p95": None, "p99": None}
+        if len(values) == 1:
+            return {key: values[0] for key in ("p50", "p90", "p95", "p99")}
+        cutpoints = statistics.quantiles(values, n=100, method="inclusive")
+        return {
+            "p50": round(cutpoints[49]),
+            "p90": round(cutpoints[89]),
+            "p95": round(cutpoints[94]),
+            "p99": round(cutpoints[98]),
+        }
+
+    overall_tokens = [_int(call.get("output_tokens")) for call in calls]
+    return {
+        "max_output_tokens": max_output_tokens,
+        "calls": len(calls),
+        "ceiling_hits": sum(hits_by_role.values()),
+        "ceiling_hit_rate_overall": _hit_rate(None),
+        "ceiling_hit_rate_by_role": {role: _hit_rate(role) for role in CALL_ROLES},
+        "calls_by_role": {role: calls_by_role.get(role, 0) for role in CALL_ROLES},
+        "ceiling_hits_by_role": {role: hits_by_role.get(role, 0) for role in CALL_ROLES},
+        "output_tokens_percentiles_overall": _percentiles(overall_tokens),
+        "output_tokens_percentiles_by_role": {
+            role: _percentiles([_int(call.get("output_tokens")) for call in calls if call["role"] == role])
+            for role in CALL_ROLES
+        },
+        "measurement_notes": [
+            "ceiling hit 判据为 finish_reason=length 的成功调用；provider 失败调用不参与。",
+            "call_role 优先取运行时记录；缺失时按 tool_call 子事件与 finalization 边界回溯推导，与运行时分类器同源。",
+            "无该角色调用的 hit rate 记为 null，不按 0 解释。",
+        ],
+    }
+
+
+def _finalization_first_step(events: list[dict[str, Any]], manifest: dict[str, Any]) -> int | None:
+    started = _events_of(events, "completion_phase_started")
+    if started:
+        return min(_int((event.get("payload") or {}).get("step")) for event in started)
+    if manifest.get("completion_policy") in FINALIZATION_POLICIES:
+        max_steps = _int(manifest.get("max_steps"))
+        if max_steps > FINALIZATION_RESERVE:
+            return max_steps - FINALIZATION_RESERVE + 1
+    return None
+
+
+_CONVERGENCE_CUE_PATTERNS = tuple(
+    re.compile(pattern, re.IGNORECASE)
+    for pattern in (
+        r"\benough evidence\b",
+        r"\bsufficient evidence\b",
+        r"\bready to submit\b",
+        r"\btime to submit\b",
+        r"\bconsolidate (?:my |the )?findings\b",
+        r"\bstop (?:exploring|searching|scanning|looking)\b",
+        r"\bdiminishing returns?\b",
+        r"\bfinali[sz]e (?:my |the )?(?:submission|report|findings)\b",
+        r"\bprepare (?:my |the )?(?:final )?(?:submission|payload|findings)\b",
+        r"\bi have (?:enough|sufficient)\b",
+        r"\bwrapping up\b",
+        r"\bcompile (?:my |the )?findings\b",
+    )
+)
+# Negation words immediately before a cue suppress it (e.g. "I do not have
+# enough evidence").  Word-bounded because "Note:" must not match "not".
+_CONVERGENCE_NEGATION_RE = re.compile(r"\b(?:not|no|never|without|lacks?|lacking|insufficient|need)\b|n't", re.IGNORECASE)
+
+
+def _first_convergence_candidates(run_dir: Path) -> dict[str, dict[str, Any]]:
+    """Earliest transcript cue that *may* express cognitive convergence.
+
+    A mechanical candidate only: negation-guarded regex hits on
+    model-response text.  The authoritative ``first_convergence_step``
+    comes from trace review; this exists so the candidate judgement is
+    reproducible and auditable.
+    """
+    candidates: dict[str, dict[str, Any]] = {}
+    transcript_dir = run_dir / "logs" / "transcripts"
+    if not transcript_dir.is_dir():
+        return candidates
+    for path in sorted(transcript_dir.glob("*.jsonl")):
+        for record in _read_jsonl(path):
+            if record.get("kind") != "model_response":
+                continue
+            content = (record.get("content") or {})
+            text = str(content.get("content") or "")
+            if not text:
+                continue
+            for pattern in _CONVERGENCE_CUE_PATTERNS:
+                match = pattern.search(text)
+                if match is None:
+                    continue
+                window = text[max(0, match.start() - 80) : match.start()]
+                if _CONVERGENCE_NEGATION_RE.search(window):
+                    continue
+                agent = str(record.get("agent_id"))
+                candidate = {
+                    "step": _int(content.get("step")),
+                    "cue": text[match.start() : match.start() + 120],
+                    "transcript_id": record.get("transcript_id"),
+                }
+                existing = candidates.get(agent)
+                if existing is None or candidate["step"] < existing["step"]:
+                    candidates[agent] = candidate
+                break
+    return candidates
+
+
+def _completion_metrics(events: list[dict[str, Any]], run_dir: Path) -> dict[str, Any]:
+    """Mechanical completion-path metrics per agent.
+
+    Everything here is derivable from events and transcripts: finalization
+    window, dispatched exploration, submit attempts, hard-gate rejections,
+    a convergence *cue* candidate, and a rule-based binding candidate.  The
+    binding candidate never replaces trace review; it only pre-classes runs
+    for it.
+    """
+    manifest = _read_json(Path(run_dir) / "run_manifest.json", {})
+    policy = manifest.get("completion_policy")
+    generation = "hard_gate" if policy in HARD_FINALIZATION_POLICIES else ("advisory" if policy in FINALIZATION_POLICIES else None)
+
+    finalization_start: int | None = None
+    started = _events_of(events, "completion_phase_started")
+    if started:
+        finalization_start = min(_int((event.get("payload") or {}).get("step")) for event in started)
+        policy = (started[0].get("payload") or {}).get("policy") or policy
+
+    step_by_event: dict[str, int | None] = {}
+    llm_calls_by_agent: dict[str, list[tuple[int, int]]] = defaultdict(list)
+    for event in _events_of(events, "llm_call"):
+        step_by_event[str(event.get("event_id"))] = _int((event.get("payload") or {}).get("step"))
+        if event.get("agent_id"):
+            llm_calls_by_agent[str(event.get("agent_id"))].append((_int(event.get("sequence")), _int((event.get("payload") or {}).get("step"))))
+    for calls in llm_calls_by_agent.values():
+        calls.sort()
+
+    def step_of(event: dict[str, Any]) -> int | None:
+        for parent in event.get("parent_event_ids") or []:
+            if str(parent) in step_by_event:
+                return step_by_event[str(parent)]
+        calls = llm_calls_by_agent.get(str(event.get("agent_id")), [])
+        sequence = _int(event.get("sequence"))
+        step: int | None = None
+        for call_sequence, call_step in calls:
+            if call_sequence <= sequence:
+                step = call_step
+            else:
+                break
+        return step
+
+    dispatches: list[dict[str, Any]] = []
+    for event in sorted(_events_of(events, "tool_call"), key=lambda item: _int(item.get("sequence"))):
+        step_by_event[str(event.get("event_id"))] = step_of(event)
+        payload = event.get("payload") or {}
+        if "arguments" in payload or "argument_error" in payload:
+            dispatches.append(event)
+
+    submitted = _events_of(events, "finding_submitted")
+    validator_rejections = _events_of(events, "finding_submission_rejected")
+    prohibited = _events_of(events, "prohibited_tool_attempt")
+    convergence_candidates = _first_convergence_candidates(Path(run_dir))
+
+    agent_ids = sorted({str(event.get("agent_id")) for event in events if event.get("agent_id")})
+    per_agent: dict[str, Any] = {}
+    for agent in agent_ids:
+        agent_dispatches = [event for event in dispatches if str(event.get("agent_id")) == agent]
+        exploration_steps = [
+            step_of(event)
+            for event in agent_dispatches
+            if str((event.get("payload") or {}).get("tool") or "") in _EXPLORATION_TOOL_NAMES and "arguments" in (event.get("payload") or {})
+        ]
+        submit_dispatches = [
+            event for event in agent_dispatches if str((event.get("payload") or {}).get("tool") or "") == "submit_findings"
+        ]
+        invalid_submit_arguments = sum(1 for event in submit_dispatches if "argument_error" in (event.get("payload") or {}))
+        agent_submitted = [event for event in submitted if str(event.get("agent_id")) == agent]
+        agent_rejections = [event for event in validator_rejections if str(event.get("agent_id")) == agent]
+        validator_steps = [step_of(event) for event in agent_submitted + agent_rejections]
+        # A submit dispatch and the validator event it triggers share one step;
+        # attempt counting is therefore step-level (deduplicated).
+        attempt_steps = sorted({step for step in list(step_of(event) for event in submit_dispatches) + validator_steps if step is not None})
+        first_submit = attempt_steps[0] if attempt_steps else None
+        successful_submit = min((step_of(event) for event in agent_submitted if step_of(event) is not None), default=None)
+        convergence = convergence_candidates.get(agent)
+        convergence_step = convergence.get("step") if convergence else None
+        agent_prohibited = [
+            {
+                "event_id": event.get("event_id"),
+                "step": _int((event.get("payload") or {}).get("step")),
+                "requested_tool": (event.get("payload") or {}).get("requested_tool"),
+                "arguments_sha256": (event.get("payload") or {}).get("arguments_sha256"),
+            }
+            for event in prohibited
+            if str(event.get("agent_id")) == agent
+        ]
+        last_exploration = max((step for step in exploration_steps if step is not None), default=None)
+        exploration_after_convergence = (
+            sum(1 for step in exploration_steps if step is not None and convergence_step is not None and step > convergence_step)
+            if convergence_step is not None
+            else None
+        )
+        record: dict[str, Any] = {
+            "finalization_policy": policy,
+            "finalization_generation": generation,
+            "finalization_start_step": finalization_start,
+            "first_convergence_candidate_step": convergence_step,
+            "first_convergence_candidate_cue": convergence.get("cue") if convergence else None,
+            "last_exploration_step": last_exploration,
+            "exploration_call_count": len(exploration_steps),
+            "exploration_calls_after_first_convergence": exploration_after_convergence,
+            "first_submit_attempt_step": first_submit,
+            "successful_submit_step": successful_submit,
+            "submission_attempt_count": len(agent_submitted) + len(agent_rejections),
+            "submit_tool_call_count": len(submit_dispatches),
+            "invalid_submit_argument_count": invalid_submit_arguments,
+            "invalid_or_rejected_submission_count": len(agent_rejections) + invalid_submit_arguments,
+        }
+        if finalization_start is not None:
+            submit_after = [step for step in attempt_steps if step >= finalization_start]
+            had_convergence_before = convergence_step is not None and convergence_step < finalization_start
+            had_submit_before = first_submit is not None and first_submit < finalization_start
+            stopped_before = last_exploration is not None and last_exploration < finalization_start
+            successful_after = successful_submit is not None and successful_submit >= finalization_start
+            record.update(
+                {
+                    "had_convergence_candidate_before_finalization": had_convergence_before,
+                    "had_submit_attempt_before_finalization": had_submit_before,
+                    "last_exploration_before_finalization": stopped_before,
+                    "prohibited_tool_attempts_after_finalization": len(agent_prohibited),
+                    "prohibited_tool_names": sorted({str(item["requested_tool"]) for item in agent_prohibited}),
+                    "prohibited_tool_attempts": agent_prohibited,
+                    "submit_attempts_after_finalization": len(submit_after),
+                    "successful_submit_after_finalization": successful_after,
+                    "steps_from_finalization_to_submit": successful_submit - finalization_start if successful_submit is not None else None,
+                }
+            )
+            if generation != "hard_gate":
+                binding = None
+            elif not had_convergence_before and not had_submit_before and agent_prohibited:
+                binding = "binding_strong"
+            elif not had_convergence_before and not had_submit_before:
+                binding = "binding_candidate"
+            elif had_convergence_before and (had_submit_before or stopped_before):
+                binding = "non_binding_strong"
+            elif had_convergence_before:
+                binding = "non_binding_candidate"
+            else:
+                binding = "ambiguous"
+            record["hard_finalization_binding_candidate"] = binding
+        per_agent[agent] = record
+
+    return {
+        "policy": manifest.get("completion_policy"),
+        "generation": generation,
+        "finalization_start_step": finalization_start,
+        "per_agent": per_agent,
+        "measurement_notes": [
+            "first_convergence_candidate 是对 transcript 的否定词防护正则命中，仅是候选信号；权威判定以 trace review 为准，未观察到时不应猜测。",
+            "exploration 计数只统计 model-selected dispatch（read_file/list_files/run_shell/coordination 工具），write_file 不算探索。",
+            "hard_finalization_binding_candidate 是机械规则：finalization 前无收敛候选且无提交尝试 → binding；有收敛候选且已停探索或已提交 → non_binding；其余 ambiguous。不替代 trace review。",
+        ],
+    }
 
 
 def _duplicate_work(events: list[dict[str, Any]], artifacts: dict[tuple[str, str], Any], findings: list[dict[str, Any]]) -> dict[str, Any]:

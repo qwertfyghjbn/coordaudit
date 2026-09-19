@@ -96,6 +96,75 @@ class AnalyzeRunTest(unittest.TestCase):
             self.assertEqual(result["structured_team"]["task_result_evidence_adoption"]["count"], 1)
             self.assertIn("does not prove", result["blackboard"]["lineage_note"])
 
+    def test_output_ceiling_backfills_roles_for_legacy_runs(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            run_dir = Path(tmp)
+            log = EventLog(run_dir / "logs" / "events.jsonl", run_id="r-ceiling")
+            log.emit("run_started")
+            log.emit("agent_started", agent_id="agent_001")
+            # Legacy-style llm_call events without call_role/output_tokens fields.
+            exploration = log.emit(
+                "llm_call",
+                agent_id="agent_001",
+                payload={"step": 1, "outcome": "succeeded", "model_metadata": {"finish_reason": "tool_calls"}},
+                token_usage={"input_tokens": 10, "output_tokens": 100},
+            )
+            log.emit(
+                "tool_call",
+                agent_id="agent_001",
+                payload={"tool": "read_file", "arguments": {"path": "target/a.py"}},
+                parent_event_ids=[exploration["event_id"]],
+            )
+            submission = log.emit(
+                "llm_call",
+                agent_id="agent_001",
+                payload={"step": 2, "outcome": "succeeded", "model_metadata": {"finish_reason": "length"}},
+                token_usage={"input_tokens": 10, "output_tokens": 2048},
+            )
+            log.emit(
+                "tool_call",
+                agent_id="agent_001",
+                payload={"tool": "submit_findings", "argument_error": {"reason": "invalid_json"}},
+                parent_event_ids=[submission["event_id"]],
+            )
+            finalization = log.emit(
+                "llm_call",
+                agent_id="agent_001",
+                payload={"step": 3, "outcome": "succeeded", "model_metadata": {"finish_reason": "tool_calls"}},
+                token_usage={"input_tokens": 10, "output_tokens": 50},
+            )
+            log.emit(
+                "tool_call",
+                agent_id="agent_001",
+                payload={"tool": "read_file", "arguments": {"path": "target/b.py"}},
+                parent_event_ids=[finalization["event_id"]],
+            )
+            log.emit(
+                "completion_phase_started",
+                agent_id="agent_001",
+                payload={"policy": "convergent_v1", "step": 3, "reserved_steps": 8},
+            )
+            log.emit("agent_finished", agent_id="agent_001")
+            (run_dir / "run_manifest.json").write_text(
+                json.dumps({"model_profile": {"max_output_tokens": 2048}}),
+                encoding="utf-8",
+            )
+            result = analyze_run(run_dir, write=False)
+            ceiling = result["output_ceiling"]
+            self.assertEqual(ceiling["max_output_tokens"], 2048)
+            self.assertEqual(ceiling["calls"], 3)
+            self.assertEqual(ceiling["ceiling_hits"], 1)
+            self.assertAlmostEqual(ceiling["ceiling_hit_rate_overall"], 1 / 3)
+            self.assertEqual(
+                ceiling["calls_by_role"],
+                {"exploration": 1, "coordination": 0, "submission": 1, "finalization": 1},
+            )
+            self.assertEqual(ceiling["ceiling_hit_rate_by_role"]["submission"], 1.0)
+            self.assertEqual(ceiling["ceiling_hit_rate_by_role"]["exploration"], 0.0)
+            self.assertIsNone(ceiling["ceiling_hit_rate_by_role"]["coordination"])
+            self.assertEqual(ceiling["output_tokens_percentiles_overall"]["p50"], 100)
+            self.assertEqual(ceiling["output_tokens_percentiles_by_role"]["submission"]["p50"], 2048)
+
     def test_distinguishes_coordination_tool_exposure_from_activity_and_deduplicates_list_events(self):
         with tempfile.TemporaryDirectory() as tmp:
             run_dir = Path(tmp)

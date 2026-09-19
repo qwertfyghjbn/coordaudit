@@ -60,6 +60,15 @@ def main() -> int:
     parser.add_argument("--live", action="store_true", help="Use LLM credentials from the environment.")
     parser.add_argument("--max-steps", type=int, default=8)
     parser.add_argument(
+        "--completion-policy",
+        choices=["none", "convergent_v1", "guidance_only", "scheduler_only", "convergent_v2", "scheduler_only_v2"],
+        default="none",
+        help=(
+            "Optional completion-path calibration; formal blocks use none. "
+            "Generation-2 policies (convergent_v2/scheduler_only_v2) enforce a hard dispatch gate during finalization."
+        ),
+    )
+    parser.add_argument(
         "--hard-team-call-permits",
         type=int,
         help="Override the manifest team call-permit cap for a non-formal calibration run.",
@@ -110,6 +119,7 @@ def main() -> int:
             budgets=budgets,
             max_steps=args.max_steps,
             max_provider_retries=int(budgets.get("max_provider_retries", 0)),
+            completion_policy=None if args.completion_policy == "none" else args.completion_policy,
             require_os_sandbox=bool(args.live and not args.mock),
             runs_dir=Path(args.runs_dir),
             case_id=args.case,

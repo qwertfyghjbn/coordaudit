@@ -447,6 +447,87 @@ class MockedHarnessTest(unittest.TestCase):
             shared_events = [event for event in events if event["event_type"].startswith("shared_")]
             self.assertEqual(shared_events, [])
 
+    def test_unparseable_submit_arguments_are_counted(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            llm = MockLLMClient(
+                scripts={
+                    "agent_001": [
+                        _response({"id": "c1", "name": "submit_findings", "arguments": '{"findings": ['}),
+                        _response(_tool_call("submit_findings", {"findings": []}, "c2")),
+                    ],
+                }
+            )
+            summary = run_experiment(
+                RunConfig(
+                    mode="single",
+                    agent_count=1,
+                    model="mock",
+                    budgets={"hard_team_call_permits": 20},
+                    runs_dir=Path(tmp),
+                    max_steps=4,
+                ),
+                llm,
+            )
+            agent = summary["agent_results"][0]
+            self.assertEqual(agent["stop_reason"], "submitted")
+            self.assertEqual(agent["submission_attempts"], 1)
+            self.assertEqual(agent["invalid_submission_attempts"], 0)
+            self.assertEqual(agent["invalid_submission_arguments"], 1)
+            events = [
+                json.loads(line)
+                for line in (Path(summary["run_dir"]) / "logs" / "events.jsonl").read_text(encoding="utf-8").splitlines()
+                if line.strip()
+            ]
+            rejected = [
+                event
+                for event in events
+                if event["event_type"] == "tool_call"
+                and (event.get("payload") or {}).get("argument_error", {}).get("tool") == "submit_findings"
+            ]
+            self.assertEqual(len(rejected), 1)
+            self.assertEqual(rejected[0]["payload"]["argument_error"]["reason"], "invalid_json")
+
+    def test_llm_call_records_call_role_and_output_ceiling_fields(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            llm = MockLLMClient(
+                scripts={
+                    "agent_001": [
+                        _response(_tool_call("read_file", {"path": "target/missing.py"}, "c1")),
+                        _response(_tool_call("submit_findings", {"findings": []}, "c2")),
+                    ],
+                }
+            )
+            summary = run_experiment(
+                RunConfig(
+                    mode="single",
+                    agent_count=1,
+                    model="mock",
+                    budgets={"hard_team_call_permits": 20},
+                    runs_dir=Path(tmp),
+                    max_steps=4,
+                ),
+                llm,
+            )
+            events = [
+                json.loads(line)
+                for line in (Path(summary["run_dir"]) / "logs" / "events.jsonl").read_text(encoding="utf-8").splitlines()
+                if line.strip()
+            ]
+            calls = [event for event in events if event["event_type"] == "llm_call" and event["payload"]["outcome"] == "succeeded"]
+            self.assertEqual([event["payload"]["call_role"] for event in calls], ["exploration", "submission"])
+            for event in calls:
+                for field in ("call_role", "output_tokens", "max_output_tokens", "finish_reason"):
+                    self.assertIn(field, event["payload"])
+                self.assertEqual(event["payload"]["max_output_tokens"], 1024)
+            metrics = json.loads((Path(summary["run_dir"]) / "metrics.json").read_text(encoding="utf-8"))
+            ceiling = metrics["output_ceiling"]
+            self.assertEqual(ceiling["calls"], 2)
+            self.assertEqual(ceiling["ceiling_hits"], 0)
+            self.assertEqual(
+                ceiling["calls_by_role"],
+                {"exploration": 1, "coordination": 0, "submission": 1, "finalization": 0},
+            )
+
     def test_blackboard_shared_create_is_logged(self):
         with tempfile.TemporaryDirectory() as tmp:
             llm = MockLLMClient(

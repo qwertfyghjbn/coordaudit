@@ -32,6 +32,33 @@ class PromptPolicyTest(unittest.TestCase):
         self.assertIn("claim_task", names("structured_team"))
         self.assertNotIn("list_agents", names("raw_blackboard"))
 
+    def test_completion_policy_is_opt_in(self):
+        baseline = system_prompt("single", "agent_001", "repository_v1")
+        calibrated = system_prompt("single", "agent_001", "repository_v1", completion_policy="convergent_v1")
+        self.assertNotIn("bounded audit loop", baseline)
+        self.assertIn("bounded audit loop", calibrated)
+        guidance = system_prompt("single", "agent_001", "repository_v1", completion_policy="guidance_only")
+        scheduler = system_prompt("single", "agent_001", "repository_v1", completion_policy="scheduler_only")
+        self.assertIn("bounded audit loop", guidance)
+        self.assertNotIn("bounded audit loop", scheduler)
+        self.assertNotEqual(baseline, calibrated)
+        with self.assertRaises(ValueError):
+            system_prompt("single", "agent_001", completion_policy="unknown")
+
+    def test_completion_generation_two_policies_keep_the_guidance_factor_split(self):
+        # Factor A (guidance text) is byte-identical across generations; only
+        # the runtime finalization gate differs.
+        self.assertEqual(
+            system_prompt("single", "agent_001", "repository_v1", completion_policy="convergent_v1"),
+            system_prompt("single", "agent_001", "repository_v1", completion_policy="convergent_v2"),
+        )
+        scheduler_v2 = system_prompt("single", "agent_001", "repository_v1", completion_policy="scheduler_only_v2")
+        scheduler_v1 = system_prompt("single", "agent_001", "repository_v1", completion_policy="scheduler_only")
+        self.assertEqual(scheduler_v1, scheduler_v2)
+        self.assertNotIn("bounded audit loop", scheduler_v2)
+        self.assertIn("bounded audit loop", system_prompt("single", "agent_001", "repository_v1", completion_policy="convergent_v2"))
+        self.assertIn("bounded audit loop", system_prompt("single", "agent_001", "repository_v1", completion_policy="guidance_only"))
+
 
 if __name__ == "__main__":
     unittest.main()

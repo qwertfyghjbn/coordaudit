@@ -1,10 +1,19 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import time
 from typing import Any
 
 from experiments.emergent_coordination.harness.budget import BudgetExhausted, BudgetTracker
+from experiments.emergent_coordination.harness.call_role import classify_call_role
+from experiments.emergent_coordination.harness.completion import (
+    FINALIZATION_ALLOWED_TOOLS,
+    FINALIZATION_POLICIES,
+    HARD_FINALIZATION_POLICIES,
+    finalization_message,
+    gate_rejection,
+)
 from experiments.emergent_coordination.harness.events import EventLog, TranscriptLog
 from experiments.emergent_coordination.harness.llm.client import LLMClient
 from experiments.emergent_coordination.harness.prompts import system_prompt, user_prompt
@@ -27,6 +36,7 @@ class AgentRunner:
         budget: BudgetTracker,
         prompt_profile: str = "repository_pilot_v0",
         finding_schema: str = "repository_pilot_v0",
+        completion_policy: str | None = None,
         max_steps: int = 12,
         max_provider_retries: int = 0,
     ):
@@ -41,6 +51,7 @@ class AgentRunner:
         self.budget = budget
         self.prompt_profile = prompt_profile
         self.finding_schema = finding_schema
+        self.completion_policy = completion_policy
         self.max_steps = max_steps
         self.max_provider_retries = max_provider_retries
         self._allowed_tools = frozenset(item["function"]["name"] for item in tools_for_mode(mode, finding_schema, role))
@@ -51,6 +62,8 @@ class AgentRunner:
         self._messages: list[dict[str, Any]] = []
         self._tools = tools_for_mode(mode, finding_schema, role)
         self._stop_reason = "completed"
+        self._completion_started = False
+        self._invalid_submission_arguments = 0
 
     def run(self) -> dict[str, Any]:
         while not self._finished:
@@ -69,16 +82,26 @@ class AgentRunner:
             started = self.event_log.emit("agent_started", agent_id=self.agent_id, payload={"mode": self.mode, "role": self.role})
             self._last_event_id = started["event_id"]
             self._messages = [
-                {"role": "system", "content": system_prompt(self.mode, self.agent_id, self.prompt_profile, self.role)},
+                {
+                    "role": "system",
+                    "content": system_prompt(
+                        self.mode,
+                        self.agent_id,
+                        self.prompt_profile,
+                        self.role,
+                        self.completion_policy,
+                    ),
+                },
                 {"role": "user", "content": user_prompt(self.mode, self.agent_id, self.agent_count, self.prompt_profile, self.role)},
             ]
             self._started = True
         if self._step >= self.max_steps:
             self._finish("max_steps")
             return self.result()
+        tools = self._tools_for_step()
         try:
             response, response_transcript, call_event_id = self._complete_with_permit(
-                self._messages, self._tools, step=self._step + 1, parent_event_id=self._last_event_id or ""
+                self._messages, tools, step=self._step + 1, parent_event_id=self._last_event_id or ""
             )
             self._step += 1
             if response.tool_calls:
@@ -93,7 +116,9 @@ class AgentRunner:
                     }
                 )
                 for call in response.tool_calls:
-                    result = self._dispatch(call["name"], call.get("arguments") or "{}", parent_event_id=call_event_id)
+                    result = self._dispatch(
+                        call["name"], call.get("arguments") or "{}", parent_event_id=call_event_id, call_id=call["id"]
+                    )
                     self._messages.append({"role": "tool", "tool_call_id": call["id"], "name": call["name"], "content": _truncate(result)})
                     self.transcript_log.tool_result(
                         agent_id=self.agent_id, tool_call_id=call["id"], name=call["name"], content=_truncate(result),
@@ -134,6 +159,33 @@ class AgentRunner:
             self._finish("max_steps")
         return self.result()
 
+    def _tools_for_step(self) -> list[dict[str, Any]]:
+        """Switch calibrated runs into an explicit finalization phase.
+
+        The formal block keeps the original tool surface.  The opt-in
+        completion calibration reserves the last eight model calls for a
+        submission attempt, preventing a model from spending every permit on
+        another exploratory read after it has already found a candidate.
+
+        Trimming the advertised surface is shared by both generations; for
+        generation-2 policies the dispatch gate below additionally enforces
+        it, which the advertisement alone never did.
+        """
+        reserve = 8
+        finalization_start = self.max_steps - reserve
+        if self.completion_policy not in FINALIZATION_POLICIES or self.max_steps <= reserve or self._step < finalization_start:
+            return self._tools
+        if not self._completion_started:
+            self._completion_started = True
+            self.event_log.emit(
+                "completion_phase_started",
+                agent_id=self.agent_id,
+                payload={"policy": self.completion_policy, "step": self._step + 1, "reserved_steps": reserve},
+                parent_event_ids=[self._last_event_id] if self._last_event_id else None,
+            )
+            self._messages.append({"role": "user", "content": finalization_message(self.completion_policy)})
+        return [tool for tool in self._tools if tool.get("function", {}).get("name") in FINALIZATION_ALLOWED_TOOLS]
+
     def stop_waiting(self, reason: str = "waiting_for_assignment") -> dict[str, Any]:
         """Finish an idle worker without inventing a model-format failure."""
         if not self._started:
@@ -162,6 +214,7 @@ class AgentRunner:
             "findings": findings,
             "submission_attempts": self.sandbox.submission_attempts,
             "invalid_submission_attempts": self.sandbox.invalid_submission_attempts,
+            "invalid_submission_arguments": self._invalid_submission_arguments,
         }
 
     def _complete_with_permit(
@@ -259,6 +312,13 @@ class AgentRunner:
                     "model_metadata": response.model_metadata,
                     "tool_calls": len(response.tool_calls),
                     "duration_seconds": time.monotonic() - started_at,
+                    "call_role": classify_call_role(
+                        (call["name"] for call in response.tool_calls),
+                        finalization_active=self._completion_started,
+                    ),
+                    "output_tokens": response.usage.output_tokens,
+                    "max_output_tokens": getattr(self.llm, "max_tokens", None),
+                    "finish_reason": response.model_metadata.get("finish_reason"),
                 },
                 token_usage=response.usage.as_dict(),
                 parent_event_ids=[attempted["event_id"]],
@@ -269,7 +329,19 @@ class AgentRunner:
             return response, response_transcript, completed["event_id"]
         raise RuntimeError("provider retry loop exited unexpectedly")
 
-    def _dispatch(self, name: str, raw_arguments: str, *, parent_event_id: str) -> str:
+    @property
+    def _hard_finalization_active(self) -> bool:
+        """Generation-2 policies keep authorizing dispatch during finalization.
+
+        Generation-1 policies (``convergent_v1``, ``scheduler_only``) only
+        trim the advertised surface and stay bypassable at dispatch; that is
+        their frozen historical semantics and must not change here.
+        """
+        return self._completion_started and self.completion_policy in HARD_FINALIZATION_POLICIES
+
+    def _dispatch(self, name: str, raw_arguments: str, *, parent_event_id: str, call_id: str | None = None) -> str:
+        if self._hard_finalization_active and name not in FINALIZATION_ALLOWED_TOOLS:
+            return self._reject_prohibited_tool(name, raw_arguments, call_id=call_id, parent_event_id=parent_event_id)
         try:
             args = json.loads(raw_arguments) if raw_arguments else {}
         except json.JSONDecodeError as exc:
@@ -301,6 +373,39 @@ class AgentRunner:
         except Exception as exc:  # noqa: BLE001
             return json.dumps({"error": str(exc), "type": type(exc).__name__})
 
+    def _reject_prohibited_tool(
+        self,
+        name: str,
+        raw_arguments: str,
+        *,
+        call_id: str | None,
+        parent_event_id: str,
+    ) -> str:
+        """Refuse a non-submission tool while the hard finalization gate is active.
+
+        The check runs before argument parsing, so malformed or repaired
+        arguments cannot route around it.  Raw arguments are reduced to a
+        hash; the attempt stays visible as a structured event and the model
+        receives the same deterministic rejection every time.
+        """
+        self.event_log.emit(
+            "prohibited_tool_attempt",
+            agent_id=self.agent_id,
+            payload={
+                "requested_tool": name,
+                "call_id": call_id,
+                "step": self._step,
+                "finalization_active": True,
+                "rejected_by": "hard_finalization_gate",
+                "policy": self.completion_policy,
+                "arguments_sha256": hashlib.sha256(raw_arguments.encode("utf-8")).hexdigest(),
+                "arguments_bytes": len(raw_arguments.encode("utf-8")),
+            },
+            parent_event_ids=[parent_event_id],
+            outcome="rejected",
+        )
+        return json.dumps(gate_rejection(name), ensure_ascii=False)
+
     def _reject_tool_arguments(
         self,
         name: str,
@@ -316,6 +421,10 @@ class AgentRunner:
             "reason": reason,
             **details,
         }
+        if name == "submit_findings":
+            # Validator counters never see unparseable payloads; keep this
+            # failure mode visible in summary metrics on its own.
+            self._invalid_submission_arguments += 1
         self.event_log.emit(
             "tool_call",
             agent_id=self.agent_id,

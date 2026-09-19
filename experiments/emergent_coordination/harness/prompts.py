@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from experiments.emergent_coordination.harness.completion import GUIDANCE_POLICIES, KNOWN_COMPLETION_POLICIES
+
 FINDING_SCHEMA = """
 Submit findings with submit_findings using this JSON shape:
 {
@@ -71,6 +73,11 @@ Submit only findings you believe are supported by evidence. Do not require a com
 """.strip()
 
 
+CONVERGENT_COMPLETION_INSTRUCTIONS = """
+Use a bounded audit loop. Once you have enough source and evidence to support one or more findings, stop broad exploration, prepare the complete repository-v1 payload, and call submit_findings. Do not continue opening unrelated files after a supported candidate is ready. With limited calls, prioritize a supported submission over additional coverage. If no supported finding remains, submit an empty findings payload before budget exhaustion.
+""".strip()
+
+
 BLACKBOARD_INSTRUCTIONS = """
 /shared is a persistent directory visible to other concurrent processes.
 Use the available tools as you judge appropriate.
@@ -103,13 +110,23 @@ def base_prompt(profile: str = "repository_pilot_v0") -> tuple[str, str]:
     raise ValueError(f"unknown prompt profile: {profile}")
 
 
-def system_prompt(mode: str, agent_id: str, profile: str = "repository_pilot_v0", role: str | None = None) -> str:
+def system_prompt(
+    mode: str,
+    agent_id: str,
+    profile: str = "repository_pilot_v0",
+    role: str | None = None,
+    completion_policy: str | None = None,
+) -> str:
+    if completion_policy is not None and completion_policy not in KNOWN_COMPLETION_POLICIES:
+        raise ValueError(f"unknown completion policy: {completion_policy}")
     common, finding_schema = base_prompt(profile)
     parts = [
         common,
         f"Your agent identity is {agent_id}.",
         finding_schema,
     ]
+    if completion_policy in GUIDANCE_POLICIES:
+        parts.append(CONVERGENT_COMPLETION_INSTRUCTIONS)
     if mode == "raw_blackboard":
         parts.append(BLACKBOARD_INSTRUCTIONS)
     elif mode == "structured_team":
