@@ -1,0 +1,1591 @@
+{
+ "generated_at": "2026-09-21",
+ "source_batches": [
+  "adjudication_batch0_core.json",
+  "adjudication_batch1_whitelist.json",
+  "adjudication_batch2_enterprise.json",
+  "adjudication_batch3_sandbox_ssrf.json"
+ ],
+ "clusters_total": 41,
+ "scope_counts": {
+  "historical_unmatched_clusters": 40,
+  "historical_unmatched_findings": 94,
+  "additional_public_issue_candidates": 1,
+  "cross_source_candidate_universe": 41
+ },
+ "summary": {
+  "validated_novel_tp": 11,
+  "canonical_tp_overlap": 9,
+  "false_positive": 17,
+  "inconclusive": 3,
+  "validated_novel_tp_conditional": 1
+ },
+ "method": "independent condition-blind static adjudication against snapshot 09f099db (tree c612819a); 40 candidates are clusters from 94 historical unmatched findings and UC41 is one additional public-issue candidate; lead resolutions applied to cross-batch conflicts (UC39, UC40) and conditional classification (UC26)",
+ "verdicts": [
+  {
+   "cluster_id": "UC01",
+   "claim": "Unauthenticated OAuth2 credential endpoints (whitelisted /api/v1/oauth2-credential/callback and /refresh) resolve credentials by id alone and overwrite credential tokens",
+   "final_classification": "validated_novel_tp",
+   "batch_classifications": [
+    "validated_novel_tp"
+   ],
+   "gt_overlap": null,
+   "severity_if_tp": "high（refresh：未认证跨租户 credential 变更；callback：medium-high 条件性覆写）",
+   "confidence": "high（refresh）；medium-high（callback，影响条件依赖 provider 行为）",
+   "lead_resolution": null,
+   "evidence": [
+    {
+     "file": "packages/server/src/utils/constants.ts",
+     "line": 41,
+     "note": "'/api/v1/oauth2-credential/callback' in unauth whitelist"
+    },
+    {
+     "file": "packages/server/src/utils/constants.ts",
+     "line": 42,
+     "note": "'/api/v1/oauth2-credential/refresh' in unauth whitelist"
+    },
+    {
+     "file": "packages/server/src/routes/oauth2/index.ts",
+     "line": 357,
+     "note": "refresh: findOneBy({ id: credentialId }) — no workspaceId predicate"
+    },
+    {
+     "file": "packages/server/src/routes/oauth2/index.ts",
+     "line": 207,
+     "note": "callback: findOneBy({ id: state }) — state used directly as credential id, no session/state nonce binding"
+    },
+    {
+     "file": "packages/server/src/routes/oauth2/index.ts",
+     "line": 78,
+     "note": "safe sibling in same file: /authorize resolves workspaceId via getActiveWorkspaceIdForRequest and falls back to an explicit WorkspaceShared share check"
+    },
+    {
+     "file": "packages/server/src/routes/oauth2/index.ts",
+     "line": 439,
+     "note": "refresh re-encrypts and updates credential.encryptedData (credential write sink)"
+    }
+   ]
+  },
+  {
+   "cluster_id": "UC02",
+   "claim": "Unauthenticated /api/v1/feedback endpoints (whitelisted) allow reading (and writing) chat-message feedback for any chatflow id",
+   "final_classification": "validated_novel_tp",
+   "batch_classifications": [
+    "validated_novel_tp",
+    "validated_novel_tp"
+   ],
+   "gt_overlap": null,
+   "severity_if_tp": "medium（私有 flow 反馈内容未认证泄露；写入为数据污染 low-medium）",
+   "confidence": "medium-high",
+   "lead_resolution": null,
+   "evidence": [
+    {
+     "file": "packages/server/src/utils/constants.ts",
+     "line": 20,
+     "note": "'/api/v1/feedback' in unauth whitelist"
+    },
+    {
+     "file": "packages/server/src/routes/feedback/index.ts",
+     "line": 9,
+     "note": "router.get(['/', '/:id'], controller) — no permission middleware on read, create, or update"
+    },
+    {
+     "file": "packages/server/src/controllers/feedback/index.ts",
+     "line": 12,
+     "note": "getAllChatMessageFeedback takes chatflowid from params, no workspace/public check"
+    },
+    {
+     "file": "packages/server/src/database/entities/ChatMessageFeedback.ts",
+     "line": 24,
+     "note": "entity includes rating and free-text content + chatId + messageId"
+    },
+    {
+     "file": "packages/server/src/utils/constants.ts",
+     "line": 20,
+     "note": "'/api/v1/feedback' 在 WHITELIST_URLS 中，整个 feedback 路由族免认证"
+    },
+    {
+     "file": "packages/server/src/routes/feedback/index.ts",
+     "line": 8,
+     "note": "POST/GET/PUT 均定义在 '/' 与 '/:id'，无任何 permission 中间件"
+    },
+    {
+     "file": "packages/server/src/controllers/feedback/index.ts",
+     "line": 15,
+     "note": "GET /:id 将 req.params.id 直接作为 chatflowid 查询，无 isPublic/ownership 检查"
+    },
+    {
+     "file": "packages/server/src/utils/getChatMessageFeedback.ts",
+     "line": 26,
+     "note": "utilGetChatMessageFeedback 仅按 chatflowid (+chatId/日期) find，全链路无守卫"
+    }
+   ]
+  },
+  {
+   "cluster_id": "UC03",
+   "claim": "Unauthenticated whitelisted POST /api/v1/text-to-speech/generate accepts arbitrary credentialId and uses stored credentials without workspace/ownership guard",
+   "final_classification": "canonical_tp_overlap",
+   "batch_classifications": [
+    "canonical_tp_overlap"
+   ],
+   "gt_overlap": "R04_generic_credential_lookup_scope",
+   "severity_if_tp": "high（未认证跨租户 credential 能力使用）",
+   "confidence": "high",
+   "lead_resolution": null,
+   "evidence": [
+    {
+     "file": "packages/server/src/utils/constants.ts",
+     "line": 44,
+     "note": "TTS generate route in unauth whitelist"
+    },
+    {
+     "file": "packages/server/src/controllers/text-to-speech/index.ts",
+     "line": 70,
+     "note": "no-chatflowId branch adopts body credentialId with empty orgId"
+    },
+    {
+     "file": "packages/components/src/utils.ts",
+     "line": 651,
+     "note": "getCredentialData findOneBy({ id }) — R04 canonical sink"
+    }
+   ]
+  },
+  {
+   "cluster_id": "UC04",
+   "claim": "Unauthenticated whitelisted GET /api/v1/get-upload-file streams uploaded files for any chatflowId/chatId/fileName without public/ownership verification (cross-tenant file read IDOR).",
+   "final_classification": "validated_novel_tp",
+   "batch_classifications": [
+    "validated_novel_tp"
+   ],
+   "gt_overlap": null,
+   "severity_if_tp": "medium",
+   "confidence": "high",
+   "lead_resolution": null,
+   "evidence": [
+    {
+     "file": "packages/server/src/utils/constants.ts",
+     "line": 22,
+     "note": "'/api/v1/get-upload-file' 免认证"
+    },
+    {
+     "file": "packages/server/src/controllers/get-upload-file/index.ts",
+     "line": 22,
+     "note": "仅有 isValidUUID(chatflowId)、chatId 存在性、isUnsafeFilePath(fileName) 等格式校验"
+    },
+    {
+     "file": "packages/server/src/controllers/get-upload-file/index.ts",
+     "line": 37,
+     "note": "注释 'This can be public API, so we can only get orgId from the chatflow'——仅反查 org 定位 storage，无 isPublic/ownership 检查"
+    },
+    {
+     "file": "packages/server/src/controllers/get-upload-file/index.ts",
+     "line": 59,
+     "note": "streamStorageFile(chatflowId, chatId, fileName, orgId) 直接流式返回任意已存在 chatflow 的上传文件"
+    }
+   ]
+  },
+  {
+   "cluster_id": "UC05",
+   "claim": "Webhook endpoint /api/v1/webhook/:id is unauthenticated by default (no signature auth, no bound API key) and resolves chatflows without workspace scoping, allowing execution of arbitrary webhook-triggered chatflows.",
+   "final_classification": "false_positive",
+   "batch_classifications": [
+    "false_positive"
+   ],
+   "gt_overlap": null,
+   "severity_if_tp": "low",
+   "confidence": "medium",
+   "lead_resolution": null,
+   "evidence": [
+    {
+     "file": "packages/server/src/routes/webhook/index.ts",
+     "line": 5,
+     "note": "注释明确 'Unauthenticated at route level — API key validation happens downstream in utilBuildChatflow'"
+    },
+    {
+     "file": "packages/server/src/services/webhook/index.ts",
+     "line": 28,
+     "note": "startInputType !== 'webhookTrigger' 即 404：仅作者显式把 flow 配置为 webhook 触发器才可达（暴露同意）"
+    },
+    {
+     "file": "packages/server/src/services/webhook/index.ts",
+     "line": 47,
+     "note": "webhookEnableAuth===true 时强制 HMAC/plain-token 签名校验（作者可选的认证机制）"
+    },
+    {
+     "file": "packages/server/src/utils/buildChatflow.ts",
+     "line": 1029,
+     "note": "外部请求走 validateFlowAPIKey：flow 绑定 apikeyid 时必须持 Bearer key"
+    },
+    {
+     "file": "packages/server/src/utils/validateKey.ts",
+     "line": 13,
+     "note": "未绑定 apikeyid 的 flow 直接放行——默认开放是 webhook 的产品设计"
+    }
+   ]
+  },
+  {
+   "cluster_id": "UC06",
+   "claim": "Whitelisted openai-assistants file-download endpoint passes attacker-controlled fileName to storage without the isUnsafeFilePath guard",
+   "final_classification": "false_positive",
+   "batch_classifications": [
+    "false_positive",
+    "false_positive"
+   ],
+   "gt_overlap": null,
+   "severity_if_tp": "",
+   "confidence": "medium-high（默认 local storage 路径；blob provider 见 batch1）",
+   "lead_resolution": null,
+   "evidence": [
+    {
+     "file": "packages/server/src/controllers/openai-assistants/index.ts",
+     "line": 79,
+     "note": "getFileFromAssistant calls streamStorageFile(chatflowId, chatId, fileName, orgId) without outer isUnsafeFilePath (get-upload-file/index.ts:31 does check)"
+    },
+    {
+     "file": "packages/components/src/storage/LocalStorageProvider.ts",
+     "line": 127,
+     "note": "provider validates chatflowId and path security"
+    },
+    {
+     "file": "packages/components/src/storage/LocalStorageProvider.ts",
+     "line": 131,
+     "note": "sanitizeFilename(fileName) applied inside shared sink"
+    },
+    {
+     "file": "packages/components/src/storage/LocalStorageProvider.ts",
+     "line": 135,
+     "note": "rejects non-absolute, '..'-containing, and out-of-storage-root paths"
+    },
+    {
+     "file": "packages/server/src/controllers/openai-assistants/index.ts",
+     "line": 58,
+     "note": "getFileFromAssistant 确实缺少外层 isValidUUID(chatflowId) 与 isUnsafeFilePath(fileName)（与 streamUploadedFile 对比）"
+    },
+    {
+     "file": "packages/components/src/storage/BaseStorageProvider.ts",
+     "line": 76,
+     "note": "所有 provider 的 streamStorageFile 首先执行 validateChatflowId（UUID 强校验）"
+    },
+    {
+     "file": "packages/components/src/storage/BaseStorageProvider.ts",
+     "line": 85,
+     "note": "validatePathSecurity 对 chatflowId/chatId 做 isPathTraversal（含 %2e 归一化、%2f/%5c、null byte、绝对路径、UNC）"
+    },
+    {
+     "file": "packages/components/src/storage/BaseStorageProvider.ts",
+     "line": 46,
+     "note": "sanitizeFilename：isUnsafeFilePath + sanitize-filename + 去前导点 + 拒绝任何剩余 / 或 \\\\"
+    }
+   ]
+  },
+  {
+   "cluster_id": "UC07",
+   "claim": "Public POST /api/v1/attachments/:chatflowId/:chatId allows unauthenticated file upload into arbitrary chatflow storage when uploads are enabled (missing ownership/API-key check).",
+   "final_classification": "false_positive",
+   "batch_classifications": [
+    "false_positive"
+   ],
+   "gt_overlap": null,
+   "severity_if_tp": "low",
+   "confidence": "medium",
+   "lead_resolution": null,
+   "evidence": [
+    {
+     "file": "packages/server/src/utils/createAttachment.ts",
+     "line": 51,
+     "note": "注释 'This is one of the WHITELIST_URLS, API can be public and there might be no req.user'——公开访问是显式设计"
+    },
+    {
+     "file": "packages/server/src/utils/createAttachment.ts",
+     "line": 144,
+     "note": "硬守卫：chatbotConfig.fullFileUpload.status 必须为 true（作者逐 flow 显式开启）否则 400"
+    },
+    {
+     "file": "packages/server/src/utils/createAttachment.ts",
+     "line": 155,
+     "note": "allowedFileTypes 必须非空且逐文件做 mimetype 白名单校验"
+    },
+    {
+     "file": "packages/server/src/utils/createAttachment.ts",
+     "line": 167,
+     "note": "validateFileMimeTypeAndExtensionMatch 阻断 MIME 伪装"
+    },
+    {
+     "file": "packages/server/src/utils/createAttachment.ts",
+     "line": 36,
+     "note": "chatflowId UUID + isPathTraversal 校验，写入路径经 provider sanitizeFilename 净化"
+    }
+   ]
+  },
+  {
+   "cluster_id": "UC08",
+   "claim": "PATCH /api/v1/datasets/rows (patchDeleteRows) deletes dataset rows by id without verifying the parent dataset belongs to the caller workspace (cross-workspace IDOR).",
+   "final_classification": "validated_novel_tp",
+   "batch_classifications": [
+    "validated_novel_tp"
+   ],
+   "gt_overlap": null,
+   "severity_if_tp": "medium",
+   "confidence": "high（代码事实）；分类判断 medium-high",
+   "lead_resolution": null,
+   "evidence": [
+    {
+     "file": "packages/server/src/routes/dataset/index.ts",
+     "line": 24,
+     "note": "router.patch('/rows', checkPermission('datasets:delete'), datasetController.patchDeleteRows) — 路由有认证+RBAC permission（不在 unauthList），所以缺口不是 permission 而是 workspace 谓词"
+    },
+    {
+     "file": "packages/server/src/controllers/dataset/index.ts",
+     "line": 171,
+     "note": "patchDeleteRows 取 req.user.activeWorkspaceId 传入 service，但该 workspaceId 只用于回写 dataset 时间戳"
+    },
+    {
+     "file": "packages/server/src/services/dataset/index.ts",
+     "line": 374,
+     "note": "find({ where: { id: In(ids) } }) 无 workspaceId 过滤，随后 delete(ids)；changeUpdateOnDataset(datasetId, workspaceId) 在删除已提交后才按 workspace 查 dataset 并抛 NOT_FOUND（无事务包裹，删除已生效）"
+    },
+    {
+     "file": "packages/server/src/services/dataset/index.ts",
+     "line": 349,
+     "note": "deleteDatasetRow（DELETE /rows/:id 单条）同样 findOneBy({id}) 无 workspace 检查 — 同一根因的姊妹路径"
+    },
+    {
+     "file": "packages/server/src/services/dataset/index.ts",
+     "line": 329,
+     "note": "对照：updateDatasetRow 先按 {id, workspaceId} 查 dataset，不存在即抛错 — add/update/deleteDataset 均带 workspace 谓词，唯独 row 删除缺"
+    },
+    {
+     "file": "packages/server/src/services/upsert-history/index.ts",
+     "line": 84,
+     "note": "R15 对照：upsert-history 的 patchDeleteUpsertHistory 在 service 层有 assertChatflowIdsInWorkspace（且 routes/upsert-history/index.ts:8-11 完全无 checkPermission）。UC08 与 R15 是镜像形态（R15 缺 permission、有 workspace 断言；UC08 有 permission、缺 workspace 断言），anchor 路由不同，非 canonical overlap"
+    }
+   ]
+  },
+  {
+   "cluster_id": "UC09",
+   "claim": "Attacker-authored JavaScript from CustomTool executes in the NodeVM fallback of executeJavaScriptCode with only vm2 isolation (insufficient sandboxing / code execution).",
+   "final_classification": "inconclusive",
+   "batch_classifications": [
+    "inconclusive"
+   ],
+   "gt_overlap": "KU02（NodeVM 依赖逃逸，known-unscored dynamic-dependent）同能力面",
+   "severity_if_tp": "high（若逃逸成立则宿主 RCE）",
+   "confidence": "high（与 KU02 同面）；不评分",
+   "lead_resolution": null,
+   "evidence": [
+    {
+     "file": "packages/components/nodes/tools/CustomTool/core.ts",
+     "line": 127,
+     "note": "executeJavaScriptCode(this.code, sandbox) — this.code 来自节点配置（DynamicStructuredToolInput.code），由保存 chatflow 的 workspace 成员提供"
+    },
+    {
+     "file": "packages/components/src/utils.ts",
+     "line": 1603,
+     "note": "shouldUseE2BSandbox = useSandbox && process.env.E2B_APIKEY；未配 E2B_APIKEY 时落入 NodeVM 分支"
+    },
+    {
+     "file": "packages/components/src/utils.ts",
+     "line": 1788,
+     "note": "new NodeVM(finalNodeVMOptions) — require.external.modules 受 TOOL_FUNCTION_EXTERNAL_DEP/ALLOW_BUILTIN_DEP 与 defaultAllowExternalDependencies 限制，eval:false, wasm:false"
+    },
+    {
+     "file": "packages/components/package.json",
+     "line": 183,
+     "note": "\"vm2\": \"3.11.2\" — 已停止维护、存在历史逃逸的库；逃逸可行性依赖具体 payload，属 dynamic-dependent"
+    }
+   ]
+  },
+  {
+   "cluster_id": "UC10",
+   "claim": "Unstructured document loader performs server-side requests to an attacker-controlled API URL, bypassing the SSRF guard (SSRF via loader config).",
+   "final_classification": "validated_novel_tp",
+   "batch_classifications": [
+    "validated_novel_tp"
+   ],
+   "gt_overlap": "R17（document loader egress 无 URL policy，GHSA-9cvr）不变量同族；Unstructured 不在 R17 冻结 variant 集（Cheerio/Playwright/Puppeteer）内，判为新 variant 而非 canonical overlap",
+   "severity_if_tp": "medium-high（与 R17 同级：内网探测/IMDS 面SSRF，响应进文档管道可能回显）",
+   "confidence": "high（代码事实与 R17 等价性）；novel-vs-overlap 取舍为 medium",
+   "lead_resolution": null,
+   "evidence": [
+    {
+     "file": "packages/components/nodes/documentloaders/Unstructured/UnstructuredFile.ts",
+     "line": 52,
+     "note": "'Unstructured API URL' 为节点字符串输入（config-supplied），placeholder 默认 env UNSTRUCTURED_API_URL 或 localhost:8000"
+    },
+    {
+     "file": "packages/components/nodes/documentloaders/Unstructured/UnstructuredFile.ts",
+     "line": 479,
+     "note": "obj.apiUrl = unstructuredAPIUrl（nodeData.inputs），line 505-507 可选 unstructuredApi credential 将 apiKey 附加到请求"
+    },
+    {
+     "file": "packages/components/nodes/documentloaders/Unstructured/Unstructured.ts",
+     "line": 132,
+     "note": "await fetch(this.apiUrl, { method: 'POST', body: formData, headers: {'UNSTRUCTURED-API-KEY': ...} }) — 裸 fetch，无 secureFetch/checkDenyList，无重定向校验"
+    },
+    {
+     "file": "packages/components/nodes/documentloaders/Unstructured/Unstructured.ts",
+     "line": 30,
+     "note": "默认 apiUrl = env 或 https://api.unstructuredapp.io（默认无害，但配置可指向任意 http/https）"
+    },
+    {
+     "file": "packages/components/nodes/documentloaders/API/APILoader.ts",
+     "line": 1,
+     "note": "对照：API/Spider/FireCrawl loader 已使用 secureFetch/secureAxiosRequest（共享 URL policy 在代码库存在），Unstructured 未接入 — 佐证'缺共享 policy'而非'无此 policy'"
+    }
+   ]
+  },
+  {
+   "cluster_id": "UC11",
+   "claim": "Code injection into the E2B sandbox bootstrap via unvalidated sandbox variable names in executeJavaScriptCode.",
+   "final_classification": "false_positive",
+   "batch_classifications": [
+    "false_positive"
+   ],
+   "gt_overlap": null,
+   "severity_if_tp": "n/a（无跨越边界的路径）",
+   "confidence": "high",
+   "lead_resolution": null,
+   "evidence": [
+    {
+     "file": "packages/components/src/utils.ts",
+     "line": 1633,
+     "note": "variableDeclarations.push(`const ${key} = ${JSON.stringify(value)};`) — key 原样拼接（无标识符校验），value 经 JSON.stringify 安全"
+    },
+    {
+     "file": "packages/components/nodes/tools/CustomTool/core.ts",
+     "line": 116,
+     "note": "additionalSandbox[`$${item}`] 的 item 来自 zod schema 属性名（节点配置定义），终端输入按 schema 解析后 key 集合固定"
+    },
+    {
+     "file": "packages/components/nodes/utilities/CustomFunction/CustomFunction.ts",
+     "line": 109,
+     "note": "inputVars key 来自 functionInputVariablesRaw 节点配置 JSON；CustomDocumentLoader/agentflow CustomFunction 同型；ChatflowTool/AgentAsTool 为固定 key（$callOptions/$callBody/$apiURL）"
+    },
+    {
+     "file": "packages/components/src/utils.ts",
+     "line": 1701,
+     "note": "sink 为 sbx.runCode(codeWithImports)（E2B 远端一次性沙箱）；注入产物只是加入配置作者本已控制的 code 同一模块体，不跨越特权边界，且整段需 E2B_APIKEY 前提"
+    },
+    {
+     "file": "packages/components/src/utils.ts",
+     "line": 1684,
+     "note": "npm install 库名另有 validPackageNameRegex 校验，命令注入面已闭合"
+    }
+   ]
+  },
+  {
+   "cluster_id": "UC12",
+   "claim": "GitHub SSO accepts unverified email fallback, enabling cross-IdP account takeover",
+   "final_classification": "canonical_tp_overlap",
+   "batch_classifications": [
+    "canonical_tp_overlap"
+   ],
+   "gt_overlap": "R08_sso_email_only_identity",
+   "severity_if_tp": "critical（账户接管）",
+   "confidence": "high",
+   "lead_resolution": null,
+   "evidence": [
+    {
+     "file": "packages/server/src/enterprise/sso/GithubSSO.ts",
+     "line": 46,
+     "note": "primary verified email preferred"
+    },
+    {
+     "file": "packages/server/src/enterprise/sso/GithubSSO.ts",
+     "line": 48,
+     "note": "fallback to emails[0].email without verified predicate"
+    },
+    {
+     "file": "packages/server/src/enterprise/sso/SSOBase.ts",
+     "line": 56,
+     "note": "verifyAndLogin → readUserByEmail(email) — account selection by email only"
+    },
+    {
+     "file": "packages/server/src/enterprise/sso/SSOBase.ts",
+     "line": 38,
+     "note": "actual enclosing method is verifyAndLogin, NOT SSOBase.getUser as the frozen GT anchor requires"
+    }
+   ]
+  },
+  {
+   "cluster_id": "UC13",
+   "claim": "SSO login auto-provisions accounts and selects a workspace without tenant binding (verifyAndLogin)",
+   "final_classification": "canonical_tp_overlap",
+   "batch_classifications": [
+    "deferred_to_batch2",
+    "canonical_tp_overlap"
+   ],
+   "gt_overlap": "R07_sso_invited_token_proof + R08_sso_email_only_identity",
+   "severity_if_tp": "",
+   "confidence": "",
+   "lead_resolution": "batch0 标记 deferred（batch0 仅固定 R07/R08 anchor 漂移事实）；batch2 完成代码级裁决：verifyAndLogin 即 R07（INVITED 激活）+ R08（email-only）真实所在，\"自动建号/选 workspace 无租户绑定\"不成立（ENTERPRISE 不自动建号，workspace 从自身 membership 选）。归 canonical_tp_overlap。",
+   "evidence": [
+    {
+     "file": "packages/server/src/enterprise/sso/SSOBase.ts",
+     "line": 38,
+     "note": "verifyAndLogin is the real enclosing method for R07/R08 anchors (GT function-name drift documented)"
+    },
+    {
+     "file": "packages/server/src/enterprise/sso/SSOBase.ts",
+     "line": 56,
+     "note": "verifyAndLogin 以 readUserByEmail(email) 作为唯一身份解析——email-only identity（R08 真实所在；GT anchor 有漂移，实际代码即此函数）"
+    },
+    {
+     "file": "packages/server/src/enterprise/sso/SSOBase.ts",
+     "line": 59,
+     "note": "未找到用户时：ENTERPRISE 平台直接抛 NOT_FOUND（L61-63，企业模式不自动建号）；CLOUD 平台走 accountService.register 自动建号（L73-79）——claim 的 'auto-provision' 只存在于 CLOUD，且其根因正是 R08 的不验证 email 即建号/登录"
+    },
+    {
+     "file": "packages/server/src/enterprise/sso/SSOBase.ts",
+     "line": 81,
+     "note": "user.status === INVITED 时仅凭 SSO email 匹配即改写为 ACTIVE 并 register，全程无 invitation token/凭证校验——即 R07（INVITED 激活无 invitation 证明）的真实代码位置"
+    },
+    {
+     "file": "packages/server/src/enterprise/sso/SSOBase.ts",
+     "line": 95,
+     "note": "readWorkspaceUserByLastLogin 仅从该用户自己的 membership 中选 workspace，L115-127 登录态绑定到该 workspace 所属 org——'选 workspace 无租户绑定'这一表述本身不构成可独立利用的跨租户路径"
+    }
+   ]
+  },
+  {
+   "cluster_id": "UC14",
+   "claim": "Cross-tenant SSO secret disclosure: enterprise login-method testConfig returns config with secrets and is missing an organization guard.",
+   "final_classification": "canonical_tp_overlap",
+   "batch_classifications": [
+    "canonical_tp_overlap"
+   ],
+   "gt_overlap": "R01 (enterprise active-org binding；census 明确 SSO-config call chains 为 R01 variants)",
+   "severity_if_tp": "medium（跨租户配置探测/操纵；非直接 secret 外泄）",
+   "confidence": "high",
+   "lead_resolution": null,
+   "evidence": [
+    {
+     "file": "packages/server/src/enterprise/routes/login-method.route.ts",
+     "line": 16,
+     "note": "POST /test 有 checkPermission('sso:manage')，故非无权限；缺陷在 organization 绑定"
+    },
+    {
+     "file": "packages/server/src/enterprise/controllers/login-method.controller.ts",
+     "line": 162,
+     "note": "testConfig 直接取 req.body.organizationId（L167），无 assertQueryOrganizationMatchesActiveOrg——同文件 create(L43)、update(L142)、read(L113-120) 均有 org 匹配守卫，safe sibling 模式成立"
+    },
+    {
+     "file": "packages/server/src/enterprise/services/login-method.service.ts",
+     "line": 90,
+     "note": "getConfigWithSecrets(organizationId,...) 对任意 org 解密已存 SSO config 并 merge clientSecret（L96-100），无 org 归属校验"
+    },
+    {
+     "file": "packages/server/src/enterprise/sso/GithubSSO.ts",
+     "line": 102,
+     "note": "testSetup 用解密后的 clientSecret 发起出站请求，但 HTTP 响应只返回有效性消息（L120-122），不回显 secret——claim 的 'returns config with secrets' 表述过强，实际是跨租户配置探测 oracle + 服务端使用他人 org secret"
+    }
+   ]
+  },
+  {
+   "cluster_id": "UC15",
+   "claim": "Organization read endpoint allows cross-organization IDOR exposing Stripe customerId/subscriptionId",
+   "final_classification": "validated_novel_tp",
+   "batch_classifications": [
+    "validated_novel_tp"
+   ],
+   "gt_overlap": null,
+   "severity_if_tp": "medium（支付标识符跨租户泄露）",
+   "confidence": "high",
+   "lead_resolution": null,
+   "evidence": [
+    {
+     "file": "packages/server/src/enterprise/routes/organization.route.ts",
+     "line": 7,
+     "note": "router.get('/', controller.read) — no permission middleware on the whole organization route file"
+    },
+    {
+     "file": "packages/server/src/enterprise/controllers/organization.controller.ts",
+     "line": 33,
+     "note": "readOrganizationById(query.id) / readOrganizationByName(query.name) — no membership or activeOrganization binding"
+    },
+    {
+     "file": "packages/server/src/enterprise/controllers/organization.controller.ts",
+     "line": 44,
+     "note": "res.json(organization) — full entity returned"
+    },
+    {
+     "file": "packages/server/src/enterprise/database/entities/organization.entity.ts",
+     "line": 16,
+     "note": "customerId (Stripe) and subscriptionId columns serialized in response"
+    },
+    {
+     "file": "packages/server/src/enterprise/controllers/organization.controller.ts",
+     "line": 66,
+     "note": "sibling endpoints guard the same ids with assertStripeIdMatchesSession — codebase treats these ids as sensitive"
+    }
+   ]
+  },
+  {
+   "cluster_id": "UC16",
+   "claim": "Cross-tenant organization update via organization.controller.update missing organization guard.",
+   "final_classification": "canonical_tp_overlap",
+   "batch_classifications": [
+    "canonical_tp_overlap"
+   ],
+   "gt_overlap": "R01 (enterprise active-org binding)",
+   "severity_if_tp": "high（任意组织元数据/计费标识跨租户篡改）",
+   "confidence": "high",
+   "lead_resolution": null,
+   "evidence": [
+    {
+     "file": "packages/server/src/enterprise/routes/organization.route.ts",
+     "line": 11,
+     "note": "router.put('/', organizationController.update)——无 checkPermission、无 feature flag；对照同文件其余路由多数也无权限但 Stripe 系列在 controller 内有守卫"
+    },
+    {
+     "file": "packages/server/src/enterprise/controllers/organization.controller.ts",
+     "line": 50,
+     "note": "update 直接 organizationService.updateOrganization(req.body)，无 activeOrganizationId 绑定、无 assertStripeIdMatchesSession、无身份断言"
+    },
+    {
+     "file": "packages/server/src/enterprise/services/organization.service.ts",
+     "line": 95,
+     "note": "updateOrganization 按 body.id 读取任意 org 后 merge 全部 body 字段（L108）——Organization 实体含 customerId/subscriptionId（organization.entity.ts L15-18），可被他租户用户覆写，影响计费标识"
+    },
+    {
+     "file": "packages/server/src/enterprise/controllers/organization.controller.ts",
+     "line": 66,
+     "note": "safe sibling：同控制器 6 个方法（L66/85/104/123/145/167）均调用 assertStripeIdMatchesSession 绑定会话 activeOrganizationSubscriptionId/CustomerId"
+    }
+   ]
+  },
+  {
+   "cluster_id": "UC17",
+   "claim": "Cross-tenant organization-user create/update/delete missing organization guard (IDOR on org membership).",
+   "final_classification": "canonical_tp_overlap",
+   "batch_classifications": [
+    "canonical_tp_overlap"
+   ],
+   "gt_overlap": "R01 (enterprise active-org binding；OrganizationUserController.update 即 census 指定的 variant anchor)",
+   "severity_if_tp": "high（跨租户添加/改写/移除成员；ENTERPRISE 下 delete 连带软删用户与个人 workspace）",
+   "confidence": "high",
+   "lead_resolution": null,
+   "evidence": [
+    {
+     "file": "packages/server/src/enterprise/routes/organization-user.route.ts",
+     "line": 11,
+     "note": "POST/PUT/DELETE 均有 checkPermission('users:manage') + feat:users——权限在，缺的是 org 绑定"
+    },
+    {
+     "file": "packages/server/src/enterprise/controllers/organization-user.controller.ts",
+     "line": 23,
+     "note": "create 直接以 req.body.organizationId 调用 service（L26、L29），无 activeOrganizationId 绑定；usage limit 用的却是 caller 自己的 subscriptionId（L27）"
+    },
+    {
+     "file": "packages/server/src/enterprise/controllers/organization-user.controller.ts",
+     "line": 103,
+     "note": "update 同样直通 req.body（L106）——这正是 R01 census 指定的 variant anchor"
+    },
+    {
+     "file": "packages/server/src/enterprise/controllers/organization-user.controller.ts",
+     "line": 113,
+     "note": "delete 以 req.query.organizationId/userId 直通（L143/L155）；ENTERPRISE 分支还会删除目标用户 personal workspace 并软删用户本体（L139-153），跨租户破坏性极强；safe sibling：read（L39-45）有 assertQueryOrganizationMatchesActiveOrg + userMayManageOrgUsers"
+    },
+    {
+     "file": "packages/server/src/enterprise/services/organization-user.service.ts",
+     "line": 212,
+     "note": "createOrganizationUser(L212)/updateOrganizationUser(L278)/deleteOrganizationUser(L314) 均按传入 orgId 直查，service 层无归属校验（update 仅校验 roleId 存在）"
+    }
+   ]
+  },
+  {
+   "cluster_id": "UC18",
+   "claim": "Cross-tenant role deletion via role.controller.delete missing organization guard.",
+   "final_classification": "canonical_tp_overlap",
+   "batch_classifications": [
+    "canonical_tp_overlap"
+   ],
+   "gt_overlap": "R01 (enterprise active-org binding；census 明确 role call chains 为 R01 variants)",
+   "severity_if_tp": "high（跨租户删除角色，破坏目标租户 RBAC 结构）",
+   "confidence": "high",
+   "lead_resolution": null,
+   "evidence": [
+    {
+     "file": "packages/server/src/enterprise/routes/role.route.ts",
+     "line": 14,
+     "note": "DELETE / 有 checkPermission('roles:manage')——权限在，缺 org 绑定"
+    },
+    {
+     "file": "packages/server/src/enterprise/controllers/role.controller.ts",
+     "line": 75,
+     "note": "delete 直接以 req.query.organizationId/id 调 roleService.deleteRole(query.organizationId, query.id)（L85），无 getLoggedInUser/无 assertQueryOrganizationMatchesActiveOrg"
+    },
+    {
+     "file": "packages/server/src/enterprise/controllers/role.controller.ts",
+     "line": 13,
+     "note": "safe sibling：create（L13-14）与 update（L64-65）均有 assertQueryOrganizationMatchesActiveOrg(user, organizationId)；read（L39-48）逐分支比对 activeOrganizationId"
+    }
+   ]
+  },
+  {
+   "cluster_id": "UC19",
+   "claim": "Arbitrary user creation via user.controller.create without required permission.",
+   "final_classification": "validated_novel_tp",
+   "batch_classifications": [
+    "validated_novel_tp"
+   ],
+   "gt_overlap": "none（与 R01 的 org-binding 谓词不同：User 实体无 organization 参数，缺失的是 permission check 本身）",
+   "severity_if_tp": "medium-high（无授权建号 + 密码预占式账号接管前置；新建账号默认无 org/workspace，直接提权有限）",
+   "confidence": "high",
+   "lead_resolution": null,
+   "evidence": [
+    {
+     "file": "packages/server/src/enterprise/routes/user.route.ts",
+     "line": 10,
+     "note": "router.post('/', userController.create)——无 checkPermission、无 feature flag、无任何中间件；对照 organization-user.route.ts L11 建用户进入 org 需 users:manage + feat:users"
+    },
+    {
+     "file": "packages/server/src/utils/constants.ts",
+     "line": 40,
+     "note": "WHITELIST_URLS 只豁免 /api/v1/user/test（L40），/api/v1/user 需 verifyToken——是'已认证但零权限'而非未认证"
+    },
+    {
+     "file": "packages/server/src/enterprise/controllers/user.controller.ts",
+     "line": 13,
+     "note": "create 直接 userService.createUser(req.body)；对照同文件 read（L39 assertMayReadTargetUser）与 update（L77-80 仅允许 self）均有守卫"
+    },
+    {
+     "file": "packages/server/src/enterprise/services/user.service.ts",
+     "line": 93,
+     "note": "createNewUser：credential 由请求体明文经 encryptUserCredential 哈希后落库（L94-95），status 可控（L96），仅做 email 唯一性校验——攻击者可为任意未注册 email 预设密码"
+    },
+    {
+     "file": "packages/server/src/enterprise/services/user.service.ts",
+     "line": 121,
+     "note": "createUser 全链路无权限/配额校验（users 配额 checkUsageLimit 只在 organization-user create 中）"
+    }
+   ]
+  },
+  {
+   "cluster_id": "UC20",
+   "claim": "Cross-tenant workspace membership manipulation via workspace-user create/update/delete missing tenant guards.",
+   "final_classification": "canonical_tp_overlap",
+   "batch_classifications": [
+    "canonical_tp_overlap"
+   ],
+   "gt_overlap": "R01 (enterprise active-org binding；borderline：census 未逐条列举 workspace-user 链，但同谓词)",
+   "severity_if_tp": "high（跨租户成员注入可实现完整租户接管）",
+   "confidence": "medium-high（缺陷本身 high-confidence；与 R01 的归并为一致性推定）",
+   "lead_resolution": null,
+   "evidence": [
+    {
+     "file": "packages/server/src/enterprise/routes/workspace-user.route.ts",
+     "line": 12,
+     "note": "create/update 有 checkPermission('workspace:add-user')、delete 有 workspace:unlink-user——权限在，缺租户绑定"
+    },
+    {
+     "file": "packages/server/src/enterprise/controllers/workspace-user.controller.ts",
+     "line": 18,
+     "note": "create（L18-26）/update（L92-106）/delete（L108-118）均将 req.body/query 的 workspaceId、userId、roleId 直通 service"
+    },
+    {
+     "file": "packages/server/src/enterprise/controllers/workspace-user.controller.ts",
+     "line": 28,
+     "note": "safe sibling：read 有完整守卫——assertWorkspaceIdAccessibleToUser（L40/L48）、assertQueryOrganizationMatchesActiveOrg + assertMayReadTargetUser（L53-54）、org-scoped 查询（L68-72）"
+    },
+    {
+     "file": "packages/server/src/enterprise/services/workspace-user.service.ts",
+     "line": 225,
+     "note": "createWorkspaceUser 只校验 roleId 存在与否（L231-232），不校验 workspace/role 归属 caller org；可把自己或盟友以高权 roleId 加进他租户 workspace"
+    },
+    {
+     "file": "packages/server/src/enterprise/services/workspace-user.service.ts",
+     "line": 344,
+     "note": "updateWorkspaceUser 仅要求新 role 与目标用户当前 role 同 org（L344-346），与 caller 的 org 无关；deleteWorkspaceUser（L362-388）仅保护 OWNER 角色，任意 (workspaceId,userId) 可删"
+    }
+   ]
+  },
+  {
+   "cluster_id": "UC21",
+   "claim": "Custom MCP server authorize/connect path performs server-side requests to user-supplied URLs (MCPToolkit.createClient) with deny-list opt-out (SSRF).",
+   "final_classification": "false_positive",
+   "batch_classifications": [
+    "false_positive"
+   ],
+   "gt_overlap": null,
+   "severity_if_tp": "low（hardening 残留）",
+   "confidence": "high",
+   "lead_resolution": null,
+   "evidence": [
+    {
+     "file": "packages/server/src/services/custom-mcp-servers/index.ts",
+     "line": 50,
+     "note": "assertSafeServerUrl：isValidURL + 仅 http/https + checkDenyList（共享 deny list：RFC1918/loopback/link-local/IMDS/IPv6）"
+    },
+    {
+     "file": "packages/server/src/services/custom-mcp-servers/index.ts",
+     "line": 100,
+     "note": "createCustomMcpServer 对 serverUrl 强制 assertSafeServerUrl；update（line 231）对任何新 serverUrl 同样强制（掩码占位符回传被拒绝）"
+    },
+    {
+     "file": "packages/components/nodes/tools/MCP/core.ts",
+     "line": 60,
+     "note": "createClient 在连接时再次 await checkDenyList(this.serverParams.url) — 双重守卫；authorizeCustomMcpServer（service line 300-334）只连接 create/update 时已验证过的保存 URL"
+    },
+    {
+     "file": "packages/components/src/httpSecurity.ts",
+     "line": 36,
+     "note": "process.env.HTTP_SECURITY_CHECK !== 'false' — deny list 默认启用；HTTP_SECURITY_CHECK=false 是显式 operator opt-out（威胁模型：单独不构成漏洞）"
+    }
+   ]
+  },
+  {
+   "cluster_id": "UC22",
+   "claim": "TTS CORS preflight is allowed for any origin when chatflowId is absent from the body (getCorsOptions misconfiguration).",
+   "final_classification": "false_positive",
+   "batch_classifications": [
+    "false_positive"
+   ],
+   "gt_overlap": null,
+   "severity_if_tp": "none",
+   "confidence": "high",
+   "lead_resolution": null,
+   "evidence": [
+    {
+     "file": "packages/server/src/utils/XSS.ts",
+     "line": 125,
+     "note": "仅当 isTTSReq 且无 chatflowId 时 chatflowAllowed=true，注释明确 'OPTIONS preflight has no body — allow it through so the actual POST can be validated'"
+    },
+    {
+     "file": "packages/server/src/utils/XSS.ts",
+     "line": 115,
+     "note": "实际 POST 请求从 req.body.chatflowId 做 validateChatflowDomain 校验，失败且无全局许可则拒绝"
+    },
+    {
+     "file": "packages/server/src/index.ts",
+     "line": 200,
+     "note": "cors 中间件在路由前拦截 OPTIONS 预检，预检响应本身不携带任何数据或凭据"
+    },
+    {
+     "file": "packages/server/src/utils/XSS.ts",
+     "line": 87,
+     "note": "credentials 在 CORS_ORIGINS=* 时强制 false，无通配+凭据组合"
+    }
+   ]
+  },
+  {
+   "cluster_id": "UC23",
+   "claim": "API key secret hash and raw API key disclosed to any user holding only apikeys:view permission.",
+   "final_classification": "validated_novel_tp",
+   "batch_classifications": [
+    "validated_novel_tp"
+   ],
+   "gt_overlap": "none（R02 为用户密码序列化，R04-R06 为 credential lookup，均不覆盖 API key 材料泄露）",
+   "severity_if_tp": "high（持久 bearer 凭证泄露给只读角色）",
+   "confidence": "high",
+   "lead_resolution": null,
+   "evidence": [
+    {
+     "file": "packages/server/src/routes/apikey/index.ts",
+     "line": 10,
+     "note": "GET / 仅要求 checkPermission('apikeys:view')"
+    },
+    {
+     "file": "packages/server/src/database/entities/ApiKey.ts",
+     "line": 8,
+     "note": "apiKey 列保存的是原始 32 字节 base64url key（utils/apiKey.ts L7-10 generateAPIKey），apiSecret（L11）为其 scrypt hash——raw key 即认证凭证（services/apikey L225-234 verifyApiKey 按 apiKey 列匹配）"
+    },
+    {
+     "file": "packages/server/src/services/apikey/index.ts",
+     "line": 109,
+     "note": "getAllApiKeys 用 createQueryBuilder 不带 .select() 投影（L112-114）→ 返回完整实体，含 apiKey 原文与 apiSecret hash；非 admin 过滤（L124-129）只按'key 权限 ⊆ 用户权限'筛选行，不脱敏任何字段"
+    },
+    {
+     "file": "packages/server/src/services/apikey/index.ts",
+     "line": 94,
+     "note": "safe sibling：getAllApiKeysByOrganization（org-admin 分支，controller L13-14）显式 .select(['api_key.keyName','api_key.permissions'])——安全投影模式已存在于同文件，但仅用于 admin 查询"
+    },
+    {
+     "file": "packages/server/src/controllers/apikey/index.ts",
+     "line": 17,
+     "note": "普通查询（含 view-only 用户）走 getAllApiKeys(user,...) 全实体路径"
+    }
+   ]
+  },
+  {
+   "cluster_id": "UC24",
+   "claim": "Authentication middleware whitelist uses prefix (startsWith) matching, allowing unauthenticated access to any route whose path begins with a whitelisted prefix.",
+   "final_classification": "false_positive",
+   "batch_classifications": [
+    "false_positive"
+   ],
+   "gt_overlap": null,
+   "severity_if_tp": "high",
+   "confidence": "medium",
+   "lead_resolution": null,
+   "evidence": [
+    {
+     "file": "packages/server/src/index.ts",
+     "line": 236,
+     "note": "确认机制属实：whitelistURLs.some((url) => req.path.startsWith(url)) 是前缀匹配而非精确/正则匹配"
+    },
+    {
+     "file": "packages/server/src/routes/index.ts",
+     "line": 77,
+     "note": "枚举全部挂载点：所有位于 whitelist 前缀之下的路由族（feedback/leads/attachments/get-upload-file/webhook/prediction/mcp/verify/apikey/public-*/text-to-speech 等）本身即设计为公开"
+    },
+    {
+     "file": "packages/server/src/routes/settings/index.ts",
+     "line": 6,
+     "note": "反例核查：'/api/v1/settings' 前缀下仅有 GET /（本就 whitelist），无受保护兄弟路由；versions/ping/user 同样单一"
+    },
+    {
+     "file": "packages/server/src/index.ts",
+     "line": 225,
+     "note": "URL_CASE_SENSITIVE_REGEX 阻断 /API/v1、/api/V1 等大小写变体（233-234 步进校验，非敏感即 401）"
+    },
+    {
+     "file": "packages/server/src/enterprise/routes/auth/index.ts",
+     "line": 8,
+     "note": "前缀扩展唯一能命中的额外处理器：GET /api/v1/auth/loginXYZ 经 /:type 落入 getAllPermissions——但该权限目录经本就 whitelist 的 /api/v1/auth/resolve 以同一 handler 同样可达，无增量暴露"
+    }
+   ]
+  },
+  {
+   "cluster_id": "UC25",
+   "claim": "Unauthenticated chatflow disclosure via /chatflows/apikey/:apikey with unvalidated keyonly parameter.",
+   "final_classification": "false_positive",
+   "batch_classifications": [
+    "false_positive"
+   ],
+   "gt_overlap": null,
+   "severity_if_tp": "low",
+   "confidence": "medium",
+   "lead_resolution": null,
+   "evidence": [
+    {
+     "file": "packages/server/src/controllers/chatflows/index.ts",
+     "line": 116,
+     "note": "apiKeyService.getApiKey(req.params.apikey)——必须提供有效的 API key 明文，查不到即 401"
+    },
+    {
+     "file": "packages/server/src/services/apikey/index.ts",
+     "line": 147,
+     "note": "按 apiKey 列（key 明文）精确 findOneBy，key 为不可猜的随机秘密"
+    },
+    {
+     "file": "packages/server/src/services/chatflows/index.ts",
+     "line": 251,
+     "note": "注释明确设计意图：'we only get chatflows that are bounded by the apikeyid and chatflows that are not bounded by any apikey'"
+    },
+    {
+     "file": "packages/server/src/services/chatflows/index.ts",
+     "line": 261,
+     "note": "keyonly===undefined 时附带返回未绑定 key 的 flow——这是 SDK 列举可执行 flow 的既定行为；keyonly 存在时只会收窄结果"
+    }
+   ]
+  },
+  {
+   "cluster_id": "UC26",
+   "claim": "Unauthenticated disclosure of private chatflow flowData via the public-chatbotConfig endpoint (no isPublic check).",
+   "final_classification": "validated_novel_tp_conditional",
+   "batch_classifications": [
+    "validated_novel_tp"
+   ],
+   "gt_overlap": null,
+   "severity_if_tp": "low",
+   "confidence": "high",
+   "lead_resolution": "batch1 判低危 TP：免认证端点对任意 chatflowId（含私有 flow）返回经 sanitizeFlowDataForPublicEndpoint 净化的 flowData。结构泄露成立，但净化后内容披露是否计入 canonical GT 取决于威胁模型规则（净化后结构披露），标记 conditional，待批准。",
+   "evidence": [
+    {
+     "file": "packages/server/src/utils/constants.ts",
+     "line": 10,
+     "note": "'/api/v1/public-chatbotConfig' 免认证"
+    },
+    {
+     "file": "packages/server/src/services/chatflows/index.ts",
+     "line": 561,
+     "note": "findOneBy({id: chatflowId})——无 isPublic、无 workspace 谓词，私有 flow 同样命中"
+    },
+    {
+     "file": "packages/server/src/services/chatflows/index.ts",
+     "line": 589,
+     "note": "返回 flowData: sanitizeFlowDataForPublicEndpoint(...)——flowData 会返回但经净化"
+    },
+    {
+     "file": "packages/server/src/utils/sanitizeFlowData.ts",
+     "line": 21,
+     "note": "净化删除 credential 引用、password/file/folder 输入及敏感 headers——claim 所称'明文 flowData 泄露秘密'不成立"
+    }
+   ]
+  },
+  {
+   "cluster_id": "UC27",
+   "claim": "Document store upsert/refresh routes omit the RBAC permission checks present on sibling documentstore routes.",
+   "final_classification": "validated_novel_tp",
+   "batch_classifications": [
+    "validated_novel_tp"
+   ],
+   "gt_overlap": "none（R15 为 routes/upsert-history 路由缺权限，属不同路由/不同 root；class-similar 但非同链）",
+   "severity_if_tp": "medium-high（零权限文档注入/RAG 投毒；带 items 时跨 workspace 写入）",
+   "confidence": "high",
+   "lead_resolution": null,
+   "evidence": [
+    {
+     "file": "packages/server/src/routes/documentstore/index.ts",
+     "line": 8,
+     "note": "POST /upsert 与 POST /refresh（L8-10）无任何 checkPermission；同文件 L14-82 的全部 sibling（create/view/update/delete/loader/vectorstore）均挂 documentStores:* 权限——safe sibling 模式成立"
+    },
+    {
+     "file": "packages/server/src/routes/index.ts",
+     "line": 89,
+     "note": "挂载于 /api/v1/document-store，不在 WHITELIST_URLS（需登录），但任何零权限 member 及未拉黑的 API key 均可调用"
+    },
+    {
+     "file": "packages/server/src/controllers/documentstore/index.ts",
+     "line": 610,
+     "note": "upsert/refresh controller 仅要求会话中存在 orgId/workspaceId（L621-634），无权限判断，直通 service"
+    },
+    {
+     "file": "packages/server/src/services/documentstore/index.ts",
+     "line": 2097,
+     "note": "refresh 的 workspace 归属校验（entity.workspaceId !== workspaceId → 'Unauthorized access'，L2102-2105）只存在于 items 为空的分支；带 items 调用时走 executeDocStoreUpsert"
+    },
+    {
+     "file": "packages/server/src/services/documentstore/index.ts",
+     "line": 1747,
+     "note": "upsertDocStore 按 findOneBy({ id: storeId }) 裸 id 解析 store，无 workspace 谓词——跨 workspace 写入面亦存在"
+    }
+   ]
+  },
+  {
+   "cluster_id": "UC28",
+   "claim": "Document store vector-store query/config/tool-desc endpoints lack workspace scoping (cross-tenant IDOR read of document stores).",
+   "final_classification": "validated_novel_tp",
+   "batch_classifications": [
+    "validated_novel_tp"
+   ],
+   "gt_overlap": "none（R03 为 chat-message 路由、R15 为 upsert-history 权限；documentstore 读取无 GT root 覆盖）",
+   "severity_if_tp": "high（跨租户知识库内容检索/外泄）",
+   "confidence": "high",
+   "lead_resolution": null,
+   "evidence": [
+    {
+     "file": "packages/server/src/routes/documentstore/index.ts",
+     "line": 70,
+     "note": "vectorstore/query 有 checkPermission('documentStores:view')，generate-tool-desc（L82）、store-configs（L28）同——权限在，缺 workspace scoping"
+    },
+    {
+     "file": "packages/server/src/controllers/documentstore/index.ts",
+     "line": 503,
+     "note": "queryVectorStore 将 body 直通 service，全程不取 workspaceId；generateDocStoreToolDesc（L703-719）与 getDocStoreConfigs（L721-739）同样直通 req.params"
+    },
+    {
+     "file": "packages/server/src/services/documentstore/index.ts",
+     "line": 1489,
+     "note": "queryVectorStore 以 findOneBy({ id: data.storeId }) 裸 id 解析 store（L1494-1496）后执行向量检索——跨租户文档内容检索"
+    },
+    {
+     "file": "packages/server/src/services/documentstore/index.ts",
+     "line": 2155,
+     "note": "generateDocStoreToolDesc 以 findBy({ storeId }) 取 chunk（L2160-2162）并把前 4 个 chunk 内容拼入 LLM prompt/描述——跨租户内容直接外泄"
+    },
+    {
+     "file": "packages/server/src/services/documentstore/index.ts",
+     "line": 2213,
+     "note": "findDocStoreAvailableConfigs 同样 findOneBy({ id: storeId }) 无归属校验"
+    },
+    {
+     "file": "packages/server/src/controllers/documentstore/index.ts",
+     "line": 110,
+     "note": "safe sibling：getDocumentStoreById 取 req.user.activeWorkspaceId 并传入 service 做谓词（L118-125）；getAllDocumentStores（L45-56）、deleteVectorStoreFromStore（L516-535）同模式"
+    }
+   ]
+  },
+  {
+   "cluster_id": "UC29",
+   "claim": "Public chatflow domain validation defaults to allow when no allowlist is configured (validateChatflowDomain).",
+   "final_classification": "false_positive",
+   "batch_classifications": [
+    "false_positive"
+   ],
+   "gt_overlap": null,
+   "severity_if_tp": "none",
+   "confidence": "medium",
+   "lead_resolution": null,
+   "evidence": [
+    {
+     "file": "packages/server/src/utils/domainValidation.ts",
+     "line": 39,
+     "note": "if (!config.allowedOrigins?.length || config.allowedOrigins[0] === '') return true——空 allowlist 默认放行，代码注释说明该语义（用户设值后清空视为允许全部）"
+    },
+    {
+     "file": "packages/server/src/controllers/predictions/index.ts",
+     "line": 42,
+     "note": "同源逻辑：仅当配置了 allowedOrigins 且请求带 Origin 头才做域校验——非浏览器客户端（无 Origin）完全绕过，证明这不是访问控制边界"
+    }
+   ]
+  },
+  {
+   "cluster_id": "UC30",
+   "claim": "Unauthenticated fetch-links endpoint performs server-side URL fetch (webCrawl/xmlScrape) guarded only by a DNS-based deny list (SSRF).",
+   "final_classification": "false_positive",
+   "batch_classifications": [
+    "false_positive"
+   ],
+   "gt_overlap": null,
+   "severity_if_tp": "medium",
+   "confidence": "high",
+   "lead_resolution": null,
+   "evidence": [
+    {
+     "file": "packages/server/src/utils/constants.ts",
+     "line": 6,
+     "note": "WHITELIST_URLS（6-58 行）不含 '/api/v1/fetch-links'——免认证前提不成立"
+    },
+    {
+     "file": "packages/server/src/routes/index.ts",
+     "line": 94,
+     "note": "fetch-links 正常挂载于 /api/v1 下，经 index.ts:230-257 认证中间件：须 JWT 或 Bearer API key"
+    },
+    {
+     "file": "packages/server/src/services/fetch-links/index.ts",
+     "line": 9,
+     "note": "checkDenyList(url) 在抓取前执行"
+    },
+    {
+     "file": "packages/components/src/httpSecurity.ts",
+     "line": 121,
+     "note": "checkDenyList：ipaddr 解析+DNS 全地址解析+IPv4-mapped 归一化，对 DEFAULT_DENY_LIST（环回/私网/链路本地/组播等，8-27 行）逐一匹配"
+    }
+   ]
+  },
+  {
+   "cluster_id": "UC31",
+   "claim": "Unauthenticated MCP endpoint DELETE route bypasses Bearer-token authentication.",
+   "final_classification": "false_positive",
+   "batch_classifications": [
+    "false_positive"
+   ],
+   "gt_overlap": null,
+   "severity_if_tp": "none",
+   "confidence": "high",
+   "lead_resolution": null,
+   "evidence": [
+    {
+     "file": "packages/server/src/routes/mcp-endpoint/index.ts",
+     "line": 43,
+     "note": "router.delete('/:chatflowId', mcpEndpointController.handleDelete) — 确实缺 authenticateToken（POST 在 line 35-40 有）；路由前缀 /api/v1/mcp/ 在 unauthList（constants.ts:43）"
+    },
+    {
+     "file": "packages/server/src/controllers/mcp-endpoint/index.ts",
+     "line": 64,
+     "note": "handleDelete 直接调用 handleMcpDeleteRequest，不取 token、不查库"
+    },
+    {
+     "file": "packages/server/src/services/mcp-endpoint/index.ts",
+     "line": 329,
+     "note": "handleMcpDeleteRequest 无条件返回 405 'Session termination is not supported in stateless mode'，忽略 chatflowId，不删除任何资源、不读任何数据"
+    }
+   ]
+  },
+  {
+   "cluster_id": "UC32",
+   "claim": "MCP endpoint executes any chatflow with isInternal=true, bypassing flow API-key validation (chatflowCallback).",
+   "final_classification": "false_positive",
+   "batch_classifications": [
+    "false_positive"
+   ],
+   "gt_overlap": null,
+   "severity_if_tp": "none",
+   "confidence": "high",
+   "lead_resolution": null,
+   "evidence": [
+    {
+     "file": "packages/server/src/services/mcp-endpoint/index.ts",
+     "line": 201,
+     "note": "utilBuildChatflow(mockReq, true, ChatType.MCP) — 第二参数是调用点硬编码字面量 true，表示'本调用已完成认证'，不是 ChatFlow 实体属性"
+    },
+    {
+     "file": "packages/server/src/utils/buildChatflow.ts",
+     "line": 990,
+     "note": "utilBuildChatflow(req, isInternal = false, chatType) — isInternal 是函数参数；公共 predictions 路径传 false（services/predictions/index.ts:10），internal-predictions 与 MCP 路径传 true"
+    },
+    {
+     "file": "packages/server/src/services/mcp-endpoint/index.ts",
+     "line": 257,
+     "note": "chatflowCallback 只在 handleMcpRequest 通过 getChatflowByIdAndVerifyToken（token 常时比较 + config.enabled）之后经 mcpServer.tool 注册执行；无 token 不可达"
+    },
+    {
+     "file": "packages/server/src/utils/buildChatflow.ts",
+     "line": 1030,
+     "note": "!isInternal 时才 validateFlowAPIKey — MCP 路径跳过 flow API key 是设计上的替代认证（MCP Bearer token 即凭证），不存在攻击者可设置的 chatflow 级 isInternal 标志"
+    }
+   ]
+  },
+  {
+   "cluster_id": "UC33",
+   "claim": "MCP endpoint chatflow lookup is not workspace-scoped (IDOR surface), though token check mitigates.",
+   "final_classification": "false_positive",
+   "batch_classifications": [
+    "false_positive"
+   ],
+   "gt_overlap": null,
+   "severity_if_tp": "none",
+   "confidence": "high",
+   "lead_resolution": null,
+   "evidence": [
+    {
+     "file": "packages/server/src/services/mcp-server/index.ts",
+     "line": 229,
+     "note": "findOne({ where: { id: chatflowId } }) 确无 workspaceId 过滤（claim 事实成立）"
+    },
+    {
+     "file": "packages/server/src/services/mcp-server/index.ts",
+     "line": 238,
+     "note": "但要求 config 存在且 enabled 且有 token，否则 404"
+    },
+    {
+     "file": "packages/server/src/services/mcp-server/index.ts",
+     "line": 243,
+     "note": "crypto.timingSafeEqual 常时比较；token 由 generateToken（line 38-40，crypto.randomBytes(16) → 128 位）生成"
+    }
+   ]
+  },
+  {
+   "cluster_id": "UC34",
+   "claim": "Global auth/whitelist middleware evaluates req.path after sanitizeMiddleware rewrites req.url with sanitizeHtml(decodeURI(...)), enabling auth-whitelist bypass via encoded/mutated paths.",
+   "final_classification": "false_positive",
+   "batch_classifications": [
+    "false_positive"
+   ],
+   "gt_overlap": null,
+   "severity_if_tp": "high",
+   "confidence": "high",
+   "lead_resolution": null,
+   "evidence": [
+    {
+     "file": "packages/server/src/index.ts",
+     "line": 221,
+     "note": "sanitizeMiddleware 先于认证中间件（230 行）注册——改写先于 whitelist 判定属实"
+    },
+    {
+     "file": "packages/server/src/utils/XSS.ts",
+     "line": 9,
+     "note": "req.url = sanitizeHtml(decodeURI(req.url)) 只执行一次"
+    },
+    {
+     "file": "packages/server/src/index.ts",
+     "line": 327,
+     "note": "Express 路由（app.use('/api/v1', router)）在认证中间件之后消费同一个被改写后的 req.url——whitelist 与路由匹配看到的是同一字符串"
+    },
+    {
+     "file": "packages/server/src/utils/XSS.ts",
+     "line": 8,
+     "note": "decodeURI 不解码 %2F（保留字），故编码斜杠无法在 whitelist 前缀与路由分段之间制造差异；Express 亦不归一化 '..' 段"
+    }
+   ]
+  },
+  {
+   "cluster_id": "UC35",
+   "claim": "node-custom-function variable leak: skipVariables flag never enforced (t4 agent_001 variant)",
+   "final_classification": "false_positive",
+   "batch_classifications": [
+    "false_positive",
+    "false_positive"
+   ],
+   "gt_overlap": "n/a",
+   "severity_if_tp": "",
+   "confidence": "high",
+   "lead_resolution": null,
+   "evidence": [
+    {
+     "file": "packages/server/src/utils/executeCustomNodeFunction.ts",
+     "line": 49,
+     "note": "skipVariables: !canViewVariables is set from the viewer capability"
+    },
+    {
+     "file": "packages/components/src/utils.ts",
+     "line": 982,
+     "note": "getVars returns [] when options.skipVariables is truthy — the flag IS enforced"
+    },
+    {
+     "file": "packages/server/src/routes/node-custom-functions/index.ts",
+     "line": 7,
+     "note": "路由确为 checkAnyPermission('chatflows:create,chatflows:update,agentflows:create,agentflows:update')——claim (b) 的权限前提属实"
+    },
+    {
+     "file": "packages/server/src/controllers/nodes/index.ts",
+     "line": 97,
+     "note": "controller 显式计算 canViewVariables = isOrganizationAdmin || permissions.includes('variables:view') 并传入 service——变量可见性有独立门禁"
+    },
+    {
+     "file": "packages/server/src/utils/executeCustomNodeFunction.ts",
+     "line": 49,
+     "note": "skipVariables: !canViewVariables——无 variables:view 的调用者强制置位 skipVariables（QUEUE 模式经 PredictionQueue.ts L96 同样透传）"
+    },
+    {
+     "file": "packages/components/src/utils.ts",
+     "line": 982,
+     "note": "getVars 首行 if (!options.workspaceId || options.skipVariables) return []——skipVariables 确实被执行（与我方先前对 claim (a) 的 FP 裁定一致），$vars 注入被阻断"
+    },
+    {
+     "file": "packages/components/nodes/utilities/CustomFunction/CustomFunction.ts",
+     "line": 85,
+     "note": "节点侧 getVars(appDataSource, databaseEntities, nodeData, options) 原样透传 options，守卫链完整闭合"
+    }
+   ]
+  },
+  {
+   "cluster_id": "UC36",
+   "claim": "Missing authorization checks on NVIDIA NIM container-management routes (startContainer etc.).",
+   "final_classification": "validated_novel_tp",
+   "batch_classifications": [
+    "validated_novel_tp"
+   ],
+   "gt_overlap": "none（R09 为 BullMQ dashboard，属不同子系统）",
+   "severity_if_tp": "high（宿主机容器执行/停摆；部署依赖性强）",
+   "confidence": "medium-high",
+   "lead_resolution": null,
+   "evidence": [
+    {
+     "file": "packages/server/src/routes/nvidia-nim/index.ts",
+     "line": 6,
+     "note": "全部 9 条路由（preload/get-token/download-installer/list/pull/start/stop/get-image/get-container）均无 checkPermission、无 admin guard"
+    },
+    {
+     "file": "packages/server/src/utils/constants.ts",
+     "line": 60,
+     "note": "/api/v1/nvidia-nim 在 API_KEY_BLACKLIST_URLS 中（API key 不可达），但不在 WHITELIST_URLS——任意 session 用户（最低权限 member）可调用"
+    },
+    {
+     "file": "packages/server/src/controllers/nvidia-nim/index.ts",
+     "line": 44,
+     "note": "pullImage/startContainer 直接采用 req.body 的 imageTag、apiKey、hostPort（L45-62），无任何过滤——任意已认证用户可在宿主机拉取并启动任意镜像、绑定 host 端口"
+    },
+    {
+     "file": "packages/server/src/controllers/nvidia-nim/index.ts",
+     "line": 63,
+     "note": "stopContainer/listRunningContainers 暴露宿主机容器清单与停止能力；getToken（L7-24）代理获取 NVIDIA NTS token；downloadInstaller/preload 触发宿主机变更"
+    },
+    {
+     "file": "packages/server/src/routes/documentstore/index.ts",
+     "line": 14,
+     "note": "safe sibling 模式：server 其余 mutation 路由普遍挂 checkPermission（如 documentStores:create），nvidia-nim 为系统性缺失"
+    }
+   ]
+  },
+  {
+   "cluster_id": "UC37",
+   "claim": "Unauthenticated prediction endpoint applies attacker-controlled overrideConfig to flow node inputs (API override abuse).",
+   "final_classification": "false_positive",
+   "batch_classifications": [
+    "false_positive"
+   ],
+   "gt_overlap": null,
+   "severity_if_tp": "medium",
+   "confidence": "high",
+   "lead_resolution": null,
+   "evidence": [
+    {
+     "file": "packages/server/src/utils/index.ts",
+     "line": 1993,
+     "note": "getAPIOverrideConfig：apiOverrideStatus 默认 false，仅当 flow 作者在 apiConfig.overrideConfig.status 显式置 true 才开启"
+    },
+    {
+     "file": "packages/server/src/utils/buildChatflow.ts",
+     "line": 180,
+     "note": "initEndingNode 中 if (incomingInput.overrideConfig && apiOverrideStatus) 才调用 replaceInputsWithConfig"
+    },
+    {
+     "file": "packages/server/src/utils/index.ts",
+     "line": 592,
+     "note": "buildFlow 内第二处应用点同样以 apiOverrideStatus 门控"
+    },
+    {
+     "file": "packages/server/src/utils/index.ts",
+     "line": 1996,
+     "note": "作者还可经 nodeOverrides/variableOverrides 进一步限定可覆盖的节点与变量"
+    }
+   ]
+  },
+  {
+   "cluster_id": "UC38",
+   "claim": "Public prediction endpoint executes any chatflow regardless of its isPublic flag.",
+   "final_classification": "canonical_tp_overlap",
+   "batch_classifications": [
+    "canonical_tp_overlap"
+   ],
+   "gt_overlap": "R20",
+   "severity_if_tp": "high",
+   "confidence": "high",
+   "lead_resolution": null,
+   "evidence": [
+    {
+     "file": "packages/server/src/utils/constants.ts",
+     "line": 12,
+     "note": "'/api/v1/prediction/' 免认证前缀"
+    },
+    {
+     "file": "packages/server/src/controllers/predictions/index.ts",
+     "line": 28,
+     "note": "workspaceId = req.user?.activeWorkspaceId——匿名时为 undefined"
+    },
+    {
+     "file": "packages/server/src/services/chatflows/index.ts",
+     "line": 44,
+     "note": "getChatflowById(id, undefined)：workspaceId 缺省时无条件 workspace 谓词（非限定查找），且无任何 isPublic 检查"
+    },
+    {
+     "file": "packages/server/src/utils/buildChatflow.ts",
+     "line": 1029,
+     "note": "唯一执行前门控是 validateFlowAPIKey"
+    },
+    {
+     "file": "packages/server/src/utils/validateKey.ts",
+     "line": 13,
+     "note": "chatflow 未绑定 apikeyid 时直接 return true——默认私有 flow（未绑 key）可被匿名执行，连带消耗其节点 credential"
+    }
+   ]
+  },
+  {
+   "cluster_id": "UC39",
+   "claim": "Webhook async callbackUrl SSRF: dispatchCallback performs server-side requests to user-supplied callbackUrl",
+   "final_classification": "false_positive",
+   "batch_classifications": [
+    "inconclusive",
+    "false_positive"
+   ],
+   "gt_overlap": null,
+   "severity_if_tp": "low（hardening）",
+   "confidence": "medium-high",
+   "lead_resolution": "batch0 判 inconclusive；batch3 复核确认 deny list 默认启用（httpSecurity.ts:36 HTTP_SECURITY_CHECK !== 'false'）、secureAxiosRequest 逐跳校验重定向并 IP pinning、callbackUrl 来自 workspace 成员保存的配置。claim 的事实前提（默认关闭）被推翻，接受收紧为 FP（hardening 记录）。",
+   "evidence": [
+    {
+     "file": "packages/server/src/controllers/webhook/index.ts",
+     "line": 105,
+     "note": "controller validates only http/https protocol on callbackUrl"
+    },
+    {
+     "file": "packages/server/src/controllers/webhook/index.ts",
+     "line": 39,
+     "note": "callbackUrl originates from webhookService.validateWebhookChatflow — saved chatflow Start-node config, not webhook request input"
+    },
+    {
+     "file": "packages/server/src/utils/callbackDispatcher.ts",
+     "line": 22,
+     "note": "dispatchCallback uses secureAxiosRequest — shared URL policy with default deny list IS applied"
+    },
+    {
+     "file": "packages/components/src/httpSecurity.ts",
+     "note": "HTTP_SECURITY_CHECK=false operator env removes deny list (explicit opt-out)"
+    },
+    {
+     "file": "packages/server/src/utils/callbackDispatcher.ts",
+     "line": 22,
+     "note": "dispatchCallback → await secureAxiosRequest({ method: 'POST', url, ... }) — sink 使用全量守卫的 secureAxiosRequest"
+    },
+    {
+     "file": "packages/components/src/httpSecurity.ts",
+     "line": 36,
+     "note": "securityCheckEnabled = process.env.HTTP_SECURITY_CHECK !== 'false' — deny list 默认启用；claim 的 'disabled by default' 前提不成立"
+    },
+    {
+     "file": "packages/components/src/httpSecurity.ts",
+     "line": 8,
+     "note": "DEFAULT_DENY_LIST 覆盖 0.0.0.0/10/8/127/8/169.254/16（含 IMDS 169.254.169.254）/172.16/12/192.168/16/224/4/240/4/IPv6 本地与 ULA/localhost"
+    },
+    {
+     "file": "packages/components/src/httpSecurity.ts",
+     "line": 176,
+     "note": "secureAxiosRequest 每一跳 resolveAndValidate + createPinnedAgent 将连接 IP 钉死为已校验地址（line 295-344）— 重定向链逐跳校验且无 DNS rebinding 窗口"
+    }
+   ]
+  },
+  {
+   "cluster_id": "UC40",
+   "claim": "Webhook-listener SSE stream accepts a client-supplied listenerId without verifying ownership of the associated chatflow, allowing subscription to other users webhook events.",
+   "final_classification": "inconclusive",
+   "batch_classifications": [
+    "false_positive",
+    "validated_novel_tp"
+   ],
+   "gt_overlap": null,
+   "severity_if_tp": "medium",
+   "confidence": "medium",
+   "lead_resolution": "batch1 判 FP（listenerId 为服务端 uuidv4 铸造的不可猜 capability，路由有 requireFlowEdit + workspace 校验）；batch3 判低危 TP（属主校验对象与订阅键错位成立）。主裁决：错位属实但可利用性依赖获取受害者 listenerId，两批均未发现泄露/枚举路径 → 按不可猜 capability 规则（与 UC33 MCP token 同一逻辑）归 inconclusive/hardening，不入 GT。",
+   "evidence": [
+    {
+     "file": "packages/server/src/routes/webhook-listener/index.ts",
+     "line": 5,
+     "note": "三个路由均挂 requireFlowEdit（chatflows/agentflows create/update 权限）——非免认证"
+    },
+    {
+     "file": "packages/server/src/controllers/webhook-listener/index.ts",
+     "line": 18,
+     "note": "assertChatflowIsWebhookTriggered(chatflowid, req.user?.activeWorkspaceId)——chatflow 查找带 caller workspace 谓词，跨租户 flow 不可用"
+    },
+    {
+     "file": "packages/server/src/services/webhook-listener/registry.ts",
+     "line": 58,
+     "note": "listenerId = 'wh-listener-' + uuidv4()——每次注册新铸的不可猜 capability"
+    },
+    {
+     "file": "packages/server/src/utils/SSEStreamer.ts",
+     "line": 57,
+     "note": "addClient 以 listenerId 为 key Map.set——理论上知他人 listenerId 可替换其流，但该 id 仅返回给注册者本人且无任何泄露/枚举通道"
+    },
+    {
+     "file": "packages/server/src/routes/webhook-listener/index.ts",
+     "line": 10,
+     "note": "requireFlowEdit = checkAnyPermission('chatflows:create,chatflows:update,agentflows:create,agentflows:update') — 认证 + 编辑权限（不在 unauthList）"
+    },
+    {
+     "file": "packages/server/src/controllers/webhook-listener/index.ts",
+     "line": 49,
+     "note": "assertChatflowIsWebhookTriggered(chatflowid, req.user?.activeWorkspaceId) 校验的是 URL 中调用者自己的 chatflow 的 workspace 归属"
+    },
+    {
+     "file": "packages/server/src/controllers/webhook-listener/index.ts",
+     "line": 60,
+     "note": "sseStreamer.addClient(listenerId, res) — listenerId 取自 req.params，未校验该 listenerId 由本 chatflow 注册、也未校验属于调用者；属主校验对象（chatflow）与订阅键（listenerId）错位"
+    },
+    {
+     "file": "packages/server/src/services/webhook-listener/registry.ts",
+     "line": 58,
+     "note": "listenerId = `wh-listener-${uuidv4()}` 服务端生成，仅通过 register 响应返回给注册者；无枚举端点"
+    }
+   ]
+  },
+  {
+   "cluster_id": "UC41",
+   "claim": "Host-header SSRF: client-controlled Host/X-Forwarded-Proto headers flow into flow-execution baseURL used for outbound requests (public issue #6687, evaluations path)",
+   "final_classification": "inconclusive",
+   "batch_classifications": [
+    "lead_direct"
+   ],
+   "gt_overlap": null,
+   "severity_if_tp": "medium-high (authenticated SSRF)",
+   "confidence": "high on source+propagation; sink leg unconfirmed",
+   "lead_resolution": "来源为公开 issue #6687（open，2026-09，无 advisory/fix）。代码级验证：buildChatflow.ts:1004-1005 与 upsertVector.ts:252-253 从 req.get(x-forwarded-proto)/req.get(host) 构造 baseURL 并传入节点 init（313/494/595/624/1065）。出站消费点（哪个默认 HTTP 客户端用 ${baseURL} 发请求、是否过 checkDenyList）未完成定位——按 inconclusive 处理，列入 KU06 待一步 sink 确认。",
+   "evidence": [
+    {
+     "file": "packages/server/src/utils/buildChatflow.ts",
+     "line": 1004,
+     "note": "httpProtocol = req.get('x-forwarded-proto') || req.protocol"
+    },
+    {
+     "file": "packages/server/src/utils/buildChatflow.ts",
+     "line": 1005,
+     "note": "baseURL = `${httpProtocol}://${req.get('host')}`"
+    },
+    {
+     "file": "packages/server/src/utils/upsertVector.ts",
+     "line": 253,
+     "note": "同模式第二处"
+    },
+    {
+     "file": "https://github.com/FlowiseAI/Flowise/issues/6687",
+     "line": null,
+     "note": "公开披露（open）：authenticated SSRF via Host header in evaluations"
+    }
+   ],
+   "provenance_note": "issue-sourced（非 agent-run、非 advisory）"
+  }
+ ]
+}

@@ -1,0 +1,284 @@
+{
+  "as_of": "2026-09-21",
+  "method": "blobless full-history clone of https://github.com/FlowiseAI/Flowise.git; enumerated all 28 commits on origin/main after snapshot commit 09f099db; every commit triaged by stat + full diff of code paths (docs/lockfile/version/CI-only commits excluded); snapshot applicability verified by direct inspection of the flowise@3.1.3 working copy at experiments/emergent_coordination/repositories/flowise_3_1_3_repository_v1/",
+  "snapshot_commit": "09f099dbfda179e439ec677d06ad737375899eef",
+  "snapshot_tag": "flowise@3.1.3",
+  "snapshot_date": "2026-06-25T11:06:22+01:00",
+  "head_commit": "9291856d1ea4a4ceea9f8fef8ce14f4f6c81e8eb",
+  "head_date": "2026-08-13T13:38:19+01:00",
+  "commits_scanned_total": 28,
+  "commits_touching_server_or_components": 20,
+  "known_fix_prefixes_excluded": [
+    "9fcb7ffb", "5ecc3c5c", "ed9e100f", "bb773ffa", "f5d16835", "ababf4c8",
+    "db8de568", "4ea39120", "b98ff81b", "441c4e98", "de3a9182", "6c989ec8",
+    "096d2d4c", "93c1abdd", "dbec8f9f"
+  ],
+  "post_snapshot_non_candidates": [
+    { "commit_sha": "fe285d0b", "title": "fix: flowise-627 (#6673)", "reason": "package.json/pnpm-lock/Dockerfile only (dependency bump)" },
+    { "commit_sha": "ba4c6509", "title": "feat(security): Sunset notice (#6692)", "reason": "SECURITY.md only" },
+    { "commit_sha": "a65f81bb", "title": "Release/3.1.4 (#6681)", "reason": "version bumps only" },
+    { "commit_sha": "9291856d", "title": "Update README.md (#6728)", "reason": "README only" },
+    { "commit_sha": "f20d0941", "title": "fix: flowise-766 (#6709)", "reason": "comments/env-example only: removes puppeteer,playwright from commented TOOL_FUNCTION_EXTERNAL_DEP example and adds warning that their launch() passes executablePath/args into child_process.spawn (sandbox escape). Documents KU02 family; no functional change." }
+  ],
+  "candidates": [
+    {
+      "commit_sha": "abe4a8601a058047b350c260676826e21dd14101",
+      "short": "abe4a860",
+      "date": "2026-08-10T22:55:55+08:00",
+      "title": "Fix Flowise 746 Chat Message Route (#6719)",
+      "files_touched": [
+        "packages/server/src/routes/chat-messages/index.ts",
+        "packages/server/src/routes/internal-chat-messages/index.ts"
+      ],
+      "security_relevance": "Routes previously bound controllers with zero RBAC middleware: GET /api/v1/chat-messages/:id, DELETE /api/v1/chat-messages/ (removeAllChatMessages), PUT /api/v1/chat-messages/abort/:chatflowid/:chatid, GET /api/v1/internal-chat-messages/:id. Fix wraps all four in checkAnyPermission('chatflows:* / agentflows:* / assistants:delete'). Additionally, abort path has no workspace scoping at any layer: snapshot controller passes req.params.chatflowid/chatid straight to chatMessagesService.abortChatMessage(chatid, chatflowid), and the service builds `${chatflowid}_${chatId}` and calls abortControllerPool.abort(id) (or queue publishEvent) with no workspace/ownership check.",
+      "recovered": {
+        "source": "Authenticated HTTP requests: req.params.id / req.params.chatflowid / req.params.chatid on /api/v1/chat-messages* (any authenticated user of any role)",
+        "propagation": "route (no permission middleware) -> chatMessageController.abortChatMessage -> chatMessagesService.abortChatMessage(chatid, chatflowid)",
+        "missing_guard": "(1) checkAnyPermission RBAC middleware on all chat-message routes; (2) for abort specifically: any workspace/ownership assertion - ids are used raw to index the global abortControllerPool",
+        "sink": "getAllChatMessages (read, workspace-scoped in controller), removeAllChatMessages (delete), abortControllerPool.abort(`${chatflowid}_${chatId}`) / QUEUE-mode publishEvent({eventName:'abort', id})",
+        "impact": "RBAC bypass: roles without chatflows:view/delete can read and bulk-delete workspace chat history. Cross-workspace DoS: any authenticated user can abort another tenant's in-flight prediction streams by guessing/knowing chatflowid+chatid (ids also appear in public chat API responses)."
+      },
+      "in_known_fix_list": false,
+      "subsystem": "server/routes/chat-messages",
+      "snapshot_applicability_guess": "vulnerable",
+      "snapshot_evidence": "snapshot routes/chat-messages/index.ts lines 10/16 and internal-chat-messages/index.ts line 8 bind controllers with no middleware; services/chat-messages abortChatMessage has no workspaceId parameter; controllers/chat-messages abortChatMessage passes raw params",
+      "pre_snapshot": false
+    },
+    {
+      "commit_sha": "1939b5f3747eff2641f3b7332e9fff33d637fbee",
+      "short": "1939b5f3",
+      "date": "2026-08-07T11:24:57+05:30",
+      "title": "add: permissions for bullmq endpoint (#6713)",
+      "files_touched": [
+        "packages/server/src/enterprise/rbac/Permissions.ts",
+        "packages/server/src/index.ts"
+      ],
+      "security_relevance": "Bull Board dashboard mounted at /admin/queues previously chained only rateLimiter + verifyTokenForBullMQDashboard. Fix inserts checkPermission('admin:queues') (new admin permission, default off for non-admin roles) ahead of the Bull Board router.",
+      "recovered": {
+        "source": "Authenticated HTTP requests to /admin/queues* (any account passing verifyTokenForBullMQDashboard)",
+        "propagation": "this.app.use('/admin/queues', rateLimiter, verifyTokenForBullMQDashboard, queueManager.getBullBoardRouter())",
+        "missing_guard": "RBAC permission check - token validity was the only gate; no role/permission requirement for an admin-only surface",
+        "sink": "Bull Board router: queue listing, job inspection (job payloads can embed chatflow inputs/credential-bearing node data), job retry/purge",
+        "impact": "Non-admin authenticated users gain admin queue dashboard access: read job payloads (potential sensitive data disclosure) and manipulate/purge queues (availability impact) when QUEUE mode Bull Board is enabled."
+      },
+      "in_known_fix_list": false,
+      "subsystem": "server/index.ts (queue mode admin dashboard)",
+      "snapshot_applicability_guess": "vulnerable",
+      "snapshot_evidence": "snapshot packages/server/src/index.ts line 350: this.app.use('/admin/queues', rateLimiter, verifyTokenForBullMQDashboard, this.queueManager.getBullBoardRouter()) - no checkPermission",
+      "pre_snapshot": false
+    },
+    {
+      "commit_sha": "0b74fc07ebd2f87a7c393d442f09aab76255bbbd",
+      "short": "0b74fc07",
+      "date": "2026-08-07T11:24:03+05:30",
+      "title": "fix: flowise-603 (#6708)",
+      "files_touched": [
+        "packages/server/src/controllers/openai-assistants/index.ts",
+        "packages/server/src/controllers/text-to-speech/index.ts",
+        "packages/server/src/routes/openai-assistants-files/index.ts",
+        "packages/server/src/routes/text-to-speech/index.ts",
+        "packages/server/src/services/assistants/index.ts",
+        "packages/server/src/services/openai-assistants/index.ts",
+        "packages/server/src/services/text-to-speech/index.ts"
+      ],
+      "security_relevance": "Credential lookups in openaiAssistantsService.getAllOpenaiAssistants / getSingleOpenaiAssistant / uploadFilesToAssistant and assistantsService.deleteAssistant used findOneBy({ id: credentialId }) with attacker-chosen credential id and NO workspaceId predicate; TTS getVoices had no workspace credential assertion (fix adds credentialsService.assertCredentialInWorkspace). Route fixes: /openai-assistants-files/upload gains checkAnyPermission('assistants:create,assistants:update') ordered BEFORE multer file parsing; /text-to-speech/voices gains checkAnyPermission('chatflows:config,agentflows:config').",
+      "recovered": {
+        "source": "req.query.credential (arbitrary credential UUID) on GET /api/v1/openai-assistants, GET /api/v1/openai-assistants/:id, POST /api/v1/openai-assistants-files/upload/, GET /api/v1/text-to-speech/voices?provider=&credential=",
+        "propagation": "controller -> service -> AppDataSource.getRepository(Credential).findOneBy({ id: credentialId }) // no workspaceId -> decryptCredential(credential.credentialData) -> OpenAI/ElevenLabs client constructed with decrypted key",
+        "missing_guard": "workspace-scoped credential lookup (workspaceId predicate / assertCredentialInWorkspace) and RBAC middleware on the upload + voices routes",
+        "sink": "Outbound API calls executed with the victim workspace's decrypted API key; API responses (assistant listings, uploaded file ids, voice lists) returned to the attacker",
+        "impact": "Cross-workspace credential access and use: any authenticated user can enumerate/use any credential id from another workspace - both data exposure (resource listings of the victim's OpenAI org) and financial/attribution abuse of stolen API keys (uploads, assistant ops). Unpermissioned multipart upload also let low-privilege/permissionless roles hit multer parsing."
+      },
+      "in_known_fix_list": false,
+      "subsystem": "server/controllers+services openai-assistants, text-to-speech",
+      "snapshot_applicability_guess": "vulnerable",
+      "snapshot_evidence": "snapshot services/openai-assistants/index.ts lines 18-20, 46-48, 87-89: findOneBy({ id: credentialId }) only; routes/openai-assistants-files/index.ts and routes/text-to-speech/index.ts contain no checkAnyPermission; controllers pass only req.query.credential",
+      "pre_snapshot": false
+    },
+    {
+      "commit_sha": "269a493712aee231889795cd29ddf8060f4c2283",
+      "short": "269a4937",
+      "date": "2026-08-07T10:37:00+05:30",
+      "title": "fix: upsert history permissions (#6680)",
+      "files_touched": [
+        "packages/server/src/controllers/upsert-history/index.ts",
+        "packages/server/src/routes/upsert-history/index.ts",
+        "packages/server/src/services/upsert-history/index.ts",
+        "packages/ui/src/menu-items/settings.js",
+        "packages/ui/src/views/vectorstore/UpsertHistoryDialog.jsx"
+      ],
+      "security_relevance": "GET and PATCH /api/v1/upsert-history had no RBAC middleware; fix adds checkAnyPermission('chatflows:view,documentStores:view') to GET and checkAnyPermission('chatflows:update,documentStores:upsert-config') to PATCH. (GET already enforced workspace scoping via getChatflowById; PATCH already called assertChatflowIdsInWorkspace - the fix additionally recognizes document-store ids as valid resources and keeps the workspace predicate.)",
+      "recovered": {
+        "source": "Authenticated HTTP: GET /api/v1/upsert-history?chatflowid=..., PATCH /api/v1/upsert-history { ids: [...] }",
+        "propagation": "route (no permission middleware) -> upsertHistoryController -> upsertHistoryService (workspace-scoped queries)",
+        "missing_guard": "checkAnyPermission RBAC middleware on both routes",
+        "sink": "UpsertHistory read (document names, paths, statuses, uploader info) and delete",
+        "impact": "RBAC bypass: roles without chatflows/documentStores permissions can read and delete upsert-history records within the workspace (audit-trail deletion, information disclosure about ingested documents). Lower severity than cross-workspace issues since workspace scoping existed."
+      },
+      "in_known_fix_list": false,
+      "subsystem": "server/routes/upsert-history",
+      "snapshot_applicability_guess": "vulnerable",
+      "snapshot_evidence": "snapshot routes/upsert-history/index.ts lines 8/11: router.get / router.patch bind controller directly, no checkAnyPermission import",
+      "pre_snapshot": false
+    },
+    {
+      "commit_sha": "754f3d4747337ec27458a7848e0aa372581d7641",
+      "short": "754f3d47",
+      "date": "2026-07-31T14:01:46+05:30",
+      "title": "fix: flowise-708 (#6679)",
+      "files_touched": [
+        "packages/server/src/enterprise/services/user.service.ts",
+        "packages/server/src/enterprise/sso/SSOBase.ts",
+        "packages/server/src/enterprise/sso/SSOBase.test.ts"
+      ],
+      "security_relevance": "SSOBase login handler: when a user found by email had status INVITED, the old code silently completed the invitation - it built a user object with status ACTIVE and called accountService.register(data), activating the account. Fix replaces this with a 403 USER_INVITED_PENDING_ACTIVATION. Commit comment states the rationale: invitation completion proves control of the emailed tempToken; an SSO login only proves the IdP's email assertion, which is not equivalent proof.",
+      "recovered": {
+        "source": "SSO login callback for an email that matches a user row with status=INVITED (email asserted by the identity provider; attacker-controlled if attacker has an IdP identity with the victim's email, or a second/misconfigured tenant IdP)",
+        "propagation": "userService.readUserByEmail(email) -> user.status === INVITED -> accountService.register({ user: { ...user, email, status: ACTIVE, credential: undefined } }) -> user = newAccount.user",
+        "missing_guard": "Proof-of-email-control requirement for invitation activation (tempToken link); SSO assertion was treated as equivalent",
+        "sink": "Account activation followed by normal session/JWT issuance for the (now ACTIVE) invited user",
+        "impact": "Authentication bypass / account pre-hijack: an attacker who can make an SSO IdP assert a victim's invited email activates that account and inherits the invited workspace/organization membership and role without ever controlling the invited mailbox."
+      },
+      "in_known_fix_list": false,
+      "subsystem": "server/enterprise/sso",
+      "snapshot_applicability_guess": "vulnerable",
+      "snapshot_evidence": "snapshot SSOBase.ts lines 81-92: if (user.status === UserStatus.INVITED) { ... const newAccount = await accountService.register(data); user = newAccount.user } - auto-activation present",
+      "pre_snapshot": false
+    },
+    {
+      "commit_sha": "4b805e051f7b952bda3b2407d4ac334f518ff460",
+      "short": "4b805e05",
+      "date": "2026-08-07T11:24:29+05:30",
+      "title": "fix: flowise-707 (#6712)",
+      "files_touched": [
+        "packages/server/src/enterprise/sso/SSOBase.ts",
+        "packages/server/src/enterprise/services/user.service.ts",
+        "packages/server/src/enterprise/database/entities/user.entity.ts",
+        "packages/server/src/database/migrations/{sqlite,mysql,mariadb,postgres}/1780000000000-AddSSOIdentityBinding.ts (and migration indexes)",
+        "packages/server/src/enterprise/sso/SSOBase.test.ts",
+        "packages/ui/src/routes/MainRoutes.jsx"
+      ],
+      "security_relevance": "Introduces SSO identity binding: User gains ssoProvider/ssoSubjectId columns; on SSO login, if both are set and (provider, subjectId) does not match, login is rejected with SSO_IDENTITY_MISMATCH (404-family audit LoginActivityCode.INVALID_LOGIN_MODE recorded); on first SSO login the pair is bound via userService.bindSSOIdentity. Missing provider profile.id is rejected. Before this, SSO account matching was purely by email.",
+      "recovered": {
+        "source": "Email assertion from any configured SSO identity provider (profile.email) plus provider name; multi-IdP or tenant-admin-configurable SSO makes the asserted email attacker-influenced",
+        "propagation": "userService.readUserByEmail(email) returns the victim's local/other-provider account; no binding check existed, so the SSO subject is accepted as that user",
+        "missing_guard": "Binding of an account to its provenance (ssoProvider, ssoSubjectId) and mismatch rejection; equivalently: trust that IdP-asserted email == account ownership",
+        "sink": "Session/JWT issuance for the matched existing user (full account takeover of login)",
+        "impact": "Email-collision SSO account takeover: an attacker controlling an IdP identity that asserts a victim's email (second IdP, self-registered OIDC, tenant admin adds rogue IdP, or IdP without verified-email enforcement) logs in AS the victim, inheriting all workspaces/roles of that account."
+      },
+      "in_known_fix_list": false,
+      "subsystem": "server/enterprise/sso",
+      "snapshot_applicability_guess": "vulnerable",
+      "snapshot_evidence": "snapshot user.entity.ts has no ssoProvider/ssoSubjectId columns; SSOBase.ts matches user solely via readUserByEmail (line 56); no bindSSOIdentity/mismatch branch exists",
+      "pre_snapshot": false
+    },
+    {
+      "commit_sha": "e816d26a7d35bf91a78a9e1562bee3caca5ff817",
+      "short": "e816d26a",
+      "date": "2026-07-24T08:43:26+08:00",
+      "title": "Fix Flowise-552 Add Allow List Execution Path (#6658)",
+      "files_touched": [
+        "packages/components/nodes/tools/MCP/core.ts",
+        "packages/components/nodes/tools/MCP/core.test.ts",
+        "packages/server/src/commands/base.ts",
+        "docker/.env.example", "docker/docker-compose.yml", "docker/docker-compose-queue-prebuilt.yml", "docker/worker/.env.example", "docker/worker/docker-compose.yml", "packages/server/.env.example"
+      ],
+      "security_relevance": "Replaces validateArgsForLocalFileAccess blocklist (regex dangerousPatterns: absolute-path prefixes, ../, ~/, file://, dangerous extensions, --file-family flags, null bytes, length cap) with a default-deny allowlist: args[0] (script path) must be an exact member of CUSTOM_MCP_ALLOWED_ABSOLUTE_SCRIPT_PATHS (comma-separated operator env var); empty/unset = execution disabled entirely. Blocklist approach was bypassable in principle (relative script paths not matching any pattern, extension-less interpreters/scripts, pattern-blind encodings).",
+      "recovered": {
+        "source": "MCP server config args array in chatflow node data (user-controlled via Flowise UI/API): serverParams.args -> validateArgsForLocalFileAccess(serverParams.args)",
+        "propagation": "chatflow save/execute -> CustomMCP/Supergateway stdio transport -> spawn(command, args) where command gated by CUSTOM_MCP_ALLOWED_COMMANDS (f5d16835) but args were only blocklist-filtered",
+        "missing_guard": "Allowlist on the executed script path (default-deny); blocklist regexes were the only filter",
+        "sink": "stdio child process spawn of the attacker-influenced script path with remaining args",
+        "impact": "Local file/script execution as the Flowise server process (RCE-adjacent) via blocklist bypass in stdio custom MCP args, when custom MCP stdio is enabled and security checks are not disabled."
+      },
+      "in_known_fix_list": false,
+      "subsystem": "components/nodes/tools/MCP",
+      "snapshot_applicability_guess": "vulnerable",
+      "snapshot_evidence": "snapshot MCP/core.ts lines 181-215 implements the OLD blocklist validateArgsForLocalFileAccess (dangerousPatterns); CUSTOM_MCP_ALLOWED_ABSOLUTE_SCRIPT_PATHS and CUSTOM_MCP_ALLOWED_COMMANDS do not exist in snapshot code; note this is a hardening follow-up to known f5d16835 (same family, distinct commit)",
+      "pre_snapshot": false
+    },
+    {
+      "commit_sha": "9d3059fdc0280e804f65757e2a30eb4d06eef033",
+      "short": "9d3059fd",
+      "date": "2026-07-22T12:04:20+08:00",
+      "title": "Fix Flowise 849 SSO And Role (#6634)",
+      "files_touched": [
+        "packages/server/src/enterprise/controllers/login-method.controller.ts",
+        "packages/server/src/enterprise/services/role.service.ts"
+      ],
+      "security_relevance": "LoginMethodController.testConfig previously performed no platform assertion and no organization match: fix prepends assertEnterprisePlatform() (403 on CLOUD/OPEN_SOURCE) and assertQueryOrganizationMatchesActiveOrg(user, req.body.organizationId). RoleService.updateRole gains an explicit organizationId mismatch rejection (404) in addition to the existing silent coercion newRole.organizationId = oldRole.organizationId.",
+      "recovered": {
+        "source": "POST /api/v1/login-methods/test body: { providers: [{config}], providerName, organizationId } (org admin with sso:manage); role update body organizationId",
+        "propagation": "login-method route (checkPermission('sso:manage') only) -> testConfig used req.body.organizationId / provider configs with no cross-check against the caller's active organization; role.service accepted newRole.organizationId differing from the stored role's org (silently coerced at save, so the org-move itself was neutralized; the mismatch now 404s)",
+        "missing_guard": "assertQueryOrganizationMatchesActiveOrg (cross-org confusion: org-A admin targeting org-B organizationId) and assertEnterprisePlatform (endpoint reachable on OSS/CLOUD platform types where enterprise SSO admin must not operate)",
+        "sink": "SSO provider config test (outbound requests driven by req.body provider config, e.g. OIDC discovery/token endpoints); role persistence",
+        "impact": "Cross-organization admin action: an organization admin could exercise SSO config testing under another organization's id (tenant confusion, outbound request primitive with attacker-influenced endpoints); on non-enterprise platform types the enterprise test endpoint was invocable. Role org-change portion was already coerced pre-fix (defense-in-depth only)."
+      },
+      "in_known_fix_list": false,
+      "subsystem": "server/enterprise (login-method controller, role service)",
+      "snapshot_applicability_guess": "vulnerable",
+      "snapshot_evidence": "snapshot login-method.controller.ts testConfig (line 162) starts directly with providers parsing - no assertEnterprisePlatform/assertQueryOrganizationMatchesActiveOrg calls (helpers exist in snapshot and are used by workspace/organization-user controllers); role.service.ts line 128 shows coercion-only handling",
+      "pre_snapshot": false
+    }
+  ],
+  "pre_snapshot_fixes": [
+    { "commit_sha": "b7a2005f", "date": "2026-05-19", "title": "fix: access to invited workspace (#6360)", "family": "authz/invite" },
+    { "commit_sha": "da8b251a", "date": "2026-04-28", "title": "Fix FLOWISE 566 OAuth2 (#6276)", "family": "auth/oauth" },
+    { "commit_sha": "b17dabbb", "date": "2026-04-27", "title": "Fix FLOWISE-319 Sanitize User (#6269)", "family": "sanitize/user-enumeration" },
+    { "commit_sha": "3d759771", "date": "2026-04-23", "title": "feat: implement the custom MCP Server in tool (#6205)", "family": "mcp (feature; security hardening followed)" },
+    { "commit_sha": "1e21e61d", "date": "2026-04-21", "title": "fix(server): preserve custom iframe allowlists in frame headers (#6232)", "family": "header/iframe allowlist" },
+    { "commit_sha": "42b9157f", "date": "2026-04-17", "title": "fix(mcp): guard malformed form option metadata in chatflow MCP schema generation (#6233)", "family": "mcp input validation" },
+    { "commit_sha": "0e528779", "date": "2026-04-13", "title": "Bugfix/Silent fallback to vm2 for sandbox execution (#6206)", "family": "sandbox escape (vm2 fallback)" },
+    { "commit_sha": "fd48519f", "date": "2026-04-10", "title": "fix: remove basic auth (#5680)", "family": "auth removal" },
+    { "commit_sha": "cb1e1e33", "date": "2026-04-03", "title": "fix: better errors for sso login (#6113)", "family": "sso errors" },
+    { "commit_sha": "b93ccf31", "date": "2026-04-01", "title": "Add Permission Checks to Vector Store API's (#6045)", "family": "rbac missing-check" },
+    { "commit_sha": "6d668fbb", "date": "2026-04-01", "title": "feat: email change confirmation flow (#5992)", "family": "auth/email verification" },
+    { "commit_sha": "6f325b0c", "date": "2026-03-24", "title": "Support CORS credentials (cookies) via env var (#6029)", "family": "cors" },
+    { "commit_sha": "f7d86912", "date": "2026-03-24", "title": "Fix Chatflow Query to Protect Against Cross-Workspace Chatflow Disclosure (#6043)", "family": "cross-workspace idor" },
+    { "commit_sha": "97b96f60", "date": "2026-03-24", "title": "Fix Credential Data Leak (#6042)", "family": "credential disclosure" },
+    { "commit_sha": "7176dcb4", "date": "2026-03-23", "title": "Additional Improvements to MCP Server Config security (#5943)", "family": "mcp config security" },
+    { "commit_sha": "d2acf4ce", "date": "2026-03-23", "title": "Hardcoded CORS wildcard on TTS endpoint enables cross-origin credential abuse (#5901)", "family": "cors credential abuse" },
+    { "commit_sha": "aff06479", "date": "2026-03-16", "title": "Control Path Traversal Protections via Env Var (#5962)", "family": "path traversal" },
+    { "commit_sha": "8799c7a3", "date": "2026-03-11", "title": "Sanitize flowData in getSinglePublicChatflow (#5938)", "family": "xss/public endpoint sanitize" },
+    { "commit_sha": "9a772b61", "date": "2026-03-09", "title": "Bugfix/TTS Invalid WorkspaceId (#5917)", "family": "workspace scoping" },
+    { "commit_sha": "219b0400", "date": "2026-03-02", "title": "fix: Control default deny list via an env var (#5862)", "family": "ssrf deny list" },
+    { "commit_sha": "6a63dbbf", "date": "2026-02-26", "title": "Add protections for loop-bound injections (#5849)", "family": "prompt/loop injection" },
+    { "commit_sha": "6010a97d", "date": "2026-02-26", "title": "Potential fix for code scanning alert no. 84: Unvalidated dynamic method call (#5746)", "family": "dynamic method call" },
+    { "commit_sha": "ec767b19", "date": "2026-02-26", "title": "fix: validate mime type list when updating chatflow configuration (#5768)", "family": "input validation" },
+    { "commit_sha": "b44affdf", "date": "2026-02-25", "title": "Validate filepaths in file utilities (#5842)", "family": "path traversal" },
+    { "commit_sha": "03c853cb", "date": "2026-02-24", "title": "Add Permissions Check to generate-tool-desc Route (#5837)", "family": "rbac missing-check" },
+    { "commit_sha": "0140ba4a", "date": "2026-02-24", "title": "Validations against path traversal (#5729)", "family": "path traversal" },
+    { "commit_sha": "b4665df8", "date": "2026-02-24", "title": "Validate flags used in MCP server config commands (#5741)", "family": "mcp command flags" },
+    { "commit_sha": "0c8236ac", "date": "2026-02-24", "title": "Sanitize Code Ran in Pyodide in CSVAgent (#5836)", "family": "sandbox code sanitize" },
+    { "commit_sha": "8c2b2ffe", "date": "2026-02-24", "title": "Always include default deny list in deny list values (#5708)", "family": "ssrf deny list" },
+    { "commit_sha": "3201257a", "date": "2026-02-20", "title": "fix: default mcp tool desc to tool name (#5802)", "family": "mcp tool description" },
+    { "commit_sha": "d63a814c", "date": "2026-02-17", "title": "Create basic guardrails for GraphCypherQAChain (#5748)", "family": "injection guardrails" },
+    { "commit_sha": "c8282c97", "date": "2026-02-06", "title": "Fix Paramater Override Bypass (#5667)", "family": "parameter override bypass" },
+    { "commit_sha": "a24acac5", "date": "2026-02-06", "title": "Sanitize Code Ran in Pyodide (#5701)", "family": "sandbox code sanitize" },
+    { "commit_sha": "efffd12f", "date": "2026-02-05", "title": "Create default HTTP_DENY_LIST (#5702)", "family": "ssrf deny list" },
+    { "commit_sha": "69fb14e6", "date": "2026-01-21", "title": "fix: route ordering in auth routes (#5661)", "family": "auth route ordering" },
+    { "commit_sha": "e135b294", "date": "2026-01-16", "title": "Feature/Add Permissions To API Keys (#5590)", "family": "rbac/api keys" }
+  ],
+  "pre_snapshot_note": "These fixes landed before the flowise@3.1.3 snapshot, so the snapshot already contains them (expected fixed/not_present in GT). They are recorded to map historical vulnerability families only: cross-workspace IDOR (f7d86912), credential disclosure (97b96f60), missing RBAC on specific routes (b93ccf31, 03c853cb, e135b294), SSRF deny-list family (efffd12f, 8c2b2ffe, 219b0400), path traversal family (0140ba4a, b44affdf, aff06479), MCP config security family (7176dcb4, b4665df8), sandbox/code-sanitize family (a24acac5, 0c8236ac, 0e528779), CORS/credential abuse (d2acf4ce, 6f325b0c), email-change verification (6d668fbb), invited-workspace access (b7a2005f).",
+  "known_unresolved_status": {
+    "CUSTOM_MCP_SECURITY_CHECK_bypass": {
+      "status_on_origin_main": "still present",
+      "detail": "Opt-out toggle unchanged on origin/main: CustomMCP.ts line 176 and SupergatewayMCP.ts line 109 still gate validation with `if (process.env.CUSTOM_MCP_SECURITY_CHECK !== 'false')`. What changed is the gated validation itself: origin/main validateMCPServerConfig is now default-deny allowlist-based (CUSTOM_MCP_ALLOWED_COMMANDS for the command, CUSTOM_MCP_ALLOWED_ABSOLUTE_SCRIPT_PATHS for args[0], cwd rejected outright, env vars allowlisted) per f5d16835 + e816d26a. So the bypass requires an operator to explicitly set CUSTOM_MCP_SECURITY_CHECK=false, after which all validation (allowlists included) is skipped.",
+      "snapshot_state": "snapshot has the same toggle wrapping the weaker blocklist-era validation; snapshot grep: CustomMCP.ts:176, SupergatewayMCP.ts:109, commands/base.ts:108"
+    },
+    "NodeVM_dependency_escape_KU02": {
+      "status_on_origin_main": "partially addressed",
+      "detail": "origin/main availableDependencies in packages/components/src/utils.ts contains 60 entries and NO puppeteer or playwright; f20d0941 added explicit warning comments (launch() forwards executablePath/args into child_process.spawn -> sandbox escape; file:// navigation -> arbitrary host file read) and removed them from the commented TOOL_FUNCTION_EXTERNAL_DEP example in all .env.example files. The operator extension mechanism itself (TOOL_FUNCTION_EXTERNAL_DEP / ALLOW_BUILTIN_DEP) is unchanged by design: an operator can still allowlist arbitrary modules, which reintroduces the escape.",
+      "snapshot_state": "puppeteer/playwright not present in snapshot availableDependencies either; KU02 concerns the mechanism (operator-extendable NodeVM dependency list), which is unchanged in both"
+    },
+    "MCP_tool_description_confusion_KU01": {
+      "status_on_origin_main": "addressed on main",
+      "detail": "origin/main MCP/core.ts get_tools() now runs every tool through sanitizeMCPToolName and sanitizeMCPToolDescription (with getMCPToolNameMaxLength/getMCPToolDescriptionMaxLength caps) before exposing it to the LLM; snapshot core.ts has no such sanitizers (grep empty). Fix belongs to the known post-snapshot set (5ecc3c5c family).",
+      "snapshot_state": "vulnerable in snapshot (no sanitization of MCP tool name/description)"
+    },
+    "GHSA_pprx_patch_semantic_conflict_U01": {
+      "status_on_origin_main": "not re-verified in this pass",
+      "detail": "Out of scope for this mining run; would require dependency-level diff of pnpm-lock between snapshot and main plus semantic comparison of the patched function. fe285d0b (post-snapshot) bumps package.json/pnpm-lock only."
+    }
+  }
+}

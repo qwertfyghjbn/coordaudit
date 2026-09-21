@@ -1,0 +1,1381 @@
+{
+ "schema_version": "repository-v1.1-ground-truth-DRAFT",
+ "case_id": "flowise_3_1_3_repository_v1",
+ "target_tree_sha256": "c612819a833fc8ab3c58fe5085fb80fc0a6c4cb1d86cbb8ed41b0b431e4a1638",
+ "version": "v1.1-draft-1 (proposal; NOT frozen, NOT mounted)",
+ "roots": [
+  {
+   "id": "R01_enterprise_active_org_binding",
+   "categories": [
+    "authorization",
+    "access_control"
+   ],
+   "guard_kinds": [
+    "missing",
+    "incorrect"
+   ],
+   "affected_object_terms": [
+    "workspace",
+    "organization",
+    "membership",
+    "role"
+   ],
+   "reasoning_terms": [
+    "organization",
+    "tenant",
+    "activeorganizationid"
+   ],
+   "anchors": [
+    {
+     "file": "packages/server/src/enterprise/controllers/workspace.controller.ts",
+     "function": "WorkspaceController.delete",
+     "excerpt": "deleteWorkspaceById(queryRunner, workspaceId)",
+     "excerpt_sha256": "db5d8a5a29d4e3640c1368dfabdac153df65b60c6c4559cc6bffab4113043cb8"
+    }
+   ],
+   "variants": [
+    {
+     "id": "enterprise_org_user_update",
+     "anchor": {
+      "file": "packages/server/src/enterprise/controllers/organization-user.controller.ts",
+      "function": "OrganizationUserController.update",
+      "excerpt": "updateOrganizationUser(req.body)",
+      "excerpt_sha256": "c68727a44395c13aa36984f0736164d4abdba7af320663b5d4dd366c82fb91b6"
+     }
+    }
+   ],
+   "equivalent_anchors_v1_1": [
+    {
+     "id": "EA_R01_org_read",
+     "file": "packages/server/src/enterprise/controllers/organization.controller.ts",
+     "function": "OrganizationController.read",
+     "excerpt": "readOrganizationById(query.id, queryRunner)",
+     "adjudication": "UC15",
+     "kind": "read"
+    },
+    {
+     "id": "EA_R01_org_update",
+     "file": "packages/server/src/enterprise/controllers/organization.controller.ts",
+     "function": "OrganizationController.update",
+     "excerpt": "organizationService.updateOrganization(req.body)",
+     "adjudication": "UC16",
+     "kind": "mutation"
+    },
+    {
+     "id": "EA_R01_org_user_create_delete",
+     "file": "packages/server/src/enterprise/controllers/organization-user.controller.ts",
+     "function": "OrganizationUserController.create",
+     "excerpt": "organizationUserService.createOrganizationUser(req.body",
+     "adjudication": "UC17",
+     "kind": "mutation"
+    },
+    {
+     "id": "EA_R01_role_delete",
+     "file": "packages/server/src/enterprise/controllers/role.controller.ts",
+     "function": "RoleController.delete",
+     "excerpt": "roleService.deleteRole(query.organizationId",
+     "adjudication": "UC18",
+     "kind": "mutation"
+    },
+    {
+     "id": "EA_R01_workspace_user",
+     "file": "packages/server/src/enterprise/controllers/workspace-user.controller.ts",
+     "function": "WorkspaceUserController.create",
+     "excerpt": "workspaceUserService.createWorkspaceUser(req.body",
+     "adjudication": "UC20",
+     "kind": "mutation"
+    },
+    {
+     "id": "EA_R01_login_method_test_config",
+     "file": "packages/server/src/enterprise/controllers/login-method.controller.ts",
+     "function": "LoginMethodController.testConfig",
+     "excerpt": "getConfigWithSecrets(organizationId",
+     "adjudication": "UC14",
+     "kind": "cross-org-config-use"
+    }
+   ],
+   "semantic_invariant": "an enterprise object access (read and mutation) binds to the caller active organization unless an explicit share/membership relation exists",
+   "invariant_change_note": "v1 invariant “an enterprise mutation may only address objects in the caller active organization” extended to read+mutation access; anchors unchanged, additions only"
+  },
+  {
+   "id": "R02_org_user_password_serialization",
+   "categories": [
+    "information_disclosure"
+   ],
+   "guard_kinds": [
+    "missing"
+   ],
+   "affected_object_terms": [
+    "password",
+    "hash",
+    "credential",
+    "secret"
+   ],
+   "reasoning_terms": [
+    "serialize",
+    "sanitize",
+    "response"
+   ],
+   "anchors": [
+    {
+     "file": "packages/server/src/enterprise/services/organization-user.service.ts",
+     "function": "OrganizationUserService.getAllOrganizationUsers",
+     "excerpt": "user.user = userDetails",
+     "excerpt_sha256": "a1511ee5eb2a769bb9ce4b5b0d58bdfbd63329e5593a5fb070d9e4ef7b135abe"
+    }
+   ],
+   "variants": []
+  },
+  {
+   "id": "R03_chat_message_route_permission",
+   "categories": [
+    "authorization",
+    "access_control"
+   ],
+   "guard_kinds": [
+    "missing"
+   ],
+   "affected_object_terms": [
+    "chat",
+    "message",
+    "history"
+   ],
+   "reasoning_terms": [
+    "permission",
+    "route",
+    "middleware"
+   ],
+   "anchors": [
+    {
+     "file": "packages/server/src/routes/chat-messages/index.ts",
+     "function": "router.get/router.delete",
+     "excerpt": "chatMessageController.getAllChatMessages",
+     "excerpt_sha256": "ba4367cdfbca4ae32df8579892c67bbef59479e11d745ff33cb33068b66c9b9b"
+    }
+   ],
+   "variants": []
+  },
+  {
+   "id": "R04_generic_credential_lookup_scope",
+   "categories": [
+    "authorization",
+    "access_control"
+   ],
+   "guard_kinds": [
+    "missing"
+   ],
+   "affected_object_terms": [
+    "credential"
+   ],
+   "reasoning_terms": [
+    "workspace",
+    "scope",
+    "shared"
+   ],
+   "anchors": [
+    {
+     "file": "packages/components/src/utils.ts",
+     "function": "getCredentialData",
+     "excerpt": "id: selectedCredentialId",
+     "excerpt_sha256": "d13cc64c6323cbdeaca5e9dca5b3db3f896ee00c5ba6795b5ecad90d67decf44"
+    }
+   ],
+   "variants": [],
+   "equivalent_anchors_v1_1": [
+    {
+     "id": "EA_R04_tts_body_credential",
+     "file": "packages/server/src/controllers/text-to-speech/index.ts",
+     "function": "generateTextToSpeech",
+     "excerpt": "credentialId",
+     "adjudication": "UC03",
+     "kind": "unauth body credential id into getCredentialData"
+    }
+   ]
+  },
+  {
+   "id": "R05_openai_assistant_credential_lookup_scope",
+   "categories": [
+    "authorization",
+    "access_control"
+   ],
+   "guard_kinds": [
+    "missing"
+   ],
+   "affected_object_terms": [
+    "credential"
+   ],
+   "reasoning_terms": [
+    "workspace",
+    "scope",
+    "assistant"
+   ],
+   "anchors": [
+    {
+     "file": "packages/server/src/services/openai-assistants/index.ts",
+     "function": "getAll/getSingle/upload",
+     "excerpt": "id: credentialId",
+     "excerpt_sha256": "e0b67eb47285c6f2af0bd4798fbbd135a223c99cb867be79a31bbac277c170f9"
+    }
+   ],
+   "variants": []
+  },
+  {
+   "id": "R06_assistant_delete_credential_lookup_scope",
+   "categories": [
+    "authorization",
+    "access_control"
+   ],
+   "guard_kinds": [
+    "missing"
+   ],
+   "affected_object_terms": [
+    "credential"
+   ],
+   "reasoning_terms": [
+    "workspace",
+    "scope",
+    "assistant"
+   ],
+   "anchors": [
+    {
+     "file": "packages/server/src/services/assistants/index.ts",
+     "function": "deleteAssistant",
+     "excerpt": "id: assistant.credential",
+     "excerpt_sha256": "7a8cef0f73dd4b6cba215e216c7621915239bcd5f091fa984acdb53e627bc705"
+    }
+   ],
+   "variants": []
+  },
+  {
+   "id": "R07_sso_invited_token_proof",
+   "categories": [
+    "authentication",
+    "authorization"
+   ],
+   "guard_kinds": [
+    "missing",
+    "incorrect"
+   ],
+   "affected_object_terms": [
+    "invite",
+    "invited",
+    "account"
+   ],
+   "reasoning_terms": [
+    "token",
+    "invitation",
+    "proof"
+   ],
+   "anchors": [
+    {
+     "file": "packages/server/src/enterprise/sso/SSOBase.ts",
+     "function": "SSOBase.getUser",
+     "excerpt": "if (user.status === UserStatus.INVITED)",
+     "excerpt_sha256": "38f00a3b745f0a99b65a63fe38b255e48b938e74280864106e15df046922ecce"
+    }
+   ],
+   "variants": [],
+   "equivalent_anchors_v1_1": [
+    {
+     "id": "EA_R07_verify_and_login",
+     "file": "packages/server/src/enterprise/sso/SSOBase.ts",
+     "function": "verifyAndLogin",
+     "excerpt": "if (user.status === UserStatus.INVITED)",
+     "adjudication": "UC13/GTD-01",
+     "kind": "anchor-repair"
+    }
+   ],
+   "anchor_repair_note": "v1 anchor function label \"SSOBase.getUser\" does not exist in the snapshot; the excerpt lives in verifyAndLogin (SSOBase.ts:38). v1.1 adds the real symbol plus strategy entry points as accepted equivalent anchors."
+  },
+  {
+   "id": "R08_sso_email_only_identity",
+   "categories": [
+    "authentication",
+    "authorization"
+   ],
+   "guard_kinds": [
+    "missing",
+    "incorrect"
+   ],
+   "affected_object_terms": [
+    "account",
+    "identity",
+    "user"
+   ],
+   "reasoning_terms": [
+    "issuer",
+    "subject",
+    "email"
+   ],
+   "anchors": [
+    {
+     "file": "packages/server/src/enterprise/sso/SSOBase.ts",
+     "function": "SSOBase.getUser",
+     "excerpt": "userService.readUserByEmail(email, queryRunner)",
+     "excerpt_sha256": "de13b701abdc5bb52aaba782258f464366acc7d7fb05beedafdc37514137aeeb"
+    }
+   ],
+   "variants": [],
+   "equivalent_anchors_v1_1": [
+    {
+     "id": "EA_R08_verify_and_login",
+     "file": "packages/server/src/enterprise/sso/SSOBase.ts",
+     "function": "verifyAndLogin",
+     "excerpt": "readUserByEmail(email, queryRunner)",
+     "adjudication": "UC13/GTD-01",
+     "kind": "anchor-repair"
+    },
+    {
+     "id": "EA_R08_github_unverified_fallback",
+     "file": "packages/server/src/enterprise/sso/GithubSSO.ts",
+     "function": "GithubSSO.setSSOConfig",
+     "excerpt": "primaryEmail = emails[0].email",
+     "adjudication": "UC12",
+     "kind": "equivalent source realization"
+    }
+   ],
+   "anchor_repair_note": "same function-name drift as R07"
+  },
+  {
+   "id": "R09_bullmq_dashboard_rbac",
+   "categories": [
+    "authorization",
+    "access_control"
+   ],
+   "guard_kinds": [
+    "missing"
+   ],
+   "affected_object_terms": [
+    "queue",
+    "job",
+    "dashboard"
+   ],
+   "reasoning_terms": [
+    "role",
+    "rbac",
+    "admin"
+   ],
+   "anchors": [
+    {
+     "file": "packages/server/src/index.ts",
+     "function": "App.init queue dashboard mount",
+     "excerpt": "this.app.use('/admin/queues', rateLimiter, verifyTokenForBullMQDashboard",
+     "excerpt_sha256": "7c2df839dbc872b931e86b72d80fe3f4e4e0fc34a71dc52622aaa6739ff425ee"
+    }
+   ],
+   "variants": []
+  },
+  {
+   "id": "R10_mcp_stdio_executable_policy",
+   "categories": [
+    "command_injection",
+    "misconfiguration"
+   ],
+   "guard_kinds": [
+    "unsafe_default",
+    "missing"
+   ],
+   "affected_object_terms": [
+    "command",
+    "executable",
+    "process"
+   ],
+   "reasoning_terms": [
+    "allowlist",
+    "operator",
+    "npx"
+   ],
+   "anchors": [
+    {
+     "file": "packages/components/nodes/tools/MCP/core.ts",
+     "function": "validateMCPServerConfig",
+     "excerpt": "const allowedCommands = ['node', 'npx', 'python', 'python3', 'docker']",
+     "excerpt_sha256": "f043beef9975e36f0542cbf4ab07a684c6d881e6939b3882dbf034e774ff3302"
+    }
+   ],
+   "variants": []
+  },
+  {
+   "id": "R11_mcp_cwd_policy",
+   "categories": [
+    "command_injection",
+    "path_traversal",
+    "misconfiguration"
+   ],
+   "guard_kinds": [
+    "missing"
+   ],
+   "affected_object_terms": [
+    "cwd",
+    "working directory",
+    "process"
+   ],
+   "reasoning_terms": [
+    "cwd",
+    "working directory",
+    "launch"
+   ],
+   "anchors": [
+    {
+     "file": "packages/components/nodes/tools/MCP/core.ts",
+     "function": "validateMCPServerConfig",
+     "excerpt": "export const validateMCPServerConfig = (serverParams: any)",
+     "excerpt_sha256": "69e01fafc6509e4bca4919e93b9ac4ffc5f2e026899cfa6a7735483cbd433223"
+    }
+   ],
+   "variants": []
+  },
+  {
+   "id": "R12_realtime_chatflow_workspace_scope",
+   "categories": [
+    "authorization",
+    "access_control"
+   ],
+   "guard_kinds": [
+    "missing"
+   ],
+   "affected_object_terms": [
+    "chatflow",
+    "tool"
+   ],
+   "reasoning_terms": [
+    "workspace",
+    "scope",
+    "realtime"
+   ],
+   "anchors": [
+    {
+     "file": "packages/server/src/services/openai-realtime/index.ts",
+     "function": "buildAndInitTool",
+     "excerpt": "id: chatflowid",
+     "excerpt_sha256": "b2276a116bd2b12f4ee1aec5ffb75558a3d602dd54358f4aaa1b2191452dcd1f"
+    }
+   ],
+   "variants": []
+  },
+  {
+   "id": "R13_sqlite_chain_write_capability",
+   "categories": [
+    "sql_injection",
+    "command_injection"
+   ],
+   "guard_kinds": [
+    "missing",
+    "incorrect"
+   ],
+   "affected_object_terms": [
+    "sqlite",
+    "database",
+    "sql"
+   ],
+   "reasoning_terms": [
+    "read-only",
+    "query",
+    "llm"
+   ],
+   "anchors": [
+    {
+     "file": "packages/components/nodes/chains/SqlDatabaseChain/SqlDatabaseChain.ts",
+     "function": "getSQLDBChain",
+     "excerpt": "SqlDatabase.fromDataSourceParams",
+     "excerpt_sha256": "82139f9998affa75f12af01dc2c982e2baa378b645b2dfb092ab6f531f1186b2"
+    }
+   ],
+   "variants": []
+  },
+  {
+   "id": "R14_chat_model_baseurl_egress_policy",
+   "categories": [
+    "ssrf"
+   ],
+   "guard_kinds": [
+    "missing"
+   ],
+   "affected_object_terms": [
+    "url",
+    "baseurl",
+    "base path"
+   ],
+   "reasoning_terms": [
+    "deny",
+    "egress",
+    "http"
+   ],
+   "anchors": [
+    {
+     "file": "packages/components/nodes/chatmodels/ChatLocalAI/ChatLocalAI.ts",
+     "function": "ChatLocalAI_ChatModels.init",
+     "excerpt": "obj.configuration = { baseURL: basePath }",
+     "excerpt_sha256": "1c5bb83be7a0c9192eb0e807d01b184a2c3bc1482b90c557986f9582bd5d8cc4"
+    }
+   ],
+   "variants": []
+  },
+  {
+   "id": "R15_upsert_history_route_scope",
+   "categories": [
+    "authorization",
+    "access_control"
+   ],
+   "guard_kinds": [
+    "missing"
+   ],
+   "affected_object_terms": [
+    "history",
+    "document",
+    "chatflow"
+   ],
+   "reasoning_terms": [
+    "permission",
+    "workspace",
+    "route"
+   ],
+   "anchors": [
+    {
+     "file": "packages/server/src/routes/upsert-history/index.ts",
+     "function": "router.get/router.patch",
+     "excerpt": "upsertHistoryController.getAllUpsertHistory",
+     "excerpt_sha256": "2fcde2e11e1e4513f9441544098ef9a6d8ed55ce8aa2ac3f94b495b1c789f893"
+    }
+   ],
+   "variants": []
+  },
+  {
+   "id": "R16_memory_session_id_type",
+   "categories": [
+    "access_control",
+    "other"
+   ],
+   "guard_kinds": [
+    "missing",
+    "incorrect"
+   ],
+   "affected_object_terms": [
+    "session",
+    "memory"
+   ],
+   "reasoning_terms": [
+    "string",
+    "type",
+    "query"
+   ],
+   "anchors": [
+    {
+     "file": "packages/server/src/utils/index.ts",
+     "function": "getMemorySessionId",
+     "excerpt": "return incomingInput.overrideConfig?.sessionId",
+     "excerpt_sha256": "92ac2edb84b060525d4d49d5354cb940373e0f73b5c82572df02ad1cb3b32164"
+    }
+   ],
+   "variants": []
+  },
+  {
+   "id": "R17_document_loader_egress_policy",
+   "categories": [
+    "ssrf"
+   ],
+   "guard_kinds": [
+    "missing"
+   ],
+   "affected_object_terms": [
+    "url",
+    "loader",
+    "request"
+   ],
+   "reasoning_terms": [
+    "deny",
+    "redirect",
+    "http"
+   ],
+   "anchors": [
+    {
+     "file": "packages/components/nodes/documentloaders/Playwright/Playwright.ts",
+     "function": "playwrightLoader",
+     "excerpt": "new PlaywrightWebBaseLoader(url, config)",
+     "excerpt_sha256": "59ef3f530275d880b5453522603d389ac2390ffcc7b39ab72dadcd2814d5658b"
+    }
+   ],
+   "variants": [],
+   "equivalent_anchors_v1_1": [
+    {
+     "id": "EA_R17_unstructured",
+     "file": "packages/components/nodes/documentloaders/Unstructured/Unstructured.ts",
+     "function": "unstructuredLoader",
+     "excerpt": "fetch(this.apiUrl",
+     "adjudication": "UC10",
+     "kind": "config-supplied egress URL without shared URL policy"
+    }
+   ]
+  },
+  {
+   "id": "R18_export_variable_secret",
+   "categories": [
+    "information_disclosure"
+   ],
+   "guard_kinds": [
+    "missing"
+   ],
+   "affected_object_terms": [
+    "variable",
+    "secret",
+    "value"
+   ],
+   "reasoning_terms": [
+    "export",
+    "plaintext",
+    "redact"
+   ],
+   "anchors": [
+    {
+     "file": "packages/server/src/services/export-import/index.ts",
+     "function": "exportData",
+     "excerpt": "Variable = 'data' in Variable ? Variable.data : Variable",
+     "excerpt_sha256": "53e2386cb1279b4f2e3f893504eeb7efd6ff1b85eb91b83115efb3bf755818f8"
+    }
+   ],
+   "variants": []
+  },
+  {
+   "id": "R19_tts_abort_cross_operation",
+   "categories": [
+    "access_control",
+    "other"
+   ],
+   "guard_kinds": [
+    "missing"
+   ],
+   "affected_object_terms": [
+    "abort",
+    "prediction",
+    "operation"
+   ],
+   "reasoning_terms": [
+    "owner",
+    "handle",
+    "chatflow"
+   ],
+   "anchors": [
+    {
+     "file": "packages/server/src/controllers/text-to-speech/index.ts",
+     "function": "abortTextToSpeech",
+     "excerpt": "appServer.abortControllerPool.abort(chatFlowAbortId)",
+     "excerpt_sha256": "472f92584b1279c21515fed1fa63e23e2ac914fb4e945ec68d1f5188963bcefb"
+    }
+   ],
+   "variants": []
+  },
+  {
+   "id": "R20_tts_private_flow_credential_use",
+   "categories": [
+    "authorization",
+    "access_control"
+   ],
+   "guard_kinds": [
+    "missing"
+   ],
+   "affected_object_terms": [
+    "chatflow",
+    "credential",
+    "tts"
+   ],
+   "reasoning_terms": [
+    "public",
+    "private",
+    "ispublic"
+   ],
+   "anchors": [
+    {
+     "file": "packages/server/src/controllers/text-to-speech/index.ts",
+     "function": "generateTextToSpeech",
+     "excerpt": "chatflow = await chatflowsService.getChatflowById(chatflowId)",
+     "excerpt_sha256": "618a423410a74b1022187153d69408feaa1673da80b8a758ff046fe5d2424303"
+    }
+   ],
+   "variants": [],
+   "equivalent_anchors_v1_1": [
+    {
+     "id": "EA_R20_prediction_ispublic",
+     "file": "packages/server/src/controllers/predictions/index.ts",
+     "function": "createPrediction",
+     "excerpt": "getChatflowById(id, undefined)",
+     "adjudication": "UC38",
+     "kind": "equivalent unauth capability realization"
+    }
+   ]
+  },
+  {
+   "id": "R21_oauth2_unauth_credential_mutation",
+   "title": "Unauthenticated OAuth2 credential endpoints resolve credentials by id alone and overwrite credential tokens",
+   "categories": [
+    "authorization",
+    "access_control"
+   ],
+   "guard_kinds": [
+    "missing"
+   ],
+   "affected_object_terms": [
+    "credential",
+    "oauth"
+   ],
+   "reasoning_terms": [
+    "whitelist",
+    "workspace",
+    "state",
+    "refresh"
+   ],
+   "anchors": [
+    {
+     "file": "packages/server/src/routes/oauth2/index.ts",
+     "function": "router.post /refresh/:credentialId",
+     "excerpt": "findOneBy({\n            id: credentialId\n        })"
+    },
+    {
+     "file": "packages/server/src/routes/oauth2/index.ts",
+     "function": "router.get /callback",
+     "excerpt": "findOneBy({\n            id: state as string\n        })"
+    }
+   ],
+   "variants": [],
+   "semantic_invariant": "whitelisted credential endpoints bind credential resolution and mutation to an authenticated owner/workspace context",
+   "chain": {
+    "source": "unauthenticated caller, path param credentialId or query state used directly as credential id",
+    "sink": "credentialRepository.update(credential.id, { encryptedData }) after decrypt + provider exchange",
+    "missing_guard": "no workspaceId predicate, no session/state nonce binding (contrast: /authorize in the same file resolves workspaceId + share check)",
+    "preconditions": "knowing/guessing target credential UUID; refresh needs stored refresh_token; callback needs a provider-accepted authorization code",
+    "expected_impact": "unauthenticated cross-tenant credential token overwrite (high); OAuth login-CSRF / conditional credential injection (medium-high)"
+   },
+   "subsystem": "server/routes (oauth2)",
+   "affected_versions": "present in flowise@3.1.3 snapshot (code-verified); no upstream fix identified within 09f099db..9291856d (2026-08-13)",
+   "snapshot_applicability": "vulnerable (verified by independent static adjudication 2026-09-21)",
+   "public_provenance": {
+    "advisory": null,
+    "family_advisories_with_ranges_excluding_3_1_3": [
+     "GHSA-r745-8hwv-h473 (<=3.1.2 declared; snapshot still id-only)",
+     "GHSA-qgvm-j2hm-6m38 (<=3.1.2 declared)"
+    ],
+    "fix_commit": null,
+    "derived_from": "historical agent runs (unmatched ledger); see artifacts/gt_audit/unmatched_candidate_ledger.json"
+   },
+   "provenance": {
+    "agent_run_derived": true,
+    "circularity_note": "root derived from historical run outputs; retrospective v1.1 scores of those runs are adjudication statements, not independent benchmark evidence"
+   },
+   "verification_status": "static chain verified with file:line evidence by independent condition-blind adjudication; targeted local validation optional (not required for TP)",
+   "severity_estimate": "high",
+   "confidence": "high"
+  },
+  {
+   "id": "R22_feedback_unauth_cross_flow_access",
+   "title": "Whitelisted feedback endpoints read and write feedback for any chatflow without public/private or ownership check",
+   "categories": [
+    "access_control",
+    "information_disclosure"
+   ],
+   "guard_kinds": [
+    "missing"
+   ],
+   "affected_object_terms": [
+    "feedback",
+    "chatflow"
+   ],
+   "reasoning_terms": [
+    "whitelist",
+    "public",
+    "chatflowid"
+   ],
+   "anchors": [
+    {
+     "file": "packages/server/src/controllers/feedback/index.ts",
+     "function": "getAllChatMessageFeedback",
+     "excerpt": "feedbackService.getAllChatMessageFeedback(chatflowid, chatId, sortOrder, startDate, endDate)"
+    }
+   ],
+   "variants": [],
+   "semantic_invariant": "public feedback collection only addresses explicitly public chatflows; feedback stores are per-flow scoped",
+   "chain": {
+    "source": "unauthenticated GET /api/v1/feedback/:chatflowid (whitelisted)",
+    "sink": "utilGetChatMessageFeedback(chatflowid, ...) returns rating + free-text content + chatId",
+    "missing_guard": "no isPublic check, no ownership, no workspace predicate on read or write",
+    "preconditions": "knowing the target chatflow UUID (unguessable without a leak path)",
+    "expected_impact": "private-flow user feedback content disclosure (medium); cross-flow feedback pollution via POST/PUT (low-medium)"
+   },
+   "subsystem": "server/routes + controllers (feedback)",
+   "affected_versions": "present in flowise@3.1.3 snapshot (code-verified); no upstream fix identified within 09f099db..9291856d (2026-08-13)",
+   "snapshot_applicability": "vulnerable (verified by independent static adjudication 2026-09-21)",
+   "public_provenance": {
+    "advisory": null,
+    "family_advisories_with_ranges_excluding_3_1_3": [],
+    "fix_commit": null,
+    "derived_from": "historical agent runs (unmatched ledger); see artifacts/gt_audit/unmatched_candidate_ledger.json"
+   },
+   "provenance": {
+    "agent_run_derived": true,
+    "circularity_note": "root derived from historical run outputs; retrospective v1.1 scores of those runs are adjudication statements, not independent benchmark evidence"
+   },
+   "verification_status": "static chain verified with file:line evidence by independent condition-blind adjudication; targeted local validation optional (not required for TP)",
+   "severity_estimate": "medium",
+   "confidence": "medium-high"
+  },
+  {
+   "id": "R23_get_upload_file_unauth_cross_tenant_read",
+   "title": "Whitelisted get-upload-file streams uploaded files for any chatflow/chatId without ownership or isPublic binding",
+   "categories": [
+    "access_control"
+   ],
+   "guard_kinds": [
+    "missing"
+   ],
+   "affected_object_terms": [
+    "file",
+    "upload",
+    "storage"
+   ],
+   "reasoning_terms": [
+    "whitelist",
+    "orgid",
+    "chatflowid"
+   ],
+   "anchors": [
+    {
+     "file": "packages/server/src/controllers/get-upload-file/index.ts",
+     "function": "streamUploadedFile",
+     "excerpt": "streamStorageFile(chatflowId, chatId, fileName, orgId)"
+    }
+   ],
+   "variants": [],
+   "semantic_invariant": "public file-download endpoints only address files of explicitly public flows or with a caller-bound capability",
+   "chain": {
+    "source": "unauthenticated GET /api/v1/get-upload-file (whitelisted) with chatflowId/chatId/fileName",
+    "sink": "streamStorageFile resolves storage path from the chatflow-derived orgId and streams file bytes",
+    "missing_guard": "UUID format checks + path-traversal guard only; no isPublic, no ownership, orgId derived from the requested chatflow itself",
+    "preconditions": "knowing chatflowId + chatId (+fileName); unguessable UUIDs unless leaked",
+    "expected_impact": "cross-tenant uploaded-file read (medium)"
+   },
+   "subsystem": "server/controllers (get-upload-file)",
+   "affected_versions": "present in flowise@3.1.3 snapshot (code-verified); no upstream fix identified within 09f099db..9291856d (2026-08-13)",
+   "snapshot_applicability": "vulnerable (verified by independent static adjudication 2026-09-21)",
+   "public_provenance": {
+    "advisory": null,
+    "family_advisories_with_ranges_excluding_3_1_3": [],
+    "fix_commit": null,
+    "derived_from": "historical agent runs (unmatched ledger); see artifacts/gt_audit/unmatched_candidate_ledger.json"
+   },
+   "provenance": {
+    "agent_run_derived": true,
+    "circularity_note": "root derived from historical run outputs; retrospective v1.1 scores of those runs are adjudication statements, not independent benchmark evidence"
+   },
+   "verification_status": "static chain verified with file:line evidence by independent condition-blind adjudication; targeted local validation optional (not required for TP)",
+   "severity_estimate": "medium",
+   "confidence": "high"
+  },
+  {
+   "id": "R24_dataset_rows_unscoped_delete",
+   "title": "Dataset row deletion resolves rows by id without workspace predicate despite route permission",
+   "categories": [
+    "authorization",
+    "access_control"
+   ],
+   "guard_kinds": [
+    "missing"
+   ],
+   "affected_object_terms": [
+    "dataset",
+    "rows"
+   ],
+   "reasoning_terms": [
+    "workspace",
+    "delete",
+    "predicate"
+   ],
+   "anchors": [
+    {
+     "file": "packages/server/src/services/dataset/index.ts",
+     "function": "DatasetService.patchDeleteRows",
+     "excerpt": "find({ where: { id: In(ids) } })"
+    }
+   ],
+   "variants": [],
+   "semantic_invariant": "dataset record mutations are scoped to the caller workspace in every service predicate",
+   "chain": {
+    "source": "authenticated caller with datasets:delete permission submits arbitrary row ids",
+    "sink": "delete(ids) after id-only find; sibling add/update/delete paths carry the workspace predicate",
+    "missing_guard": "service-level workspaceId passed in is used only for timestamp bookkeeping, not as a query predicate",
+    "preconditions": "valid datasets:delete permission; knowledge of target row ids",
+    "expected_impact": "cross-workspace dataset row deletion (medium)"
+   },
+   "subsystem": "server/services (dataset)",
+   "affected_versions": "present in flowise@3.1.3 snapshot (code-verified); no upstream fix identified within 09f099db..9291856d (2026-08-13)",
+   "snapshot_applicability": "vulnerable (verified by independent static adjudication 2026-09-21)",
+   "public_provenance": {
+    "advisory": null,
+    "family_advisories_with_ranges_excluding_3_1_3": [],
+    "fix_commit": null,
+    "derived_from": "historical agent runs (unmatched ledger); see artifacts/gt_audit/unmatched_candidate_ledger.json"
+   },
+   "provenance": {
+    "agent_run_derived": true,
+    "circularity_note": "root derived from historical run outputs; retrospective v1.1 scores of those runs are adjudication statements, not independent benchmark evidence"
+   },
+   "verification_status": "static chain verified with file:line evidence by independent condition-blind adjudication; targeted local validation optional (not required for TP)",
+   "severity_estimate": "medium",
+   "confidence": "high"
+  },
+  {
+   "id": "R25_user_create_zero_permission",
+   "title": "User creation endpoint requires no permission, enabling pre-squatting of invited identities",
+   "categories": [
+    "authorization",
+    "access_control"
+   ],
+   "guard_kinds": [
+    "missing"
+   ],
+   "affected_object_terms": [
+    "user",
+    "account"
+   ],
+   "reasoning_terms": [
+    "permission",
+    "create",
+    "status"
+   ],
+   "anchors": [
+    {
+     "file": "packages/server/src/enterprise/routes/user.route.ts",
+     "function": "router.post /",
+     "excerpt": "router.post('/', userController.create)"
+    },
+    {
+     "file": "packages/server/src/enterprise/controllers/user.controller.ts",
+     "function": "UserController.create",
+     "excerpt": "userService.createUser(req.body)"
+    }
+   ],
+   "variants": [],
+   "semantic_invariant": "principal-account creation requires an explicit user-management permission (contrast: organizationuser routes require users:manage)",
+   "chain": {
+    "source": "authenticated caller (any session, zero permissions) POSTs user fields including credential/status",
+    "sink": "createUser persists the account directly",
+    "missing_guard": "no checkPermission, no feature flag, no middleware; sibling read/update paths carry assert guards",
+    "preconditions": "authenticated session; victim email known for pre-squatting variants",
+    "expected_impact": "unauthorized account creation + invitation pre-squatting account-takeover vector (medium-high)"
+   },
+   "subsystem": "enterprise/routes (user)",
+   "affected_versions": "present in flowise@3.1.3 snapshot (code-verified); no upstream fix identified within 09f099db..9291856d (2026-08-13)",
+   "snapshot_applicability": "vulnerable (verified by independent static adjudication 2026-09-21)",
+   "public_provenance": {
+    "advisory": null,
+    "family_advisories_with_ranges_excluding_3_1_3": [
+     "GHSA-48m6-ch88-55mj (<=3.0.13 declared, registration mass-assignment family)",
+     "GHSA-59fh-9f3p-7m39 (<=3.1.1 declared, PUT /user mass assignment)"
+    ],
+    "fix_commit": null,
+    "derived_from": "historical agent runs (unmatched ledger); see artifacts/gt_audit/unmatched_candidate_ledger.json"
+   },
+   "provenance": {
+    "agent_run_derived": true,
+    "circularity_note": "root derived from historical run outputs; retrospective v1.1 scores of those runs are adjudication statements, not independent benchmark evidence"
+   },
+   "verification_status": "static chain verified with file:line evidence by independent condition-blind adjudication; targeted local validation optional (not required for TP)",
+   "severity_estimate": "medium-high",
+   "confidence": "high"
+  },
+  {
+   "id": "R26_apikey_raw_secret_exposure",
+   "title": "API key listing returns raw bearer key material to holders of a view-only permission",
+   "categories": [
+    "information_disclosure",
+    "authorization"
+   ],
+   "guard_kinds": [
+    "missing"
+   ],
+   "affected_object_terms": [
+    "apikey",
+    "key",
+    "secret"
+   ],
+   "reasoning_terms": [
+    "view",
+    "projection",
+    "plaintext"
+   ],
+   "anchors": [
+    {
+     "file": "packages/server/src/services/apikey/index.ts",
+     "function": "getAllApiKeys",
+     "excerpt": "createQueryBuilder"
+    }
+   ],
+   "variants": [],
+   "semantic_invariant": "secret-bearing list responses use least-privilege projections; raw bearer material is write-only after creation",
+   "chain": {
+    "source": "authenticated caller holding apikeys:view performs GET /api/v1/apikey",
+    "sink": "unprojected entity query returns apiKey (raw 32-byte base64url key) and apiSecret hash columns",
+    "missing_guard": "no column projection on the non-admin branch (admin branch getAllApiKeysByOrganization already projects safely)",
+    "preconditions": "apikeys:view permission",
+    "expected_impact": "persistent bearer credential disclosure to read-only roles (high)"
+   },
+   "subsystem": "server/services (apikey)",
+   "affected_versions": "present in flowise@3.1.3 snapshot (code-verified); no upstream fix identified within 09f099db..9291856d (2026-08-13)",
+   "snapshot_applicability": "vulnerable (verified by independent static adjudication 2026-09-21)",
+   "public_provenance": {
+    "advisory": null,
+    "family_advisories_with_ranges_excluding_3_1_3": [],
+    "fix_commit": null,
+    "derived_from": "historical agent runs (unmatched ledger); see artifacts/gt_audit/unmatched_candidate_ledger.json"
+   },
+   "provenance": {
+    "agent_run_derived": true,
+    "circularity_note": "root derived from historical run outputs; retrospective v1.1 scores of those runs are adjudication statements, not independent benchmark evidence"
+   },
+   "verification_status": "static chain verified with file:line evidence by independent condition-blind adjudication; targeted local validation optional (not required for TP)",
+   "severity_estimate": "high",
+   "confidence": "high"
+  },
+  {
+   "id": "R27_documentstore_upsert_zero_permission",
+   "title": "Document-store upsert/refresh routes lack the permission checks present on every sibling route",
+   "categories": [
+    "authorization",
+    "access_control"
+   ],
+   "guard_kinds": [
+    "missing"
+   ],
+   "affected_object_terms": [
+    "documentstore",
+    "upsert",
+    "document"
+   ],
+   "reasoning_terms": [
+    "permission",
+    "route",
+    "sibling"
+   ],
+   "anchors": [
+    {
+     "file": "packages/server/src/routes/documentstore/index.ts",
+     "function": "router.post /upsert /refresh",
+     "excerpt": "upsertDocStore"
+    }
+   ],
+   "variants": [],
+   "semantic_invariant": "document-store operational routes are permission-gated like their sibling routes",
+   "chain": {
+    "source": "authenticated zero-permission member or non-blacklisted API key",
+    "sink": "upsertDocStore resolves store by bare id and writes documents; refresh partially guards only the empty-items branch",
+    "missing_guard": "no checkPermission on upsert/refresh while every sibling route in the same file carries one",
+    "preconditions": "authenticated session/API key; store id knowledge for cross-workspace writes",
+    "expected_impact": "zero-permission document injection / RAG poisoning; cross-workspace writes with items (medium-high)"
+   },
+   "subsystem": "server/routes (documentstore)",
+   "affected_versions": "present in flowise@3.1.3 snapshot (code-verified); no upstream fix identified within 09f099db..9291856d (2026-08-13)",
+   "snapshot_applicability": "vulnerable (verified by independent static adjudication 2026-09-21)",
+   "public_provenance": {
+    "advisory": null,
+    "family_advisories_with_ranges_excluding_3_1_3": [],
+    "fix_commit": null,
+    "derived_from": "historical agent runs (unmatched ledger); see artifacts/gt_audit/unmatched_candidate_ledger.json"
+   },
+   "provenance": {
+    "agent_run_derived": true,
+    "circularity_note": "root derived from historical run outputs; retrospective v1.1 scores of those runs are adjudication statements, not independent benchmark evidence"
+   },
+   "verification_status": "static chain verified with file:line evidence by independent condition-blind adjudication; targeted local validation optional (not required for TP)",
+   "severity_estimate": "medium-high",
+   "confidence": "high"
+  },
+  {
+   "id": "R28_documentstore_query_unscoped",
+   "title": "Document-store vector query and config endpoints resolve stores by id without workspace predicate",
+   "categories": [
+    "authorization",
+    "access_control"
+   ],
+   "guard_kinds": [
+    "missing"
+   ],
+   "affected_object_terms": [
+    "documentstore",
+    "vector",
+    "store"
+   ],
+   "reasoning_terms": [
+    "workspace",
+    "scope",
+    "query"
+   ],
+   "anchors": [
+    {
+     "file": "packages/server/src/services/documentstore/index.ts",
+     "function": "queryVectorStore",
+     "excerpt": "findOneBy({ id: data.storeId })"
+    }
+   ],
+   "variants": [],
+   "semantic_invariant": "knowledge-base reads bind the store to the caller workspace (safe sibling getDocumentStoreById demonstrates the predicate)",
+   "chain": {
+    "source": "authenticated caller with documentStores:view submits an arbitrary storeId",
+    "sink": "vector retrieval over the resolved store content",
+    "missing_guard": "service resolves store by bare id; controller passes body through without workspaceId",
+    "preconditions": "documentStores:view permission; target store id",
+    "expected_impact": "cross-tenant knowledge-base content retrieval (high)"
+   },
+   "subsystem": "server/services (documentstore)",
+   "affected_versions": "present in flowise@3.1.3 snapshot (code-verified); no upstream fix identified within 09f099db..9291856d (2026-08-13)",
+   "snapshot_applicability": "vulnerable (verified by independent static adjudication 2026-09-21)",
+   "public_provenance": {
+    "advisory": null,
+    "family_advisories_with_ranges_excluding_3_1_3": [
+     "GHSA-hmg2-jjjx-jcp2 (<=3.1.1 declared, vector store no permission checks)"
+    ],
+    "fix_commit": null,
+    "derived_from": "historical agent runs (unmatched ledger); see artifacts/gt_audit/unmatched_candidate_ledger.json"
+   },
+   "provenance": {
+    "agent_run_derived": true,
+    "circularity_note": "root derived from historical run outputs; retrospective v1.1 scores of those runs are adjudication statements, not independent benchmark evidence"
+   },
+   "verification_status": "static chain verified with file:line evidence by independent condition-blind adjudication; targeted local validation optional (not required for TP)",
+   "severity_estimate": "high",
+   "confidence": "high"
+  },
+  {
+   "id": "R29_nvidia_nim_zero_permission_routes",
+   "title": "NVIDIA NIM container management routes require no permission and accept body-controlled image/host parameters",
+   "categories": [
+    "authorization",
+    "access_control",
+    "misconfiguration"
+   ],
+   "guard_kinds": [
+    "missing",
+    "unsafe_default"
+   ],
+   "affected_object_terms": [
+    "container",
+    "nim",
+    "image"
+   ],
+   "reasoning_terms": [
+    "permission",
+    "route",
+    "host"
+   ],
+   "anchors": [
+    {
+     "file": "packages/server/src/routes/nvidia-nim/index.ts",
+     "function": "router (9 routes)",
+     "excerpt": "startContainer"
+    }
+   ],
+   "variants": [],
+   "semantic_invariant": "host-level container lifecycle operations require an administrative permission gate",
+   "chain": {
+    "source": "authenticated session caller (API keys are blacklisted for these routes)",
+    "sink": "host docker pull/start with body-controlled imageTag/apiKey/hostPort",
+    "missing_guard": "no checkPermission on any of the 9 routes; body parameters flow unfiltered",
+    "preconditions": "authenticated session; deployment with docker capability",
+    "expected_impact": "unauthorized host container execution / DoS (high; deployment-dependent)"
+   },
+   "subsystem": "server/routes (nvidia-nim)",
+   "affected_versions": "present in flowise@3.1.3 snapshot (code-verified); no upstream fix identified within 09f099db..9291856d (2026-08-13)",
+   "snapshot_applicability": "vulnerable (verified by independent static adjudication 2026-09-21)",
+   "public_provenance": {
+    "advisory": null,
+    "family_advisories_with_ranges_excluding_3_1_3": [
+     "GHSA-5f53-522j-j454 (<=3.0.12 declared; snapshot still zero-permission)"
+    ],
+    "fix_commit": null,
+    "derived_from": "historical agent runs (unmatched ledger); see artifacts/gt_audit/unmatched_candidate_ledger.json"
+   },
+   "provenance": {
+    "agent_run_derived": true,
+    "circularity_note": "root derived from historical run outputs; retrospective v1.1 scores of those runs are adjudication statements, not independent benchmark evidence"
+   },
+   "verification_status": "static chain verified with file:line evidence by independent condition-blind adjudication; targeted local validation optional (not required for TP)",
+   "severity_estimate": "high",
+   "confidence": "medium-high"
+  }
+ ],
+ "near_misses": [
+  {
+   "id": "NM01_scoped_role_read",
+   "categories": [
+    "authorization",
+    "access_control"
+   ],
+   "anchor": {
+    "file": "packages/server/src/enterprise/controllers/role.controller.ts",
+    "function": "RoleController.read",
+    "excerpt": "oneRole.organizationId !== user.activeOrganizationId"
+   },
+   "claim_terms": [
+    "role"
+   ],
+   "exclude_claim_terms": [
+    "update",
+    "delete",
+    "create",
+    "mutation"
+   ],
+   "safety_basis": "The loaded Role object's organizationId is checked against the principal before the response; RoleController.update is deliberately excluded."
+  },
+  {
+   "id": "NM02_sanitized_login_user",
+   "categories": [
+    "information_disclosure"
+   ],
+   "anchor": {
+    "file": "packages/server/src/enterprise/services/account.service.ts",
+    "function": "AccountService.login",
+    "excerpt": "const sanitizedUser = sanitizeUser(user)"
+   },
+   "claim_terms": [
+    "credential",
+    "password",
+    "hash"
+   ],
+   "exclude_claim_terms": [
+    "workspaceDetails",
+    "workspace details",
+    "variable",
+    "export"
+   ],
+   "safety_basis": "The returned User object passes through sanitizeUser, which removes credential and invitation-token fields; other response objects are outside this proof."
+  },
+  {
+   "id": "NM03_guarded_assistant_read",
+   "categories": [
+    "authorization",
+    "access_control"
+   ],
+   "anchor": {
+    "file": "packages/server/src/routes/assistants/index.ts",
+    "function": "router.get assistant detail",
+    "excerpt": "checkPermission('assistants:view')"
+   },
+   "claim_terms": [
+    "assistant"
+   ],
+   "exclude_claim_terms": [
+    "credential",
+    "upload",
+    "delete",
+    "update",
+    "create"
+   ],
+   "safety_basis": "The read route checks assistants:view, the controller passes req.user.activeWorkspaceId, and getAssistantById queries by id plus workspaceId."
+  },
+  {
+   "id": "NM04_scoped_credential_read",
+   "categories": [
+    "authorization",
+    "access_control"
+   ],
+   "anchor": {
+    "file": "packages/server/src/services/credentials/index.ts",
+    "function": "getCredentialById",
+    "excerpt": "workspaceId: workspaceId"
+   },
+   "claim_terms": [
+    "credential"
+   ],
+   "exclude_claim_terms": [
+    "sharing",
+    "shared",
+    "reveal",
+    "delete",
+    "update"
+   ],
+   "safety_basis": "The owned Credential lookup uses id and workspaceId before decryption; only this method and branch are covered."
+  },
+  {
+   "id": "NM05_required_workspace_chatflow_read",
+   "categories": [
+    "authorization",
+    "access_control"
+   ],
+   "anchor": {
+    "file": "packages/server/src/services/chatflows/index.ts",
+    "function": "getChatflowByIdForWorkspace",
+    "excerpt": "return getChatflowById(chatflowId, workspaceId)"
+   },
+   "claim_terms": [
+    "chatflow",
+    "workspace"
+   ],
+   "exclude_claim_terms": [
+    "realtime",
+    "tool execution",
+    "execute",
+    "public",
+    "tts"
+   ],
+   "safety_basis": "The wrapper rejects a missing workspaceId and getChatflowById includes it in the database predicate; Realtime execution is outside this proof."
+  }
+ ],
+ "supersedes": {
+  "case": "flowise_3_1_3_repository_v1",
+  "gt_version": "phase3-draft-1",
+  "note": "repository-v1 GT stays immutable; v1.1 is a separate versioned identity pending ratification"
+ },
+ "snapshot_applicability_protocol": {
+  "primary": "code-level verification against the frozen snapshot (file:line evidence), never advisory declared ranges alone",
+  "advisory_ranges_caveat": "multiple upstream advisories declare fixes at <=3.1.1/3.1.2/3.0.12/3.0.13 while the described pattern persists in the 3.1.3 snapshot (e.g. GHSA-r745 OAuth2 refresh, GHSA-5f53 NIM); declared ranges are provenance, not applicability"
+ },
+ "known_unscored_registry_v1_1": [
+  {
+   "id": "KU03_public_chatbotconfig_sanitized_structure_disclosure",
+   "adjudication": "UC26",
+   "class": "conditional",
+   "reason": "whitelisted public-chatbotConfig resolves any chatflow id (private included) and returns sanitized flowData; structural disclosure of private flows is real, but inclusion in scored GT awaits threat-model ratification of sanitized-disclosure rule",
+   "anchor": {
+    "path": "packages/server/src/services/chatflows/index.ts",
+    "symbol": "getSinglePublicChatbotConfig",
+    "excerpt": "sanitizeFlowDataForPublicEndpoint"
+   }
+  },
+  {
+   "id": "KU04_webhook_listener_capability_mismatch",
+   "adjudication": "UC40",
+   "class": "hardening",
+   "reason": "ownership check validates the caller chatflow while the SSE subscription key is the client-supplied listenerId; listenerId is a server-minted uuidv4 with no observed leak path, so unreachable in practice",
+   "anchor": {
+    "path": "packages/server/src/controllers/webhook-listener/index.ts",
+    "symbol": "streamListener",
+    "excerpt": "sseStreamer.addClient(listenerId, res)"
+   }
+  },
+  {
+   "id": "KU05_customtool_nodevm_capability_face",
+   "adjudication": "UC09",
+   "class": "known_unscored_dynamic_dependent",
+   "reason": "same NodeVM capability face as KU02; no concrete new chain beyond node-configuration authorship",
+   "anchor": {
+    "path": "packages/components/nodes/tools/CustomTool/core.ts",
+    "symbol": "DynamicStructuredTool._call",
+    "excerpt": "executeJavaScriptCode(this.code, sandbox)"
+   }
+  },
+  {
+   "id": "KU06_host_header_baseurl_ssrf",
+   "adjudication": "UC41",
+   "class": "conditional/inconclusive",
+   "reason": "client-controlled Host/X-Forwarded-Proto construct the flow-execution baseURL (buildChatflow.ts:1004-1005, upsertVector.ts:252-253) which propagates into node init; outbound sink consumer not yet located — needs one bounded confirmation before any GT admission (public issue #6687)",
+   "anchor": {
+    "path": "packages/server/src/utils/buildChatflow.ts",
+    "symbol": "utilBuildChatflow",
+    "excerpt": "const baseURL = `${httpProtocol}://${req.get('host')}`"
+   }
+  }
+ ],
+ "counts": {
+  "roots_total": 29,
+  "roots_v1": 20,
+  "roots_new_v1_1": 9,
+  "new_roots_agent_run_derived": 9,
+  "equivalent_anchor_expansions": 12
+ }
+}

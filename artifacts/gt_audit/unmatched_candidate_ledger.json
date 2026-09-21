@@ -1,0 +1,1973 @@
+{
+ "generated_at": "2026-09-21T05:21:09.109679+00:00",
+ "case": "flowise_3_1_3_repository_v1",
+ "runs_scanned": 115,
+ "flowise_run_count": 63,
+ "flowise_runs": [
+  "flowise-n4-formal-2048-01/runs/parallel_n4_20260918T141935.833971+0000_512cd1df",
+  "flowise-n4-formal-2048-01/runs/raw_blackboard_n4_20260918T142037.672076+0000_b629fbe5",
+  "flowise-n4-formal-2048-01/runs/single_n1_20260918T141655.612567+0000_dd0df70d",
+  "flowise-n4-formal-2048-01/runs/structured_team_n4_20260918T142132.617685+0000_7d01cd44",
+  "manager_worker_n4_20260918T123230.583954+0000_afae3bfe",
+  "manager_worker_n4_20260918T123249.621431+0000_c6c19161",
+  "n4-flowise-completion-calibration-v2-96p/formal_b4_team-finalization-v1",
+  "n4-flowise-completion-calibration-v2-96p/formal_p4_team-finalization-v1",
+  "n4-flowise-completion-calibration-v2-96p/formal_s1_team-finalization-v1",
+  "n4-flowise-completion-calibration-v2-96p/formal_t4_team-finalization-v1",
+  "n4m-flowise-calibration-v1-96p/formal_b4_completion-v2",
+  "n4m-flowise-calibration-v1-96p/formal_p4_completion-v2",
+  "n4m-flowise-calibration-v1-96p/formal_s1_completion-v2",
+  "n4m-flowise-calibration-v1-96p/formal_t4_completion-v2",
+  "n4m-flowise-calibration-v1-96p/manager_worker_n4_20260920T042731.219124+0000_d3e5f569",
+  "n4m-flowise-calibration-v1-96p/parallel_n4_20260920T042339.036294+0000_ed42122f",
+  "n4m-flowise-calibration-v1-96p/raw_blackboard_n4_20260920T042454.253585+0000_1b236f2a",
+  "n4m-flowise-calibration-v1-96p/single_n1_20260920T042041.413565+0000_6629e1e3",
+  "n4m-flowise-calibration-v1-96p/structured_team_n4_20260920T042602.261170+0000_c6519973",
+  "parallel_n4_20260918T123211.154541+0000_66e1ed08",
+  "raw_blackboard_n4_20260918T123217.498894+0000_858f97e5",
+  "single_n1_20260918T123208.408495+0000_ecaf33f8",
+  "single_n1_20260918T124405.776944+0000_c792f2cc",
+  "single_n1_20260918T141114.622570+0000_5b4db6fa",
+  "single_n1_20260919T002540.053881+0000_4e86afcf",
+  "single_n1_20260919T003239.655288+0000_bcbf7ec3",
+  "single_n1_20260919T004958.035995+0000_2c9edb89",
+  "single_n1_20260919T005712.105877+0000_9f6f60b1",
+  "single_n1_20260919T013923.221314+0000_14e9da39",
+  "single_n1_20260919T015554.026898+0000_f8b46033",
+  "single_n1_20260919T020929.584601+0000_5e034b57",
+  "single_n1_20260919T021423.935064+0000_1a6244b9",
+  "single_n1_20260919T021948.640024+0000_40bd3d2e",
+  "single_n1_20260919T035548.514070+0000_517bcf94",
+  "single_n1_20260919T040004.254731+0000_0038df2e",
+  "single_n1_20260919T043236.562030+0000_0906e04e",
+  "single_n1_20260919T043422.038396+0000_7115f4c1",
+  "single_n1_20260919T043607.735505+0000_d2527e90",
+  "single_n1_20260919T043752.931894+0000_ee9271bb",
+  "single_n1_20260919T043947.149201+0000_a8afbe28",
+  "single_n1_20260919T044128.426804+0000_ddaadeb0",
+  "single_n1_20260919T044314.544537+0000_08633048",
+  "single_n1_20260919T044647.138261+0000_bec52002",
+  "single_n1_20260919T045055.779809+0000_77081634",
+  "single_n1_20260919T045304.598787+0000_28d2d36e",
+  "single_n1_20260919T045736.278175+0000_4455ede1",
+  "single_n1_20260919T050111.482674+0000_a6409f3c",
+  "single_n1_20260919T050526.679955+0000_6793723c",
+  "single_n1_20260919T050926.137877+0000_c3a912ed",
+  "single_n1_20260919T051314.688086+0000_54b1add0",
+  "single_n1_20260919T051634.656613+0000_3be2e511",
+  "single_n1_20260919T052100.005951+0000_953dd098",
+  "single_n1_20260919T052352.707783+0000_8e78df51",
+  "single_n1_20260919T052703.310841+0000_fb71500f",
+  "structured_team_n4_20260918T123223.960058+0000_f463a12f",
+  "t4-board-bootstrap-adoption-v1-192p/formal_t4-board-bootstrap-adoption-v1",
+  "t4-flowise-completion-budget-diagnostic-v1-192p/formal_t4_completion-budget-diagnostic-v1",
+  "t4-nonoverlap-v1-192p/formal_t4-nonoverlap-v1",
+  "t4-sequenced-bootstrap-v1-192p/formal_t4-sequenced-bootstrap-v1",
+  "t4-sequenced-bootstrap-v1-corrected-192p/formal_t4-sequenced-bootstrap-v1-corrected",
+  "t4-sequenced-bootstrap-v1-corrected-3seed-192p/formal_seed-02",
+  "t4-sequenced-bootstrap-v1-corrected-3seed-192p/formal_seed-03",
+  "t4-task-lifecycle-v2-192p/formal_t4-task-lifecycle-v2"
+ ],
+ "excluded_runs": [
+  {
+   "run": "calibration/b4-t4-2048-diagnostic-20260915/raw_blackboard_n4_20260915T141730.257336+0000_c5c7b22e",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "calibration/b4-t4-2048-diagnostic-20260915/retries/raw_blackboard_n4_20260915T142606.059859+0000_e5f06264",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "calibration/b4-t4-2048-diagnostic-20260915/retries/raw_blackboard_n4_20260915T142707.916433+0000_8f4461b3",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "calibration/b4-t4-2048-diagnostic-20260915/retries/raw_blackboard_n4_20260915T142941.471702+0000_06a43582",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "calibration/b4-t4-2048-diagnostic-20260915/t4/structured_team_n4_20260915T144424.959279+0000_eb5f3278",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "calibration/b4-t4-local-gate-20260915/raw_blackboard_n4_20260915T141346.252173+0000_be17a308",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "calibration/b4-t4-local-gate-20260915/structured_team_n4_20260915T141351.171243+0000_8e913cf1",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "calibration/metrics-schema-v2-smoke-20260916/b4/raw_blackboard_n4_20260916T013648.598560+0000_a04605e2",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "calibration/metrics-schema-v2-smoke-20260916/p4/parallel_n4_20260916T013648.582957+0000_fa06d585",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "calibration/metrics-schema-v2-smoke-20260916/s1/single_n1_20260916T013648.576577+0000_2fdd4d70",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "calibration/metrics-schema-v2-smoke-20260916/t4/structured_team_n4_20260916T013648.628796+0000_b69cb55d",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "calibration/n4-balanced-replication-20260915/p4-retries/parallel_n4_20260915T150548.697616+0000_3701eff3",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "calibration/n4-balanced-replication-20260915/p4-retries/parallel_n4_20260915T150657.006679+0000_f8799abc",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "calibration/n4-balanced-replication-20260915/p4-retries/parallel_n4_20260915T150733.264563+0000_adf20d48",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "calibration/n4-balanced-replication-20260915/parallel_n4_20260915T150153.902458+0000_f4ce8f4f",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "calibration/n4-balanced-replication-20260915/parallel_n4_20260915T150259.335825+0000_19f41d03",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "calibration/n4-balanced-replication-20260915/raw_blackboard_n4_20260915T150321.301377+0000_a756b665",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "calibration/n4-balanced-replication-20260915/single_n1_20260915T150033.215718+0000_712fa4fa",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "calibration/n4-balanced-replication-20260915/single_n1_20260915T150106.777763+0000_c00fd0da",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "calibration/n4-balanced-replication-20260915/structured_team_n4_20260915T150340.711872+0000_2c8ee464",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "calibration/n4-balanced-replication-20260915/structured_team_n4_20260915T150354.181552+0000_7da0493e",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "calibration/p4-2048-front-supply-probe-20260915/parallel_n4_20260915T135744.418415+0000_d73f03b7",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "calibration/p4-capacity-sweep-20260916/permits48/parallel_n4_20260916T003319.912258+0000_d52594ff",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "calibration/p4-capacity-sweep-20260916/permits64/parallel_n4_20260916T003416.816966+0000_f702840b",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "calibration/pbt4-64-calibration-20260916/b4/raw_blackboard_n4_20260916T011316.622124+0000_737ae5cf",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "calibration/pbt4-64-calibration-20260916/p4/parallel_n4_20260916T011228.651309+0000_7ac3bfa6",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "calibration/pbt4-64-calibration-20260916/t4/structured_team_n4_20260916T011411.853173+0000_ab3bc254",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "calibration/pre-s1-observability-calibration-20260915/single_n1_20260915T124129.109774+0000_14611cf8",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "calibration/relative-path-fix-20260915/parallel_n4_20260915T111704.073877+0000_16710774",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "calibration/relative-path-fix-20260915/single_n1_20260915T111603.437549+0000_0286d039",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "calibration/s1-2048-path-normalization-diagnostic-20260915/single_n1_20260915T135003.786982+0000_c227e0c1",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "calibration/s1-ceiling-calibration-20260915/parallel_n4_20260915T083322.791990+0000_63208cc6",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "calibration/s1-ceiling-calibration-20260915/single_n1_20260915T082952.698214+0000_dd1a8f1a",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "calibration/s1-output-ceiling-2048-diagnostic-20260915/single_n1_20260915T125825.997618+0000_1a1f2aef",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "parallel_n4_20260915T073505.809401+0000_f47dcd81",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "parallel_n4_20260915T081146.127285+0000_2936b76b",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "parallel_n4_20260915T111514.452424+0000_0dce9e44",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "parallel_n4_20260918T123237.751984+0000_b72b4856",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "raw_blackboard_n4_20260915T073506.030429+0000_7688f8f2",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "raw_blackboard_n4_20260915T081146.340702+0000_789fcd8a",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "raw_blackboard_n4_20260915T111514.473685+0000_fd5e74ef",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "raw_blackboard_n4_20260918T123238.025775+0000_2e6161c7",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "single_n1_20260915T072102.366704+0000_e7eb6e7b",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "single_n1_20260915T073505.660300+0000_f59eaee8",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "single_n1_20260915T080646.642486+0000_ce952b81",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "single_n1_20260915T081145.972266+0000_99ede2a9",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "single_n1_20260915T111514.420766+0000_1961832a",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "single_n1_20260918T123237.537857+0000_5ac153be",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "structured_team_n4_20260915T073506.250226+0000_d05c3873",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "structured_team_n4_20260915T081146.547905+0000_3a2d7c2d",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "structured_team_n4_20260915T111514.497540+0000_7e37817c",
+   "repository": "repo_pilot_v0"
+  },
+  {
+   "run": "structured_team_n4_20260918T123238.315063+0000_130b4eb9",
+   "repository": "repo_pilot_v0"
+  }
+ ],
+ "disposition_filter": [
+  "unmatched_review",
+  "known_near_miss"
+ ],
+ "unmatched_records_total": 94,
+ "known_near_miss_records_total": 0,
+ "note": "known_near_miss disposition did not occur in any flowise run; all ledger entries are unmatched_review. positive/duplicate_root dispositions excluded. Clustering merged initial (category, source.file, source.function, title-prefix) keys sharing the same endpoint/root cause across runs.",
+ "clusters": [
+  {
+   "cluster_id": "UC01",
+   "cluster_key": "OAUTH2",
+   "claim_summary": "Unauthenticated OAuth2 credential endpoints (GET /api/v1/oauth2-credential/callback, POST /refresh/:credentialId) are whitelisted and mutate/read arbitrary credentials via attacker-controlled state or credentialId without workspace/ownership scoping (cross-tenant credential token injection/overwrite).",
+   "category": "access_control",
+   "source_anchor": {
+    "file": "packages/server/src/routes/oauth2/index.ts",
+    "function": "router.get('/callback')"
+   },
+   "sink_anchor": {
+    "file": "packages/server/src/routes/oauth2/index.ts",
+    "function": "router.get('/callback')"
+   },
+   "affected_subsystem": "server:routes/oauth2 (auth whitelist)",
+   "occurrence_count": 20,
+   "conditions_present": [
+    "B",
+    "P",
+    "S",
+    "T"
+   ],
+   "occurrences": [
+    {
+     "run": "n4-flowise-completion-calibration-v2-96p/formal_b4_team-finalization-v1",
+     "condition": "B",
+     "submitted_by": "agent_001",
+     "finding_index": 0,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "n4-flowise-completion-calibration-v2-96p/formal_p4_team-finalization-v1",
+     "condition": "P",
+     "submitted_by": "agent_002",
+     "finding_index": 2,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "n4-flowise-completion-calibration-v2-96p/formal_p4_team-finalization-v1",
+     "condition": "P",
+     "submitted_by": "agent_004",
+     "finding_index": 4,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "n4m-flowise-calibration-v1-96p/formal_s1_completion-v2",
+     "condition": "S",
+     "submitted_by": "agent_001",
+     "finding_index": 1,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "single_n1_20260919T003239.655288+0000_bcbf7ec3",
+     "condition": "S",
+     "submitted_by": "agent_001",
+     "finding_index": 0,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "single_n1_20260919T003239.655288+0000_bcbf7ec3",
+     "condition": "S",
+     "submitted_by": "agent_001",
+     "finding_index": 1,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "single_n1_20260919T005712.105877+0000_9f6f60b1",
+     "condition": "S",
+     "submitted_by": "agent_001",
+     "finding_index": 0,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "single_n1_20260919T020929.584601+0000_5e034b57",
+     "condition": "S",
+     "submitted_by": "agent_001",
+     "finding_index": 2,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "single_n1_20260919T045055.779809+0000_77081634",
+     "condition": "S",
+     "submitted_by": "agent_001",
+     "finding_index": 0,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "single_n1_20260919T052352.707783+0000_8e78df51",
+     "condition": "S",
+     "submitted_by": "agent_001",
+     "finding_index": 0,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "single_n1_20260919T052352.707783+0000_8e78df51",
+     "condition": "S",
+     "submitted_by": "agent_001",
+     "finding_index": 1,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "t4-board-bootstrap-adoption-v1-192p/formal_t4-board-bootstrap-adoption-v1",
+     "condition": "T",
+     "submitted_by": "agent_001",
+     "finding_index": 0,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "t4-board-bootstrap-adoption-v1-192p/formal_t4-board-bootstrap-adoption-v1",
+     "condition": "T",
+     "submitted_by": "agent_004",
+     "finding_index": 6,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "t4-flowise-completion-budget-diagnostic-v1-192p/formal_t4_completion-budget-diagnostic-v1",
+     "condition": "T",
+     "submitted_by": "agent_001",
+     "finding_index": 0,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "t4-flowise-completion-budget-diagnostic-v1-192p/formal_t4_completion-budget-diagnostic-v1",
+     "condition": "T",
+     "submitted_by": "agent_002",
+     "finding_index": 1,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "t4-nonoverlap-v1-192p/formal_t4-nonoverlap-v1",
+     "condition": "T",
+     "submitted_by": "agent_003",
+     "finding_index": 3,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "t4-sequenced-bootstrap-v1-192p/formal_t4-sequenced-bootstrap-v1",
+     "condition": "T",
+     "submitted_by": "agent_001",
+     "finding_index": 0,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "t4-sequenced-bootstrap-v1-corrected-3seed-192p/formal_seed-02",
+     "condition": "T",
+     "submitted_by": "agent_001",
+     "finding_index": 0,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "t4-sequenced-bootstrap-v1-corrected-3seed-192p/formal_seed-03",
+     "condition": "T",
+     "submitted_by": "agent_001",
+     "finding_index": 0,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "t4-task-lifecycle-v2-192p/formal_t4-task-lifecycle-v2",
+     "condition": "T",
+     "submitted_by": "agent_002",
+     "finding_index": 2,
+     "disposition": "unmatched_review"
+    }
+   ],
+   "distinct_claim_variants": [
+    "Unauthenticated OAuth2 callback allows cross-tenant credential access and token overwrite (IDOR)",
+    "Unauthenticated OAuth2 callback allows cross-tenant credential token injection",
+    "Unauthenticated OAuth2 callback allows cross-tenant credential token overwrite (missing workspace/tenant scoping)",
+    "Unauthenticated OAuth2 callback allows cross-tenant credential write via attacker-controlled state",
+    "Unauthenticated OAuth2 callback endpoint allows cross-tenant credential token overwrite via attacker-controlled state",
+    "Unauthenticated OAuth2 callback endpoint performs server-side token exchange and mutates credentials",
+    "Unauthenticated OAuth2 callback lets attacker bind tokens to any credential by state",
+    "Unauthenticated OAuth2 callback resolves credential by attacker-controlled state with no workspace scoping (cross-tenant credential disclosure)",
+    "Unauthenticated OAuth2 callback resolves credential by attacker-controlled state without workspace scoping (cross-tenant credential access)",
+    "Unauthenticated OAuth2 callback resolves credential by attacker-supplied state without workspace scoping (IDOR / cross-tenant token write)",
+    "Unauthenticated OAuth2 callback resolves credentials by attacker-supplied state without workspace scoping (cross-tenant credential token overwrite)",
+    "Unauthenticated OAuth2 callback updates arbitrary credential by state without workspace scoping",
+    "Unauthenticated OAuth2 callback/refresh endpoints allow cross-workspace credential access and token exchange",
+    "Unauthenticated OAuth2 callback/refresh endpoints operate on arbitrary credentialId without workspace scoping (cross-tenant credential tampering)",
+    "Unauthenticated OAuth2 credential refresh endpoint allows arbitrary credential mutation by ID",
+    "Unauthenticated OAuth2 refresh endpoint allows cross-tenant credential token refresh/overwrite by credentialId",
+    "Unauthenticated OAuth2 token refresh endpoint operates on any credential by ID without workspace check",
+    "Unauthenticated OAuth2 token refresh for arbitrary credential (IDOR / broken access control)",
+    "Unauthenticated OAuth2 token refresh for arbitrary credentialId via whitelisted /api/v1/oauth2-credential/refresh",
+    "Unauthenticated cross-tenant OAuth2 credential overwrite via /oauth2-credential/callback and /refresh (IDOR)"
+   ]
+  },
+  {
+   "cluster_id": "UC02",
+   "cluster_key": "FEEDBACK",
+   "claim_summary": "Unauthenticated /api/v1/feedback endpoints (whitelisted) allow reading all chat-message feedback for any chatflow (GET) and modifying arbitrary feedback records (PUT /:id) without authentication or ownership checks (cross-tenant IDOR).",
+   "category": "access_control",
+   "source_anchor": {
+    "file": "packages/server/src/controllers/feedback/index.ts",
+    "function": "getAllChatMessageFeedback"
+   },
+   "sink_anchor": {
+    "file": "packages/server/src/utils/getChatMessageFeedback.ts",
+    "function": "utilGetChatMessageFeedback"
+   },
+   "affected_subsystem": "server:feedback API (auth whitelist)",
+   "occurrence_count": 12,
+   "conditions_present": [
+    "S",
+    "T"
+   ],
+   "occurrences": [
+    {
+     "run": "n4m-flowise-calibration-v1-96p/single_n1_20260920T042041.413565+0000_6629e1e3",
+     "condition": "S",
+     "submitted_by": "agent_001",
+     "finding_index": 0,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "n4m-flowise-calibration-v1-96p/single_n1_20260920T042041.413565+0000_6629e1e3",
+     "condition": "S",
+     "submitted_by": "agent_001",
+     "finding_index": 1,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "single_n1_20260919T005712.105877+0000_9f6f60b1",
+     "condition": "S",
+     "submitted_by": "agent_001",
+     "finding_index": 3,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "single_n1_20260919T021948.640024+0000_40bd3d2e",
+     "condition": "S",
+     "submitted_by": "agent_001",
+     "finding_index": 0,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "single_n1_20260919T040004.254731+0000_0038df2e",
+     "condition": "S",
+     "submitted_by": "agent_001",
+     "finding_index": 1,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "single_n1_20260919T045055.779809+0000_77081634",
+     "condition": "S",
+     "submitted_by": "agent_001",
+     "finding_index": 2,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "single_n1_20260919T052703.310841+0000_fb71500f",
+     "condition": "S",
+     "submitted_by": "agent_001",
+     "finding_index": 0,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "single_n1_20260919T052703.310841+0000_fb71500f",
+     "condition": "S",
+     "submitted_by": "agent_001",
+     "finding_index": 1,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "t4-board-bootstrap-adoption-v1-192p/formal_t4-board-bootstrap-adoption-v1",
+     "condition": "T",
+     "submitted_by": "agent_003",
+     "finding_index": 4,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "t4-nonoverlap-v1-192p/formal_t4-nonoverlap-v1",
+     "condition": "T",
+     "submitted_by": "agent_001",
+     "finding_index": 1,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "t4-task-lifecycle-v2-192p/formal_t4-task-lifecycle-v2",
+     "condition": "T",
+     "submitted_by": "agent_002",
+     "finding_index": 3,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "t4-task-lifecycle-v2-192p/formal_t4-task-lifecycle-v2",
+     "condition": "T",
+     "submitted_by": "agent_003",
+     "finding_index": 5,
+     "disposition": "unmatched_review"
+    }
+   ],
+   "distinct_claim_variants": [
+    "IDOR: unauthenticated feedback listing returns any chatflow's feedback by chatflowId",
+    "Unauthenticated IDOR: modify arbitrary chat message feedback via PUT /api/v1/feedback/:id",
+    "Unauthenticated IDOR: public /api/v1/feedback endpoints expose and modify any chatflow's feedback",
+    "Unauthenticated IDOR: read all chat message feedback for any chatflow via GET /api/v1/feedback/:id",
+    "Unauthenticated cross-tenant disclosure of chat feedback via public /api/v1/feedback endpoint",
+    "Unauthenticated disclosure of chat message feedback for any chatflow",
+    "Unauthenticated feedback endpoint discloses all chat feedback for any chatflow (IDOR / information disclosure)",
+    "Unauthenticated feedback read exposes any chatflow's feedback across tenants",
+    "Unauthenticated information disclosure of chat feedback via whitelisted GET /api/v1/feedback/:id",
+    "Unauthenticated modification of arbitrary feedback records via PUT /api/v1/feedback/:id",
+    "Unauthenticated read/write of chat message feedback via whitelisted /api/v1/feedback routes",
+    "Unauthenticated retrieval of all chat feedback for any chatflow (information disclosure)"
+   ]
+  },
+  {
+   "cluster_id": "UC03",
+   "cluster_key": "TTS_CREDS",
+   "claim_summary": "Unauthenticated whitelisted POST /api/v1/text-to-speech/generate accepts an arbitrary credentialId and consumes any stored TTS credential without ownership/workspace check (credential abuse).",
+   "category": "authorization",
+   "source_anchor": {
+    "file": "packages/server/src/controllers/text-to-speech/index.ts",
+    "function": "generateTextToSpeech"
+   },
+   "sink_anchor": {
+    "file": "packages/components/src/textToSpeech.ts",
+    "function": "convertTextToSpeechStream"
+   },
+   "affected_subsystem": "server:text-to-speech API (auth whitelist)",
+   "occurrence_count": 9,
+   "conditions_present": [
+    "P",
+    "S",
+    "T"
+   ],
+   "occurrences": [
+    {
+     "run": "n4-flowise-completion-calibration-v2-96p/formal_p4_team-finalization-v1",
+     "condition": "P",
+     "submitted_by": "agent_002",
+     "finding_index": 1,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "single_n1_20260919T021423.935064+0000_1a6244b9",
+     "condition": "S",
+     "submitted_by": "agent_001",
+     "finding_index": 0,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "single_n1_20260919T045055.779809+0000_77081634",
+     "condition": "S",
+     "submitted_by": "agent_001",
+     "finding_index": 1,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "single_n1_20260919T045736.278175+0000_4455ede1",
+     "condition": "S",
+     "submitted_by": "agent_001",
+     "finding_index": 0,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "single_n1_20260919T052100.005951+0000_953dd098",
+     "condition": "S",
+     "submitted_by": "agent_001",
+     "finding_index": 0,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "t4-board-bootstrap-adoption-v1-192p/formal_t4-board-bootstrap-adoption-v1",
+     "condition": "T",
+     "submitted_by": "agent_002",
+     "finding_index": 2,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "t4-board-bootstrap-adoption-v1-192p/formal_t4-board-bootstrap-adoption-v1",
+     "condition": "T",
+     "submitted_by": "agent_004",
+     "finding_index": 5,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "t4-flowise-completion-budget-diagnostic-v1-192p/formal_t4_completion-budget-diagnostic-v1",
+     "condition": "T",
+     "submitted_by": "agent_004",
+     "finding_index": 3,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "t4-sequenced-bootstrap-v1-corrected-192p/formal_t4-sequenced-bootstrap-v1-corrected",
+     "condition": "T",
+     "submitted_by": "agent_003",
+     "finding_index": 2,
+     "disposition": "unmatched_review"
+    }
+   ],
+   "distinct_claim_variants": [
+    "Unauthenticated TTS endpoint uses arbitrary stored credentialId (credential abuse / secret use)",
+    "Unauthenticated credential abuse via public text-to-speech endpoint (arbitrary credentialId)",
+    "Unauthenticated text-to-speech /generate endpoint allows use of arbitrary stored credentials (missing ownership check)",
+    "Unauthenticated text-to-speech endpoint allows use of arbitrary stored credentials (credential abuse / missing authorization)",
+    "Unauthenticated text-to-speech endpoints allow use of arbitrary stored credentials by ID",
+    "Unauthenticated text-to-speech generation using arbitrary credentialId (credential abuse)",
+    "Unauthenticated use of arbitrary stored credentials via whitelisted /api/v1/text-to-speech/generate",
+    "Unauthenticated use of stored TTS credentials via whitelisted /api/v1/text-to-speech/generate"
+   ]
+  },
+  {
+   "cluster_id": "UC04",
+   "cluster_key": "UPLOAD_FILE",
+   "claim_summary": "Unauthenticated whitelisted GET /api/v1/get-upload-file streams uploaded files for any chatflowId/chatId/fileName without public/ownership verification (cross-tenant file read IDOR).",
+   "category": "access_control",
+   "source_anchor": {
+    "file": "packages/server/src/routes/get-upload-file/index.ts",
+    "function": "router.get('/', getUploadFileController.streamUploadedFile)"
+   },
+   "sink_anchor": {
+    "file": "packages/server/src/controllers/get-upload-file/index.ts",
+    "function": "streamUploadedFile"
+   },
+   "affected_subsystem": "server:get-upload-file API (auth whitelist)",
+   "occurrence_count": 8,
+   "conditions_present": [
+    "B",
+    "P",
+    "S",
+    "T"
+   ],
+   "occurrences": [
+    {
+     "run": "n4-flowise-completion-calibration-v2-96p/formal_b4_team-finalization-v1",
+     "condition": "B",
+     "submitted_by": "agent_002",
+     "finding_index": 1,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "n4-flowise-completion-calibration-v2-96p/formal_p4_team-finalization-v1",
+     "condition": "P",
+     "submitted_by": "agent_001",
+     "finding_index": 0,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "n4-flowise-completion-calibration-v2-96p/formal_p4_team-finalization-v1",
+     "condition": "P",
+     "submitted_by": "agent_003",
+     "finding_index": 3,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "single_n1_20260919T004958.035995+0000_2c9edb89",
+     "condition": "S",
+     "submitted_by": "agent_001",
+     "finding_index": 2,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "single_n1_20260919T021423.935064+0000_1a6244b9",
+     "condition": "S",
+     "submitted_by": "agent_001",
+     "finding_index": 1,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "single_n1_20260919T021948.640024+0000_40bd3d2e",
+     "condition": "S",
+     "submitted_by": "agent_001",
+     "finding_index": 1,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "single_n1_20260919T052100.005951+0000_953dd098",
+     "condition": "S",
+     "submitted_by": "agent_001",
+     "finding_index": 1,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "t4-nonoverlap-v1-192p/formal_t4-nonoverlap-v1",
+     "condition": "T",
+     "submitted_by": "agent_003",
+     "finding_index": 7,
+     "disposition": "unmatched_review"
+    }
+   ],
+   "distinct_claim_variants": [
+    "IDOR in get-upload-file: stored files streamed for any chatflowId/chatId without ownership check",
+    "Public get-upload-file endpoint serves uploaded files from any chatflow without ownership/public check",
+    "Unauthenticated cross-tenant file read via /api/v1/get-upload-file (whitelisted route with no authorization check)",
+    "Unauthenticated file download for non-public chatflows via get-upload-file (IDOR)",
+    "Unauthenticated file download from any chatflow via whitelisted /api/v1/get-upload-file",
+    "Unauthenticated file download via /api/v1/get-upload-file lacks public/ownership check (IDOR information disclosure)",
+    "Unauthenticated file read via /api/v1/get-upload-file (public endpoint streams arbitrary uploaded files by chatflowId/chatId/fileName)",
+    "Unauthenticated file read via whitelisted /api/v1/get-upload-file (missing authorization on streamUploadedFile)"
+   ]
+  },
+  {
+   "cluster_id": "UC05",
+   "cluster_key": "WEBHOOK_UNAUTH",
+   "claim_summary": "Webhook endpoint /api/v1/webhook/:id is unauthenticated by default (no signature auth, no bound API key) and resolves chatflows without workspace scoping, allowing execution of arbitrary webhook-triggered chatflows.",
+   "category": "access_control",
+   "source_anchor": {
+    "file": "packages/server/src/routes/webhook/index.ts",
+    "function": "router.all('/:id', ...)"
+   },
+   "sink_anchor": {
+    "file": "packages/server/src/controllers/webhook/index.ts",
+    "function": "createWebhook"
+   },
+   "affected_subsystem": "server:webhook execution path",
+   "occurrence_count": 5,
+   "conditions_present": [
+    "S",
+    "T"
+   ],
+   "occurrences": [
+    {
+     "run": "n4-flowise-completion-calibration-v2-96p/formal_t4_team-finalization-v1",
+     "condition": "T",
+     "submitted_by": "agent_003",
+     "finding_index": 1,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "n4-flowise-completion-calibration-v2-96p/formal_t4_team-finalization-v1",
+     "condition": "T",
+     "submitted_by": "agent_004",
+     "finding_index": 2,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "single_n1_20260919T052352.707783+0000_8e78df51",
+     "condition": "S",
+     "submitted_by": "agent_001",
+     "finding_index": 2,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "t4-flowise-completion-budget-diagnostic-v1-192p/formal_t4_completion-budget-diagnostic-v1",
+     "condition": "T",
+     "submitted_by": "agent_003",
+     "finding_index": 2,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "t4-nonoverlap-v1-192p/formal_t4-nonoverlap-v1",
+     "condition": "T",
+     "submitted_by": "agent_003",
+     "finding_index": 5,
+     "disposition": "unmatched_review"
+    }
+   ],
+   "distinct_claim_variants": [
+    "Unauthenticated webhook endpoint can invoke any webhook-triggered chatflow when no API key is bound",
+    "Unauthenticated webhook endpoint executes arbitrary chatflow/agentflow by chatflow id",
+    "Unauthenticated webhook endpoint executes chatflows when signature auth is not enabled (default)",
+    "Unauthenticated webhook endpoint executes chatflows with unscoped (cross-workspace) chatflow lookup",
+    "Webhook endpoint is unauthenticated by default and resolves chatflow without workspace scoping"
+   ]
+  },
+  {
+   "cluster_id": "UC06",
+   "cluster_key": "ASSISTANT_FILE",
+   "claim_summary": "Whitelisted openai-assistants file-download endpoint (GET /api/v1/openai-assistants-file/:fileName) passes attacker-controlled fileName to storage without the isUnsafeFilePath/UUID validation used by its sibling endpoint (path traversal file read).",
+   "category": "path_traversal",
+   "source_anchor": {
+    "file": "packages/server/src/controllers/openai-assistants/index.ts",
+    "function": "getFileFromAssistant"
+   },
+   "sink_anchor": {
+    "file": "packages/server/src/controllers/openai-assistants/index.ts",
+    "function": "getFileFromAssistant"
+   },
+   "affected_subsystem": "server:openai-assistants file download",
+   "occurrence_count": 4,
+   "conditions_present": [
+    "S",
+    "T"
+   ],
+   "occurrences": [
+    {
+     "run": "single_n1_20260919T050926.137877+0000_c3a912ed",
+     "condition": "S",
+     "submitted_by": "agent_001",
+     "finding_index": 0,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "t4-board-bootstrap-adoption-v1-192p/formal_t4-board-bootstrap-adoption-v1",
+     "condition": "T",
+     "submitted_by": "agent_001",
+     "finding_index": 1,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "t4-sequenced-bootstrap-v1-corrected-3seed-192p/formal_seed-02",
+     "condition": "T",
+     "submitted_by": "agent_002",
+     "finding_index": 2,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "t4-sequenced-bootstrap-v1-corrected-3seed-192p/formal_seed-02",
+     "condition": "T",
+     "submitted_by": "agent_004",
+     "finding_index": 4,
+     "disposition": "unmatched_review"
+    }
+   ],
+   "distinct_claim_variants": [
+    "Missing filename/path validation in whitelisted openai-assistants file download endpoint",
+    "Public unauthenticated file-download endpoint omits UUID/path-traversal input validation applied by its sibling endpoint",
+    "Unauthenticated file-download endpoint passes attacker-controlled fileName to storage layer without the isUnsafeFilePath guard used by its sibling endpoint",
+    "Whitelisted assistant file-download endpoint omits UUID/path-traversal validation applied by its sibling controller"
+   ]
+  },
+  {
+   "cluster_id": "UC07",
+   "cluster_key": "ATTACHMENTS",
+   "claim_summary": "Public POST /api/v1/attachments/:chatflowId/:chatId allows unauthenticated file upload into arbitrary chatflow storage when uploads are enabled (missing ownership/API-key check).",
+   "category": "access_control",
+   "source_anchor": {
+    "file": "packages/server/src/routes/attachments/index.ts",
+    "function": "router.post"
+   },
+   "sink_anchor": {
+    "file": "packages/server/src/utils/createAttachment.ts",
+    "function": "createFileAttachment"
+   },
+   "affected_subsystem": "server:attachments upload API",
+   "occurrence_count": 2,
+   "conditions_present": [
+    "S",
+    "T"
+   ],
+   "occurrences": [
+    {
+     "run": "single_n1_20260919T052100.005951+0000_953dd098",
+     "condition": "S",
+     "submitted_by": "agent_001",
+     "finding_index": 2,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "t4-nonoverlap-v1-192p/formal_t4-nonoverlap-v1",
+     "condition": "T",
+     "submitted_by": "agent_003",
+     "finding_index": 6,
+     "disposition": "unmatched_review"
+    }
+   ],
+   "distinct_claim_variants": [
+    "Public attachments endpoint allows unauthenticated file upload to any chatflow with uploads enabled",
+    "Unauthenticated attachment upload into arbitrary chatflow storage (missing ownership/API-key check)"
+   ]
+  },
+  {
+   "cluster_id": "UC08",
+   "cluster_key": "DATASET_ROWS",
+   "claim_summary": "PATCH /api/v1/datasets/rows (patchDeleteRows) deletes dataset rows by id without verifying the parent dataset belongs to the caller workspace (cross-workspace IDOR).",
+   "category": "access_control",
+   "source_anchor": {
+    "file": "packages/server/src/controllers/dataset/index.ts",
+    "function": "patchDeleteRows"
+   },
+   "sink_anchor": {
+    "file": "packages/server/src/services/dataset/index.ts",
+    "function": "patchDeleteRows"
+   },
+   "affected_subsystem": "server:dataset rows API",
+   "occurrence_count": 2,
+   "conditions_present": [
+    "S"
+   ],
+   "occurrences": [
+    {
+     "run": "single_n1_20260919T045736.278175+0000_4455ede1",
+     "condition": "S",
+     "submitted_by": "agent_001",
+     "finding_index": 1,
+     "disposition": "unmatched_review"
+    },
+    {
+     "run": "single_n1_20260919T051314.688086+0000_54b1add0",
+     "condition": "S",
+     "submitted_by": "agent_001",
+     "finding_index": 0,
+     "disposition": "unmatched_review"
+    }
+   ],
+   "distinct_claim_variants": [
+    "Cross-workspace IDOR: PATCH /api/v1/datasets/rows deletes arbitrary dataset rows by id",
+    "Cross-workspace IDOR: dataset rows can be deleted by ID without verifying the parent dataset belongs to the caller's workspace"
+   ]
+  },
+  {
+   "cluster_id": "UC09",
+   "cluster_key": "CUSTOMTOOL_SANDBOX",
+   "claim_summary": "Attacker-authored JavaScript from CustomTool executes in the NodeVM fallback of executeJavaScriptCode with only vm2 isolation (insufficient sandboxing / code execution).",
+   "category": "other",
+   "source_anchor": {
+    "file": "packages/components/nodes/tools/CustomTool/core.ts",
+    "function": "DynamicStructuredTool._call"
+   },
+   "sink_anchor": {
+    "file": "packages/components/src/utils.ts",
+    "function": "executeJavaScriptCode"
+   },
+   "affected_subsystem": "components:CustomTool + utils sandbox",
+   "occurrence_count": 1,
+   "conditions_present": [
+    "T"
+   ],
+   "occurrences": [
+    {
+     "run": "t4-sequenced-bootstrap-v1-corrected-3seed-192p/formal_seed-03",
+     "condition": "T",
+     "submitted_by": "agent_002",
+     "finding_index": 2,
+     "disposition": "unmatched_review"
+    }
+   ],
+   "distinct_claim_variants": [
+    "Attacker-authored JavaScript executed in NodeVM fallback of executeJavaScriptCode with only vm2 isolation"
+   ]
+  },
+  {
+   "cluster_id": "UC10",
+   "cluster_key": "UNSTRUCTURED_SSRF",
+   "claim_summary": "Unstructured document loader performs server-side requests to an attacker-controlled API URL, bypassing the SSRF guard (SSRF via loader config).",
+   "category": "ssrf",
+   "source_anchor": {
+    "file": "packages/components/nodes/documentloaders/Unstructured/UnstructuredFile.ts",
+    "function": "init"
+   },
+   "sink_anchor": {
+    "file": "packages/components/nodes/documentloaders/Unstructured/Unstructured.ts",
+    "function": "UnstructuredLoader._partition"
+   },
+   "affected_subsystem": "components:documentloaders/Unstructured",
+   "occurrence_count": 1,
+   "conditions_present": [
+    "T"
+   ],
+   "occurrences": [
+    {
+     "run": "t4-sequenced-bootstrap-v1-192p/formal_t4-sequenced-bootstrap-v1",
+     "condition": "T",
+     "submitted_by": "agent_002",
+     "finding_index": 1,
+     "disposition": "unmatched_review"
+    }
+   ],
+   "distinct_claim_variants": [
+    "SSRF guard bypass in Unstructured document loader via attacker-controlled API URL"
+   ]
+  },
+  {
+   "cluster_id": "UC11",
+   "cluster_key": "E2B_SANDBOX",
+   "claim_summary": "Code injection into the E2B sandbox bootstrap via unvalidated sandbox variable names in executeJavaScriptCode.",
+   "category": "command_injection",
+   "source_anchor": {
+    "file": "packages/components/src/utils.ts",
+    "function": "executeJavaScriptCode"
+   },
+   "sink_anchor": {
+    "file": "packages/components/src/utils.ts",
+    "function": "executeJavaScriptCode"
+   },
+   "affected_subsystem": "components:utils E2B sandbox",
+   "occurrence_count": 1,
+   "conditions_present": [
+    "T"
+   ],
+   "occurrences": [
+    {
+     "run": "t4-sequenced-bootstrap-v1-corrected-3seed-192p/formal_seed-03",
+     "condition": "T",
+     "submitted_by": "agent_002",
+     "finding_index": 1,
+     "disposition": "unmatched_review"
+    }
+   ],
+   "distinct_claim_variants": [
+    "Code injection into E2B sandbox bootstrap via unvalidated sandbox variable names in executeJavaScriptCode"
+   ]
+  },
+  {
+   "cluster_id": "UC12",
+   "cluster_key": "GITHUB_SSO",
+   "claim_summary": "GitHub SSO accepts unverified email, enabling account takeover (GithubSSO.setSSOConfig / SSOBase.verifyAndLogin).",
+   "category": "authentication",
+   "source_anchor": {
+    "file": "packages/server/src/enterprise/sso/GithubSSO.ts",
+    "function": "GithubSSO.setSSOConfig"
+   },
+   "sink_anchor": {
+    "file": "packages/server/src/enterprise/sso/SSOBase.ts",
+    "function": "SSOBase.verifyAndLogin"
+   },
+   "affected_subsystem": "enterprise:SSO GithubSSO",
+   "occurrence_count": 1,
+   "conditions_present": [
+    "T"
+   ],
+   "occurrences": [
+    {
+     "run": "t4-sequenced-bootstrap-v1-corrected-192p/formal_t4-sequenced-bootstrap-v1-corrected",
+     "condition": "T",
+     "submitted_by": "agent_004",
+     "finding_index": 3,
+     "disposition": "unmatched_review"
+    }
+   ],
+   "distinct_claim_variants": [
+    "GitHub SSO accepts unverified email, enabling account takeover"
+   ]
+  },
+  {
+   "cluster_id": "UC13",
+   "cluster_key": "SSO_AUTOPROVISION",
+   "claim_summary": "SSO login auto-provisions accounts and selects a workspace without tenant binding (verifyAndLogin).",
+   "category": "authentication",
+   "source_anchor": {
+    "file": "packages/server/src/enterprise/sso/SSOBase.ts",
+    "function": "verifyAndLogin"
+   },
+   "sink_anchor": {
+    "file": "packages/server/src/enterprise/sso/SSOBase.ts",
+    "function": "verifyAndLogin"
+   },
+   "affected_subsystem": "enterprise:SSO SSOBase",
+   "occurrence_count": 1,
+   "conditions_present": [
+    "S"
+   ],
+   "occurrences": [
+    {
+     "run": "single_n1_20260919T045304.598787+0000_28d2d36e",
+     "condition": "S",
+     "submitted_by": "agent_001",
+     "finding_index": 0,
+     "disposition": "unmatched_review"
+    }
+   ],
+   "distinct_claim_variants": [
+    "SSO login auto-provisions accounts and selects workspace without tenant binding"
+   ]
+  },
+  {
+   "cluster_id": "UC14",
+   "cluster_key": "LOGIN_METHOD",
+   "claim_summary": "Cross-tenant SSO secret disclosure: enterprise login-method testConfig returns config with secrets and is missing an organization guard.",
+   "category": "authorization",
+   "source_anchor": {
+    "file": "packages/server/src/enterprise/controllers/login-method.controller.ts",
+    "function": "LoginMethodController.testConfig"
+   },
+   "sink_anchor": {
+    "file": "packages/server/src/enterprise/services/login-method.service.ts",
+    "function": "LoginMethodService.getConfigWithSecrets"
+   },
+   "affected_subsystem": "enterprise:login-method controller",
+   "occurrence_count": 1,
+   "conditions_present": [
+    "T"
+   ],
+   "occurrences": [
+    {
+     "run": "t4-sequenced-bootstrap-v1-corrected-3seed-192p/formal_seed-03",
+     "condition": "T",
+     "submitted_by": "agent_004",
+     "finding_index": 3,
+     "disposition": "unmatched_review"
+    }
+   ],
+   "distinct_claim_variants": [
+    "Cross-tenant SSO secret disclosure via login-method testConfig missing organization guard"
+   ]
+  },
+  {
+   "cluster_id": "UC15",
+   "cluster_key": "ORG_READ",
+   "claim_summary": "Organization read endpoint allows cross-organization IDOR exposing Stripe customerId/subscriptionId.",
+   "category": "access_control",
+   "source_anchor": {
+    "file": "packages/server/src/enterprise/controllers/organization.controller.ts",
+    "function": "read"
+   },
+   "sink_anchor": {
+    "file": "packages/server/src/enterprise/controllers/organization.controller.ts",
+    "function": "read"
+   },
+   "affected_subsystem": "enterprise:organization controller",
+   "occurrence_count": 1,
+   "conditions_present": [
+    "S"
+   ],
+   "occurrences": [
+    {
+     "run": "single_n1_20260919T035548.514070+0000_517bcf94",
+     "condition": "S",
+     "submitted_by": "agent_001",
+     "finding_index": 1,
+     "disposition": "unmatched_review"
+    }
+   ],
+   "distinct_claim_variants": [
+    "Organization read endpoint allows cross-organization IDOR exposing Stripe customerId/subscriptionId"
+   ]
+  },
+  {
+   "cluster_id": "UC16",
+   "cluster_key": "ORG_UPDATE",
+   "claim_summary": "Cross-tenant organization update via organization.controller.update missing organization guard.",
+   "category": "authorization",
+   "source_anchor": {
+    "file": "packages/server/src/enterprise/controllers/organization.controller.ts",
+    "function": "OrganizationController.update"
+   },
+   "sink_anchor": {
+    "file": "packages/server/src/enterprise/controllers/organization.controller.ts",
+    "function": "OrganizationController.update"
+   },
+   "affected_subsystem": "enterprise:organization controller",
+   "occurrence_count": 1,
+   "conditions_present": [
+    "T"
+   ],
+   "occurrences": [
+    {
+     "run": "t4-sequenced-bootstrap-v1-corrected-3seed-192p/formal_seed-03",
+     "condition": "T",
+     "submitted_by": "agent_004",
+     "finding_index": 8,
+     "disposition": "unmatched_review"
+    }
+   ],
+   "distinct_claim_variants": [
+    "Cross-tenant organization update via organization.controller.update missing guard"
+   ]
+  },
+  {
+   "cluster_id": "UC17",
+   "cluster_key": "ORG_USER",
+   "claim_summary": "Cross-tenant organization-user create/update/delete missing organization guard (IDOR on org membership).",
+   "category": "authorization",
+   "source_anchor": {
+    "file": "packages/server/src/enterprise/controllers/organization-user.controller.ts",
+    "function": "OrganizationUserController.create/update/delete"
+   },
+   "sink_anchor": {
+    "file": "packages/server/src/enterprise/controllers/organization-user.controller.ts",
+    "function": "OrganizationUserController.delete"
+   },
+   "affected_subsystem": "enterprise:organization-user controller",
+   "occurrence_count": 1,
+   "conditions_present": [
+    "T"
+   ],
+   "occurrences": [
+    {
+     "run": "t4-sequenced-bootstrap-v1-corrected-3seed-192p/formal_seed-03",
+     "condition": "T",
+     "submitted_by": "agent_004",
+     "finding_index": 5,
+     "disposition": "unmatched_review"
+    }
+   ],
+   "distinct_claim_variants": [
+    "Cross-tenant organization-user create/update/delete missing organization guard"
+   ]
+  },
+  {
+   "cluster_id": "UC18",
+   "cluster_key": "ROLE_DELETE",
+   "claim_summary": "Cross-tenant role deletion via role.controller.delete missing organization guard.",
+   "category": "authorization",
+   "source_anchor": {
+    "file": "packages/server/src/enterprise/controllers/role.controller.ts",
+    "function": "RoleController.delete"
+   },
+   "sink_anchor": {
+    "file": "packages/server/src/enterprise/controllers/role.controller.ts",
+    "function": "RoleController.delete"
+   },
+   "affected_subsystem": "enterprise:role controller",
+   "occurrence_count": 1,
+   "conditions_present": [
+    "T"
+   ],
+   "occurrences": [
+    {
+     "run": "t4-sequenced-bootstrap-v1-corrected-3seed-192p/formal_seed-03",
+     "condition": "T",
+     "submitted_by": "agent_004",
+     "finding_index": 6,
+     "disposition": "unmatched_review"
+    }
+   ],
+   "distinct_claim_variants": [
+    "Cross-tenant role deletion via role.controller.delete missing organization guard"
+   ]
+  },
+  {
+   "cluster_id": "UC19",
+   "cluster_key": "USER_CREATE",
+   "claim_summary": "Arbitrary user creation via user.controller.create without required permission (unauthenticated-by-permission user creation).",
+   "category": "authorization",
+   "source_anchor": {
+    "file": "packages/server/src/enterprise/routes/user.route.ts",
+    "function": "userRouter"
+   },
+   "sink_anchor": {
+    "file": "packages/server/src/enterprise/services/user.service.ts",
+    "function": "UserService.createUser"
+   },
+   "affected_subsystem": "enterprise:user route",
+   "occurrence_count": 1,
+   "conditions_present": [
+    "T"
+   ],
+   "occurrences": [
+    {
+     "run": "t4-sequenced-bootstrap-v1-corrected-3seed-192p/formal_seed-03",
+     "condition": "T",
+     "submitted_by": "agent_004",
+     "finding_index": 7,
+     "disposition": "unmatched_review"
+    }
+   ],
+   "distinct_claim_variants": [
+    "Unauthenticated-by-permission arbitrary user creation via user.controller.create"
+   ]
+  },
+  {
+   "cluster_id": "UC20",
+   "cluster_key": "WORKSPACE_USER",
+   "claim_summary": "Cross-tenant workspace membership manipulation via workspace-user create/update/delete missing tenant guards.",
+   "category": "authorization",
+   "source_anchor": {
+    "file": "packages/server/src/enterprise/controllers/workspace-user.controller.ts",
+    "function": "WorkspaceUserController.create/update/delete"
+   },
+   "sink_anchor": {
+    "file": "packages/server/src/enterprise/services/workspace-user.service.ts",
+    "function": "WorkspaceUserService.createWorkspaceUser"
+   },
+   "affected_subsystem": "enterprise:workspace-user controller",
+   "occurrence_count": 1,
+   "conditions_present": [
+    "T"
+   ],
+   "occurrences": [
+    {
+     "run": "t4-sequenced-bootstrap-v1-corrected-3seed-192p/formal_seed-03",
+     "condition": "T",
+     "submitted_by": "agent_004",
+     "finding_index": 4,
+     "disposition": "unmatched_review"
+    }
+   ],
+   "distinct_claim_variants": [
+    "Cross-tenant workspace membership manipulation via workspace-user create/update/delete missing tenant guards"
+   ]
+  },
+  {
+   "cluster_id": "UC21",
+   "cluster_key": "CUSTOM_MCP_SSRF",
+   "claim_summary": "Custom MCP server authorize/connect path performs server-side requests to user-supplied URLs (MCPToolkit.createClient) with deny-list opt-out (SSRF).",
+   "category": "ssrf",
+   "source_anchor": {
+    "file": "packages/server/src/services/custom-mcp-servers/index.ts",
+    "function": "authorizeCustomMcpServer"
+   },
+   "sink_anchor": {
+    "file": "packages/components/nodes/tools/MCP/core.ts",
+    "function": "MCPToolkit.createClient"
+   },
+   "affected_subsystem": "server+mcp client:custom MCP servers",
+   "occurrence_count": 1,
+   "conditions_present": [
+    "T"
+   ],
+   "occurrences": [
+    {
+     "run": "t4-sequenced-bootstrap-v1-192p/formal_t4-sequenced-bootstrap-v1",
+     "condition": "T",
+     "submitted_by": "agent_004",
+     "finding_index": 4,
+     "disposition": "unmatched_review"
+    }
+   ],
+   "distinct_claim_variants": [
+    "Custom MCP server authorize/connect path performs server-side requests to user-supplied URLs with deny-list opt-out"
+   ]
+  },
+  {
+   "cluster_id": "UC22",
+   "cluster_key": "TTS_CORS",
+   "claim_summary": "TTS CORS preflight is allowed for any origin when chatflowId is absent from the body (getCorsOptions misconfiguration).",
+   "category": "misconfiguration",
+   "source_anchor": {
+    "file": "packages/server/src/utils/XSS.ts",
+    "function": "getCorsOptions"
+   },
+   "sink_anchor": {
+    "file": "packages/server/src/utils/XSS.ts",
+    "function": "getCorsOptions"
+   },
+   "affected_subsystem": "server:CORS options",
+   "occurrence_count": 1,
+   "conditions_present": [
+    "S"
+   ],
+   "occurrences": [
+    {
+     "run": "single_n1_20260919T045304.598787+0000_28d2d36e",
+     "condition": "S",
+     "submitted_by": "agent_001",
+     "finding_index": 1,
+     "disposition": "unmatched_review"
+    }
+   ],
+   "distinct_claim_variants": [
+    "TTS CORS preflight allowed for any origin when chatflowId absent from body"
+   ]
+  },
+  {
+   "cluster_id": "UC23",
+   "cluster_key": "APIKEY_DISCLOSURE",
+   "claim_summary": "API key secret hash and raw API key disclosed to any user holding only apikeys:view permission.",
+   "category": "information_disclosure",
+   "source_anchor": {
+    "file": "packages/server/src/services/apikey/index.ts",
+    "function": "getAllApiKeys"
+   },
+   "sink_anchor": {
+    "file": "packages/server/src/controllers/apikey/index.ts",
+    "function": "getAllApiKeys"
+   },
+   "affected_subsystem": "server:apikey service",
+   "occurrence_count": 1,
+   "conditions_present": [
+    "T"
+   ],
+   "occurrences": [
+    {
+     "run": "t4-sequenced-bootstrap-v1-corrected-3seed-192p/formal_seed-02",
+     "condition": "T",
+     "submitted_by": "agent_002",
+     "finding_index": 1,
+     "disposition": "unmatched_review"
+    }
+   ],
+   "distinct_claim_variants": [
+    "API key secret hash and raw API key disclosed to any user with apikeys:view permission"
+   ]
+  },
+  {
+   "cluster_id": "UC24",
+   "cluster_key": "WHITELIST_STARTSWITH",
+   "claim_summary": "Authentication middleware whitelist uses prefix (startsWith) matching, allowing unauthenticated access to any route whose path begins with a whitelisted prefix.",
+   "category": "access_control",
+   "source_anchor": {
+    "file": "packages/server/src/index.ts",
+    "function": "App.config (auth middleware)"
+   },
+   "sink_anchor": {
+    "file": "packages/server/src/utils/constants.ts",
+    "function": "WHITELIST_URLS"
+   },
+   "affected_subsystem": "server:auth whitelist constants",
+   "occurrence_count": 1,
+   "conditions_present": [
+    "S"
+   ],
+   "occurrences": [
+    {
+     "run": "n4-flowise-completion-calibration-v2-96p/formal_s1_team-finalization-v1",
+     "condition": "S",
+     "submitted_by": "agent_001",
+     "finding_index": 0,
+     "disposition": "unmatched_review"
+    }
+   ],
+   "distinct_claim_variants": [
+    "Authentication middleware whitelist uses prefix (startsWith) matching, allowing unauthenticated access to any route whose path begins with a whitelisted prefix"
+   ]
+  },
+  {
+   "cluster_id": "UC25",
+   "cluster_key": "CHATFLOW_APIKEY",
+   "claim_summary": "Unauthenticated chatflow disclosure via /chatflows/apikey/:apikey with unvalidated keyonly parameter.",
+   "category": "information_disclosure",
+   "source_anchor": {
+    "file": "packages/server/src/routes/chatflows/index.ts",
+    "function": "router.get(['/apikey/', '/apikey/:apikey'], chatflowsController.getChatflowByApiKey)"
+   },
+   "sink_anchor": {
+    "file": "packages/server/src/services/chatflows/index.ts",
+    "function": "getChatflowByApiKey"
+   },
+   "affected_subsystem": "server:chatflows apikey API",
+   "occurrence_count": 1,
+   "conditions_present": [
+    "T"
+   ],
+   "occurrences": [
+    {
+     "run": "t4-task-lifecycle-v2-192p/formal_t4-task-lifecycle-v2",
+     "condition": "T",
+     "submitted_by": "agent_004",
+     "finding_index": 6,
+     "disposition": "unmatched_review"
+    }
+   ],
+   "distinct_claim_variants": [
+    "Unauthenticated chatflow disclosure via /chatflows/apikey/:apikey with unvalidated keyonly parameter"
+   ]
+  },
+  {
+   "cluster_id": "UC26",
+   "cluster_key": "PUBLIC_CHATBOT_CONFIG",
+   "claim_summary": "Unauthenticated disclosure of private chatflow flowData via the public-chatbotConfig endpoint (no isPublic check).",
+   "category": "information_disclosure",
+   "source_anchor": {
+    "file": "packages/server/src/controllers/chatflows/index.ts",
+    "function": "getSinglePublicChatbotConfig"
+   },
+   "sink_anchor": {
+    "file": "packages/server/src/services/chatflows/index.ts",
+    "function": "getSinglePublicChatbotConfig"
+   },
+   "affected_subsystem": "server:chatflows public config API",
+   "occurrence_count": 1,
+   "conditions_present": [
+    "S"
+   ],
+   "occurrences": [
+    {
+     "run": "single_n1_20260919T004958.035995+0000_2c9edb89",
+     "condition": "S",
+     "submitted_by": "agent_001",
+     "finding_index": 1,
+     "disposition": "unmatched_review"
+    }
+   ],
+   "distinct_claim_variants": [
+    "Unauthenticated disclosure of private chatflow flowData via public-chatbotConfig endpoint"
+   ]
+  },
+  {
+   "cluster_id": "UC27",
+   "cluster_key": "DOCSTORE_UPSERT",
+   "claim_summary": "Document store upsert/refresh routes omit the RBAC permission checks present on sibling documentstore routes.",
+   "category": "authorization",
+   "source_anchor": {
+    "file": "packages/server/src/routes/documentstore/index.ts",
+    "function": "router"
+   },
+   "sink_anchor": {
+    "file": "packages/server/src/controllers/documentstore/index.ts",
+    "function": "upsertDocStoreMiddleware"
+   },
+   "affected_subsystem": "server:documentstore routes",
+   "occurrence_count": 1,
+   "conditions_present": [
+    "S"
+   ],
+   "occurrences": [
+    {
+     "run": "single_n1_20260919T021423.935064+0000_1a6244b9",
+     "condition": "S",
+     "submitted_by": "agent_001",
+     "finding_index": 2,
+     "disposition": "unmatched_review"
+    }
+   ],
+   "distinct_claim_variants": [
+    "Document store upsert/refresh routes omit RBAC permission checks present on sibling routes"
+   ]
+  },
+  {
+   "cluster_id": "UC28",
+   "cluster_key": "DOCSTORE_VECTOR",
+   "claim_summary": "Document store vector-store query/config/tool-desc endpoints lack workspace scoping (cross-tenant IDOR read of document stores).",
+   "category": "access_control",
+   "source_anchor": {
+    "file": "packages/server/src/routes/documentstore/index.ts",
+    "function": "router.post('/vectorstore/query', ...)"
+   },
+   "sink_anchor": {
+    "file": "packages/server/src/services/documentstore/index.ts",
+    "function": "queryVectorStore"
+   },
+   "affected_subsystem": "server:documentstore routes",
+   "occurrence_count": 1,
+   "conditions_present": [
+    "S"
+   ],
+   "occurrences": [
+    {
+     "run": "single_n1_20260919T050526.679955+0000_6793723c",
+     "condition": "S",
+     "submitted_by": "agent_001",
+     "finding_index": 0,
+     "disposition": "unmatched_review"
+    }
+   ],
+   "distinct_claim_variants": [
+    "Cross-tenant IDOR in document store vector-store query / config / tool-desc endpoints (missing workspace scoping)"
+   ]
+  },
+  {
+   "cluster_id": "UC29",
+   "cluster_key": "DOMAIN_VALIDATION",
+   "claim_summary": "Public chatflow domain validation defaults to allow when no allowlist is configured (validateChatflowDomain).",
+   "category": "misconfiguration",
+   "source_anchor": {
+    "file": "packages/server/src/utils/domainValidation.ts",
+    "function": "validateChatflowDomain"
+   },
+   "sink_anchor": {
+    "file": "packages/server/src/utils/domainValidation.ts",
+    "function": "validateChatflowDomain"
+   },
+   "affected_subsystem": "server:domainValidation",
+   "occurrence_count": 1,
+   "conditions_present": [
+    "S"
+   ],
+   "occurrences": [
+    {
+     "run": "single_n1_20260919T045304.598787+0000_28d2d36e",
+     "condition": "S",
+     "submitted_by": "agent_001",
+     "finding_index": 2,
+     "disposition": "unmatched_review"
+    }
+   ],
+   "distinct_claim_variants": [
+    "Public chatflow domain validation defaults to allow when no allowlist configured"
+   ]
+  },
+  {
+   "cluster_id": "UC30",
+   "cluster_key": "FETCH_LINKS_SSRF",
+   "claim_summary": "Unauthenticated fetch-links endpoint performs server-side URL fetch (webCrawl/xmlScrape) guarded only by a DNS-based deny list (SSRF).",
+   "category": "ssrf",
+   "source_anchor": {
+    "file": "packages/server/src/controllers/fetch-links/index.ts",
+    "function": "getAllLinks"
+   },
+   "sink_anchor": {
+    "file": "packages/server/src/services/fetch-links/index.ts",
+    "function": "getAllLinks"
+   },
+   "affected_subsystem": "server:fetch-links API",
+   "occurrence_count": 1,
+   "conditions_present": [
+    "S"
+   ],
+   "occurrences": [
+    {
+     "run": "n4-flowise-completion-calibration-v2-96p/formal_s1_team-finalization-v1",
+     "condition": "S",
+     "submitted_by": "agent_001",
+     "finding_index": 1,
+     "disposition": "unmatched_review"
+    }
+   ],
+   "distinct_claim_variants": [
+    "Unauthenticated fetch-links endpoint performs server-side URL fetch (webCrawl/xmlScrape) guarded only by a DNS-based deny list"
+   ]
+  },
+  {
+   "cluster_id": "UC31",
+   "cluster_key": "MCP_DELETE",
+   "claim_summary": "Unauthenticated MCP endpoint DELETE route bypasses Bearer-token authentication.",
+   "category": "authentication",
+   "source_anchor": {
+    "file": "packages/server/src/routes/mcp-endpoint/index.ts",
+    "function": "router.delete('/:chatflowId', ...)"
+   },
+   "sink_anchor": {
+    "file": "packages/server/src/controllers/mcp-endpoint/index.ts",
+    "function": "handleDelete"
+   },
+   "affected_subsystem": "server:mcp-endpoint routes",
+   "occurrence_count": 1,
+   "conditions_present": [
+    "T"
+   ],
+   "occurrences": [
+    {
+     "run": "t4-task-lifecycle-v2-192p/formal_t4-task-lifecycle-v2",
+     "condition": "T",
+     "submitted_by": "agent_001",
+     "finding_index": 0,
+     "disposition": "unmatched_review"
+    }
+   ],
+   "distinct_claim_variants": [
+    "Unauthenticated MCP endpoint DELETE route bypasses Bearer-token authentication"
+   ]
+  },
+  {
+   "cluster_id": "UC32",
+   "cluster_key": "MCP_INTERNAL",
+   "claim_summary": "MCP endpoint executes any chatflow with isInternal=true, bypassing flow API-key validation (chatflowCallback).",
+   "category": "authorization",
+   "source_anchor": {
+    "file": "packages/server/src/services/mcp-endpoint/index.ts",
+    "function": "chatflowCallback"
+   },
+   "sink_anchor": {
+    "file": "packages/server/src/utils/buildChatflow.ts",
+    "function": "utilBuildChatflow"
+   },
+   "affected_subsystem": "server:mcp-endpoint service",
+   "occurrence_count": 1,
+   "conditions_present": [
+    "T"
+   ],
+   "occurrences": [
+    {
+     "run": "t4-nonoverlap-v1-192p/formal_t4-nonoverlap-v1",
+     "condition": "T",
+     "submitted_by": "agent_003",
+     "finding_index": 4,
+     "disposition": "unmatched_review"
+    }
+   ],
+   "distinct_claim_variants": [
+    "MCP endpoint executes any chatflow with isInternal=true, bypassing flow API-key validation"
+   ]
+  },
+  {
+   "cluster_id": "UC33",
+   "cluster_key": "MCP_SCOPE",
+   "claim_summary": "MCP endpoint chatflow lookup is not workspace-scoped (IDOR surface), though token check mitigates.",
+   "category": "authorization",
+   "source_anchor": {
+    "file": "packages/server/src/services/mcp-server/index.ts",
+    "function": "getChatflowByIdAndVerifyToken"
+   },
+   "sink_anchor": {
+    "file": "packages/server/src/services/mcp-endpoint/index.ts",
+    "function": "handleMcpRequest"
+   },
+   "affected_subsystem": "server:mcp-server/mcp-endpoint",
+   "occurrence_count": 1,
+   "conditions_present": [
+    "T"
+   ],
+   "occurrences": [
+    {
+     "run": "n4-flowise-completion-calibration-v2-96p/formal_t4_team-finalization-v1",
+     "condition": "T",
+     "submitted_by": "agent_004",
+     "finding_index": 3,
+     "disposition": "unmatched_review"
+    }
+   ],
+   "distinct_claim_variants": [
+    "MCP endpoint chatflow lookup is not workspace-scoped (IDOR surface) though token check mitigates"
+   ]
+  },
+  {
+   "cluster_id": "UC34",
+   "cluster_key": "SANITIZE_MIDDLEWARE",
+   "claim_summary": "Global auth/whitelist middleware evaluates req.path after sanitizeMiddleware rewrites req.url with sanitizeHtml(decodeURI(...)), enabling auth-whitelist bypass via encoded/mutated paths.",
+   "category": "access_control",
+   "source_anchor": {
+    "file": "packages/server/src/utils/XSS.ts",
+    "function": "sanitizeMiddleware"
+   },
+   "sink_anchor": {
+    "file": "packages/server/src/index.ts",
+    "function": "App.config"
+   },
+   "affected_subsystem": "server:middleware XSS.ts + auth",
+   "occurrence_count": 1,
+   "conditions_present": [
+    "T"
+   ],
+   "occurrences": [
+    {
+     "run": "t4-sequenced-bootstrap-v1-192p/formal_t4-sequenced-bootstrap-v1",
+     "condition": "T",
+     "submitted_by": "agent_003",
+     "finding_index": 2,
+     "disposition": "unmatched_review"
+    }
+   ],
+   "distinct_claim_variants": [
+    "Global auth/whitelist middleware evaluates req.path after sanitizeMiddleware rewrites req.url with sanitizeHtml(decodeURI(...))"
+   ]
+  },
+  {
+   "cluster_id": "UC35",
+   "cluster_key": "NODE_CUSTOM_FUNC",
+   "claim_summary": "POST /api/v1/node-custom-function reachable with only chatflows:create/update passes workspace variables (incl. runtime env secrets) into the JS sandbox because the skipVariables flag is never enforced in getVars (secret disclosure to low-privileged users).",
+   "category": "information_disclosure",
+   "source_anchor": {
+    "file": "packages/server/src/controllers/nodes/index.ts",
+    "function": "executeCustomFunction"
+   },
+   "sink_anchor": {
+    "file": "packages/components/src/utils.ts",
+    "function": "getVars"
+   },
+   "affected_subsystem": "server:nodes controller + components getVars",
+   "occurrence_count": 1,
+   "conditions_present": [
+    "T"
+   ],
+   "occurrences": [
+    {
+     "run": "t4-sequenced-bootstrap-v1-corrected-192p/formal_t4-sequenced-bootstrap-v1-corrected",
+     "condition": "T",
+     "submitted_by": "agent_001",
+     "finding_index": 0,
+     "disposition": "unmatched_review"
+    }
+   ],
+   "distinct_claim_variants": [
+    "Workspace variable secrets exposed to low-privileged users via /api/v1/node-custom-function (skipVariables flag never enforced)"
+   ]
+  },
+  {
+   "cluster_id": "UC36",
+   "cluster_key": "NVIDIA_NIM",
+   "claim_summary": "Missing authorization checks on NVIDIA NIM container-management routes (startContainer etc.).",
+   "category": "authorization",
+   "source_anchor": {
+    "file": "packages/server/src/routes/nvidia-nim/index.ts",
+    "function": "router"
+   },
+   "sink_anchor": {
+    "file": "packages/server/src/controllers/nvidia-nim/index.ts",
+    "function": "startContainer"
+   },
+   "affected_subsystem": "server:nvidia-nim routes",
+   "occurrence_count": 1,
+   "conditions_present": [
+    "S"
+   ],
+   "occurrences": [
+    {
+     "run": "single_n1_20260919T020929.584601+0000_5e034b57",
+     "condition": "S",
+     "submitted_by": "agent_001",
+     "finding_index": 1,
+     "disposition": "unmatched_review"
+    }
+   ],
+   "distinct_claim_variants": [
+    "Missing authorization checks on NVIDIA NIM container-management routes"
+   ]
+  },
+  {
+   "cluster_id": "UC37",
+   "cluster_key": "PRED_OVERRIDE",
+   "claim_summary": "Unauthenticated prediction endpoint applies attacker-controlled overrideConfig to flow node inputs (API override abuse).",
+   "category": "access_control",
+   "source_anchor": {
+    "file": "packages/server/src/controllers/predictions/index.ts",
+    "function": "createPrediction"
+   },
+   "sink_anchor": {
+    "file": "packages/server/src/utils/buildChatflow.ts",
+    "function": "initEndingNode"
+   },
+   "affected_subsystem": "server:predictions API",
+   "occurrence_count": 1,
+   "conditions_present": [
+    "T"
+   ],
+   "occurrences": [
+    {
+     "run": "n4-flowise-completion-calibration-v2-96p/formal_t4_team-finalization-v1",
+     "condition": "T",
+     "submitted_by": "agent_001",
+     "finding_index": 0,
+     "disposition": "unmatched_review"
+    }
+   ],
+   "distinct_claim_variants": [
+    "Unauthenticated prediction endpoint applies attacker-controlled overrideConfig to flow node inputs (API override abuse)"
+   ]
+  },
+  {
+   "cluster_id": "UC38",
+   "cluster_key": "PRED_ISPUBLIC",
+   "claim_summary": "Public prediction endpoint executes any chatflow regardless of its isPublic flag.",
+   "category": "access_control",
+   "source_anchor": {
+    "file": "packages/server/src/controllers/predictions/index.ts",
+    "function": "createPrediction"
+   },
+   "sink_anchor": {
+    "file": "packages/server/src/utils/buildChatflow.ts",
+    "function": "utilBuildChatflow"
+   },
+   "affected_subsystem": "server:predictions API",
+   "occurrence_count": 1,
+   "conditions_present": [
+    "S"
+   ],
+   "occurrences": [
+    {
+     "run": "single_n1_20260919T052352.707783+0000_8e78df51",
+     "condition": "S",
+     "submitted_by": "agent_001",
+     "finding_index": 3,
+     "disposition": "unmatched_review"
+    }
+   ],
+   "distinct_claim_variants": [
+    "Unauthenticated public prediction endpoint executes any chatflow regardless of isPublic flag"
+   ]
+  },
+  {
+   "cluster_id": "UC39",
+   "cluster_key": "WEBHOOK_SSRF",
+   "claim_summary": "Webhook async callbackUrl SSRF: dispatchCallback performs server-side requests to user-supplied URLs where only the protocol is validated and the SSRF deny-list is disabled by default (HTTP_SECURITY_CHECK=false).",
+   "category": "ssrf",
+   "source_anchor": {
+    "file": "packages/server/src/controllers/webhook/index.ts",
+    "function": "createWebhook"
+   },
+   "sink_anchor": {
+    "file": "packages/server/src/utils/callbackDispatcher.ts",
+    "function": "dispatchCallback"
+   },
+   "affected_subsystem": "server:webhook callbackDispatcher",
+   "occurrence_count": 1,
+   "conditions_present": [
+    "T"
+   ],
+   "occurrences": [
+    {
+     "run": "t4-sequenced-bootstrap-v1-corrected-192p/formal_t4-sequenced-bootstrap-v1-corrected",
+     "condition": "T",
+     "submitted_by": "agent_002",
+     "finding_index": 1,
+     "disposition": "unmatched_review"
+    }
+   ],
+   "distinct_claim_variants": [
+    "Webhook async callbackUrl SSRF: only protocol is validated, SSRF deny-list is disabled by HTTP_SECURITY_CHECK=false"
+   ]
+  },
+  {
+   "cluster_id": "UC40",
+   "cluster_key": "WEBHOOK_LISTENER_SSE",
+   "claim_summary": "Webhook-listener SSE stream accepts a client-supplied listenerId without verifying ownership of the associated chatflow, allowing subscription to other users webhook events.",
+   "category": "authorization",
+   "source_anchor": {
+    "file": "packages/server/src/controllers/webhook-listener/index.ts",
+    "function": "streamListener"
+   },
+   "sink_anchor": {
+    "file": "packages/server/src/utils/SSEStreamer.ts",
+    "function": "addClient"
+   },
+   "affected_subsystem": "server:webhook-listener SSE",
+   "occurrence_count": 1,
+   "conditions_present": [
+    "T"
+   ],
+   "occurrences": [
+    {
+     "run": "t4-sequenced-bootstrap-v1-corrected-3seed-192p/formal_seed-02",
+     "condition": "T",
+     "submitted_by": "agent_003",
+     "finding_index": 3,
+     "disposition": "unmatched_review"
+    }
+   ],
+   "distinct_claim_variants": [
+    "Webhook listener SSE stream accepts client-supplied listenerId without verifying ownership of the chatflow"
+   ]
+  }
+ ]
+}
