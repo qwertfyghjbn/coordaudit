@@ -7,10 +7,16 @@ import hashlib
 import json
 import re
 import subprocess
+import sys
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+from experiments.emergent_coordination.harness.prompts import base_prompt
+from experiments.emergent_coordination.harness.tools.specs import tools_for_mode
+
 TARGET = ROOT / "experiments/emergent_coordination/repositories/flowise_3_1_3_repository_v1"
 V1 = ROOT / "experiments/emergent_coordination/evaluator_private/flowise_3_1_3_repository_v1/ground_truth.json"
 V11 = ROOT / "experiments/emergent_coordination/evaluator_private/flowise_3_1_3_repository_v1_1/ground_truth.json"
@@ -122,6 +128,17 @@ def main() -> None:
     require(manifest["target_root"] == "experiments/emergent_coordination/repositories/flowise_3_1_3_repository_v1", "same target root")
     require(manifest["prompt_profile"] == manifest["finding_schema"] == "repository_v1", "same prompt/schema profile")
     require(manifest["permissions"]["evaluator_private"] is False, "private GT isolation")
+    common_prompt, schema_prompt = base_prompt("repository_v1")
+    require(sha((common_prompt + "\n" + schema_prompt).encode()) == manifest["digests"]["base_prompt_sha256"], "base prompt digest")
+    finding_schema_file = ROOT / "experiments/emergent_coordination/harness/repository_v1_findings.py"
+    require(sha(finding_schema_file.read_bytes()) == manifest["digests"]["finding_schema_sha256"], "finding schema digest")
+    modes = ("single", "parallel", "raw_blackboard", "structured_team")
+    tool_surface = {mode: tools_for_mode(mode, "repository_v1") for mode in modes}
+    tool_surface["manager_worker"] = {
+        role: tools_for_mode("manager_worker", "repository_v1", role=role)
+        for role in ("manager", "worker")
+    }
+    require(sha(json.dumps(tool_surface, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()) == manifest["digests"]["tool_surface_sha256"], "tool surface digest")
 
     git_status = subprocess.run(["git", "status", "--porcelain", "--untracked-files=normal"], cwd=ROOT, capture_output=True, text=True, check=True).stdout
     print(json.dumps({

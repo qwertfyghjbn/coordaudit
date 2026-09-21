@@ -4,6 +4,8 @@
 
 `GT_FREEZE_COMPLETE = no`。内容 gate 已裁决，versioned GT 与 case manifest 候选已物化并通过只读校验；**全局 git clean / 版本控制冻结 gate 尚未满足**。当前工作树包含本阶段开始前就存在的无关已修改和未跟踪文件，其中旧 v1 manifest 也已有用户修改；本阶段没有覆盖或清理它们。`flowise_3_1_3_repository_v1_1` 的 runtime 注册和 live gate 保持 blocked，evaluator-v2 尚未实现。
 
+候选资产已单独提交为 `396982b`（未把先前存在的无关修改纳入提交）。因此 GT 与 manifest 的内容摘要具有 commit 证据；仓库全局工作树仍不 clean，且 GT 内状态仍为候选。
+
 ## 逐项裁决
 
 | Gate | 结论 | 依据 |
@@ -35,7 +37,7 @@
 | GT status | `pending_git_clean_and_validation`（候选，尚未宣称 frozen） |
 | Live gate | `blocked` |
 
-`python3 scripts/verify_flowise_3_1_3_repository_v1_1_gt.py`：450 checks，`validation=passed`，`failures=[]`，`git_clean=false`（72 个 status entry，含本阶段候选文件及事先存在的修改）。校验包括 schema、唯一 root ID、旧 root 字段恒等、所有 file/excerpt 存在、函数标签或版本化 repair anchor、等价锚与 invariant 绑定、固定分母、target/private tree digest、case identity 与私有 GT 不可挂载配置。`git diff --check` 通过。
+`python3 scripts/verify_flowise_3_1_3_repository_v1_1_gt.py`：内容校验通过，`failures=[]`，`git_clean=false`。校验包括 schema、唯一 root ID、旧 root 字段恒等、所有 file/excerpt 存在、函数标签或版本化 repair anchor、等价锚与 invariant 绑定、固定分母、target/private tree digest、prompt/schema/tool surface digests、case identity 与私有 GT 不可挂载配置。`git diff --check` 通过。
 
 ## 尚需关闭的 freeze gate
 
