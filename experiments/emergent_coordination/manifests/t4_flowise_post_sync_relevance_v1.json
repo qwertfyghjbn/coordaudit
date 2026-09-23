@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "contract_id": "t4_flowise_post_sync_relevance_v1",
+  "repository": {
+    "id": "flowise_3_1_3_repository_v1",
+    "version": "repository-v1-candidate"
+  },
+  "model": {
+    "provider": "openai_compatible",
+    "requested_model": "deepseek-flash",
+    "thinking_mode": "disabled",
+    "temperature": 0.0,
+    "max_output_tokens": 4096
+  },
+  "budget": {
+    "hard_team_call_permits": 192,
+    "reserved_final_synthesis_permits": 0,
+    "token_stop_threshold": null,
+    "per_agent_token_cap": null
+  },
+  "runtime": {
+    "max_steps": 96,
+    "wall_clock_timeout_seconds": 1200
+  },
+  "retry": {
+    "max_provider_retries": 1,
+    "final_synthesis_retries": 0
+  },
+  "completion_generation": "completion_v2_team",
+  "completion_policy": "convergent_v2",
+  "team_completion_policy": "all_agents_terminal_v1",
+  "team_finalization_policy": "team_remaining_permits_v1",
+  "team_finalization_reserve": 32,
+  "task_board_sequencing_policy": "initialization_lease_v1",
+  "task_closure_policy": "task_closure_gate_v1",
+  "result_sync_policy": "result_sync_v1",
+  "prompt_profile": "repository_v1_t4_post_sync_relevance_v1",
+  "conditions": [
+    {"id": "T4", "mode": "structured_team", "agent_count": 4}
+  ],
+  "preregistration": {
+    "status": "frozen_for_post_sync_relevance_diagnostic",
+    "live_execution_authorized": true,
+    "network_access": false,
+    "provider_live_calls": true,
+    "seed_identities": [
+      "t4-result-sync-v1-matched-seed-01",
+      "t4-result-sync-v1-matched-seed-02",
+      "t4-result-sync-v1-matched-seed-03"
+    ],
+    "comparison_reference": "t4-post-sync-inspection-v2-192p/matched-seed-01-replacement-01,matched-seed-02,matched-seed-03",
+    "research_question": "在已有 foreign artifact inspection 的前提下，要求明确区分主题相近与直接相关、提出可验证目标或说明没有目标，是否增加可追溯的直接相关判断与具体线索？",
+    "intervention": "仅在 RESULT_SYNC user message 的 v2 inspection instruction 后追加 relevance 判断；初始 system/user prompt、raw snapshot 和 v2 inspection text 逐字一致；不要求执行验证、不强制 evidence reuse、citation 或 finding 改动",
+    "primary_outcomes": [
+      "manual v1 direct relation per agent",
+      "manual v1 actionable lead per agent",
+      "inspection record with explicit no direct relation or no useful verification target"
+    ],
+    "secondary_outcomes": [
+      "R0-R4 visibility/inspection/adoption ladder",
+      "post-sync verification follow-through",
+      "foreign evidence body read and final finding incorporation",
+      "finding count and evaluator outcomes"
+    ],
+    "analysis_protocol": "docs/research/t4-post-sync-inspection-manual-adjudication-v1-20260922.md",
+    "validity_gate": "run valid, 4/4 initial task closure, result_sync exactly once, complete provenance, no deadlock",
+    "interpretation_limit": "result_sync commonly occurs after team finalization; R3 or tool follow-through cannot isolate relevance under this unchanged scheduler",
+    "unchanged_semantics": [
+      "result_sync_v1",
+      "initialization_lease_v1",
+      "task_closure_gate_v1",
+      "decomposition and task lifecycle",
+      "hard_team_call_permits=192",
+      "team_finalization_reserve=32",
+      "model/seed/scheduler/tools/target/evaluator",
+      "submission/completion/finalization"
+    ],
+    "excluded_conditions": ["S1", "P4", "B4", "M4"],
+    "not_an_architecture_benchmark": true
+  }
+}

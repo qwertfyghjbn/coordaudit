@@ -301,6 +301,15 @@ class AgentSandbox:
         except CoordinationError as exc:
             raise ToolError(str(exc)) from exc
 
+    def claimed_tasks(self) -> list[dict[str, Any]]:
+        return self._board().claimed_tasks_for(self.agent_id)
+
+    def result_sync_status(self) -> dict[str, Any]:
+        return self._board().result_sync_status(self.agent_id)
+
+    def observe_result_sync(self, *, parent_event_id: str | None = None) -> dict[str, Any] | None:
+        return self._board().observe_result_sync(self.agent_id, parent_event_id=parent_event_id)
+
     def send_message(self, to: str, body: str) -> dict[str, Any]:
         return self._board().send_message(self.agent_id, to, body)
 
@@ -387,13 +396,19 @@ class AgentSandbox:
             task_observed = {
                 reference
                 for event in all_events
-                if event.get("agent_id") == self.agent_id and event.get("event_type") == "task_result_observed"
-                for reference in ((event.get("payload") or {}).get("evidence_refs") or [])
+                if event.get("agent_id") == self.agent_id
+                and event.get("event_type") in {"task_result_observed", "result_sync_observed"}
+                for reference in (
+                    (event.get("payload") or {}).get("evidence_refs")
+                    or (event.get("payload") or {}).get("foreign_evidence_refs")
+                    or []
+                )
             }
             manager_report_observed = {
                 reference
                 for event in all_events
-                if event.get("agent_id") == self.agent_id and event.get("event_type") == "manager_report_observed"
+                if event.get("agent_id") == self.agent_id
+                and event.get("event_type") in {"manager_report_observed", "manager_report_model_visible"}
                 for reference in ((event.get("payload") or {}).get("evidence_refs") or [])
             }
             evidence_events = {

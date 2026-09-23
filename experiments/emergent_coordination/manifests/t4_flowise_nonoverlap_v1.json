@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "contract_id": "t4_flowise_nonoverlap_v1",
+  "repository": {
+    "id": "flowise_3_1_3_repository_v1",
+    "version": "repository-v1-candidate"
+  },
+  "model": {
+    "provider": "openai_compatible",
+    "requested_model": "deepseek-flash",
+    "thinking_mode": "disabled",
+    "temperature": 0.0,
+    "max_output_tokens": 4096
+  },
+  "budget": {
+    "hard_team_call_permits": 192,
+    "reserved_final_synthesis_permits": 0,
+    "token_stop_threshold": null,
+    "per_agent_token_cap": null
+  },
+  "runtime": {
+    "max_steps": 96,
+    "wall_clock_timeout_seconds": 1200
+  },
+  "retry": {
+    "max_provider_retries": 1,
+    "final_synthesis_retries": 0
+  },
+  "completion_generation": "completion_v2_team",
+  "completion_policy": "convergent_v2",
+  "team_completion_policy": "all_agents_terminal_v1",
+  "team_finalization_policy": "team_remaining_permits_v1",
+  "team_finalization_reserve": 32,
+  "prompt_profile": "repository_v1_t4_nonoverlap_v1",
+  "conditions": [
+    {"id": "T4", "mode": "structured_team", "agent_count": 4}
+  ],
+  "preregistration": {
+    "status": "frozen_for_weak_nonoverlap_diagnostic",
+    "live_execution_authorized": true,
+    "network_access": false,
+    "provider_live_calls": true,
+    "seed_identity": "n4-flowise-completion-calibration-v2-96p",
+    "comparison_reference": "t4-task-lifecycle-v2-192p/formal_t4-task-lifecycle-v2",
+    "research_question": "在已经采用 task board 且 completion 充足的条件下，弱约束的非重叠 scope 指令是否足以让四个 agent 自发形成互补任务？",
+    "intervention": "append weak pre-create/pre-claim non-overlap scope inspection and exclusion instruction; preserve bootstrap, task lifecycle and finalization semantics",
+    "race_hypothesis": "Concurrent list_tasks observations may all be empty before any create_task becomes visible; this diagnostic records that race rather than adding runtime deduplication or automatic assignment.",
+    "primary_outcomes": [
+      "adoption: list/create/claim/complete actions",
+      "coordination_quality: materially distinct scopes, overlap, duplicate work, ownership",
+      "task_effectiveness: completed artifacts, evidence_refs and evidence reuse"
+    ],
+    "unchanged_semantics": [
+      "hard_team_call_permits=192",
+      "team_finalization_reserve=32",
+      "model, seed, tools, scheduler, target, evaluator, retry and wall-clock",
+      "completion and team-completion policies",
+      "bootstrap/decomposition prompt and claimed-task lifecycle"
+    ],
+    "excluded_conditions": ["S1", "P4", "B4", "M4"],
+    "not_an_architecture_benchmark": true
+  }
+}

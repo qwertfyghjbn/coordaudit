@@ -1,0 +1,157 @@
+{
+  "all_old_unmatched": {
+    "canonical_tp": 39,
+    "duplicate_root": 12,
+    "equivalent_tp": 15,
+    "false_positive": 25,
+    "gt_overlap_uncredited": 8,
+    "inconclusive": 3,
+    "unmatched_unreviewed": 20
+  },
+  "anchor_drift": {
+    "frozen_repair_roots": [
+      "R02_org_user_password_serialization",
+      "R05_generic_variable_resolution",
+      "R07_sso_invited_token_proof",
+      "R08_sso_email_only_identity"
+    ],
+    "observed_old_unmatched_to_formal_tp": {
+      "R02_org_user_password_serialization": 0,
+      "R05_generic_variable_resolution": 0,
+      "R07_sso_invited_token_proof": 0,
+      "R08_sso_email_only_identity": 2
+    }
+  },
+  "historical_adjudication_clusters": {
+    "UC01": {
+      "canonical_tp": 14,
+      "duplicate_root": 3,
+      "gt_overlap_uncredited": 3
+    },
+    "UC02": {
+      "canonical_tp": 8,
+      "duplicate_root": 1,
+      "gt_overlap_uncredited": 3
+    },
+    "UC03": {
+      "duplicate_root": 1,
+      "equivalent_tp": 8
+    },
+    "UC04": {
+      "canonical_tp": 6,
+      "duplicate_root": 1,
+      "gt_overlap_uncredited": 1
+    },
+    "UC05": {
+      "false_positive": 5
+    },
+    "UC06": {
+      "false_positive": 4
+    },
+    "UC07": {
+      "false_positive": 2
+    },
+    "UC08": {
+      "canonical_tp": 2
+    },
+    "UC09": {
+      "inconclusive": 1
+    },
+    "UC10": {
+      "equivalent_tp": 1
+    },
+    "UC11": {
+      "false_positive": 1
+    },
+    "UC12": {
+      "equivalent_tp": 1
+    },
+    "UC13": {
+      "equivalent_tp": 1
+    },
+    "UC14": {
+      "equivalent_tp": 1
+    },
+    "UC15": {
+      "equivalent_tp": 1
+    },
+    "UC16": {
+      "duplicate_root": 1
+    },
+    "UC17": {
+      "duplicate_root": 1
+    },
+    "UC18": {
+      "duplicate_root": 1
+    },
+    "UC19": {
+      "canonical_tp": 1
+    },
+    "UC20": {
+      "duplicate_root": 1
+    },
+    "UC21": {
+      "false_positive": 1
+    },
+    "UC22": {
+      "false_positive": 1
+    },
+    "UC23": {
+      "gt_overlap_uncredited": 1
+    },
+    "UC24": {
+      "false_positive": 1
+    },
+    "UC25": {
+      "false_positive": 1
+    },
+    "UC26": {
+      "inconclusive": 1
+    },
+    "UC27": {
+      "canonical_tp": 1
+    },
+    "UC28": {
+      "canonical_tp": 1
+    },
+    "UC29": {
+      "false_positive": 1
+    },
+    "UC30": {
+      "false_positive": 1
+    },
+    "UC31": {
+      "false_positive": 1
+    },
+    "UC32": {
+      "false_positive": 1
+    },
+    "UC33": {
+      "false_positive": 1
+    },
+    "UC34": {
+      "false_positive": 1
+    },
+    "UC35": {
+      "false_positive": 1
+    },
+    "UC36": {
+      "canonical_tp": 1
+    },
+    "UC37": {
+      "false_positive": 1
+    },
+    "UC38": {
+      "equivalent_tp": 1
+    },
+    "UC39": {
+      "false_positive": 1
+    },
+    "UC40": {
+      "inconclusive": 1
+    }
+  },
+  "note": "Canonical/equivalent TP require deterministic frozen-anchor constraints; cluster adjudication alone cannot promote an unmatched finding to formal TP.",
+  "schema_version": "repository-v1-to-v1.1-transition-matrix",
+  "unit": "individual original evaluator-v1 unmatched finding, including duplicate-root administrative outcomes"
+}

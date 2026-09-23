@@ -22,6 +22,7 @@ class CaseSelectionError(ValueError):
 _MANIFESTS = {
     "repo_pilot_v0": "repository_pilot_v0.json",
     "flowise_3_1_3_repository_v1": "flowise_3_1_3_repository_v1.json",
+    "flowise_3_1_3_repository_v1_1": "flowise_3_1_3_repository_v1_1.json",
 }
 
 
@@ -70,8 +71,17 @@ def load_case(case_id: str = "repo_pilot_v0") -> CaseDefinition:
         raise CaseSelectionError("unsupported prompt profile")
     if finding_schema not in {"repository_pilot_v0", "repository_v1"}:
         raise CaseSelectionError("unsupported finding schema")
-    if evaluator not in {"repository_pilot_v0", "repository_v1"}:
+    if evaluator not in {"repository_pilot_v0", "repository_v1", "repository_v1_1"}:
         raise CaseSelectionError("unsupported evaluator")
+    if evaluator == "repository_v1_1":
+        if case_id != "flowise_3_1_3_repository_v1_1" or raw.get("schema_version") != "repository-v1.1-case-manifest":
+            raise CaseSelectionError("repository-v1.1 evaluator requires its versioned case manifest")
+        from experiments.emergent_coordination.evaluator.repository_v1_1_score import load_ground_truth
+
+        try:
+            load_ground_truth(ground_truth)
+        except (OSError, ValueError) as exc:
+            raise CaseSelectionError(f"invalid repository-v1.1 trusted GT: {exc}") from exc
     return CaseDefinition(
         case_id=case_id,
         manifest_path=manifest_path,

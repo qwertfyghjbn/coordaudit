@@ -1,0 +1,137 @@
+{
+  "agent_run_derived_gt_overlap": {
+    "discovery_cluster_ids": [
+      "UC01",
+      "UC10"
+    ],
+    "discovery_equivalent_anchor_ids": [
+      "EA_R17_unstructured"
+    ],
+    "discovery_root_ids": [
+      "R21_oauth2_unauth_credential_mutation"
+    ],
+    "discovery_source": true,
+    "independent_generalization_evidence": false,
+    "matched_agent_run_derived_root_ids": [
+      "R21_oauth2_unauth_credential_mutation"
+    ],
+    "present": true
+  },
+  "condition": "T",
+  "input_sha256": {
+    "evaluation.json": "f26ffccacd28e26183ba50655d60f7675a2c1e7dc7b30f830874af5d129e5566",
+    "evaluator_private/verification.json": "80012887e0ae2e639cb8bd8678c6e5fedda04dd6f8e809f19eda1467205c96fa",
+    "merged_findings.json": "c659025c469b09fb7ebbdcf6eb83ce47d920b0dcf858eb300f38551a32aba2c2",
+    "run_manifest.json": "281f228d4a95804abbe78e1b9f67c5223438fa50abd8763d44a15837ee4dbd3f"
+  },
+  "original": {
+    "evaluator_generation": "repository_v1",
+    "false_negatives": 19,
+    "score_artifact": "experiments/emergent_coordination/runs/t4-sequenced-bootstrap-v1-192p/formal_t4-sequenced-bootstrap-v1/evaluation.json",
+    "score_artifact_sha256": "f26ffccacd28e26183ba50655d60f7675a2c1e7dc7b30f830874af5d129e5566",
+    "true_positives": 1,
+    "unmatched": 4,
+    "verification_artifact": "experiments/emergent_coordination/runs/t4-sequenced-bootstrap-v1-192p/formal_t4-sequenced-bootstrap-v1/evaluator_private/verification.json",
+    "verification_artifact_sha256": "80012887e0ae2e639cb8bd8678c6e5fedda04dd6f8e809f19eda1467205c96fa"
+  },
+  "per_finding_transition": [
+    {
+      "anchor_id": "primary:1",
+      "historical_cluster_id": "UC01",
+      "index": 0,
+      "original_disposition": "unmatched_review",
+      "retrospective_classification": "canonical_tp",
+      "root_id": "R21_oauth2_unauth_credential_mutation"
+    },
+    {
+      "anchor_id": "EA_R17_unstructured",
+      "historical_cluster_id": "UC10",
+      "index": 1,
+      "original_disposition": "unmatched_review",
+      "retrospective_classification": "equivalent_tp",
+      "root_id": "R17_document_loader_egress_policy"
+    },
+    {
+      "historical_cluster_id": "UC34",
+      "index": 2,
+      "original_disposition": "unmatched_review",
+      "retrospective_classification": "false_positive"
+    },
+    {
+      "anchor_id": "primary:0",
+      "index": 3,
+      "original_disposition": "positive",
+      "retrospective_classification": "canonical_tp",
+      "root_id": "R10_mcp_stdio_executable_policy"
+    },
+    {
+      "historical_cluster_id": "UC21",
+      "index": 4,
+      "original_disposition": "unmatched_review",
+      "retrospective_classification": "false_positive"
+    }
+  ],
+  "retrospective": {
+    "canonical_tp": 2,
+    "duplicate_findings": 0,
+    "equivalent_tp": 1,
+    "evaluator_generation": "repository_v1_1",
+    "false_negatives": 27,
+    "false_positive": 2,
+    "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+    "inconclusive": 0,
+    "known_gt_overlap_uncredited": 0,
+    "matched_roots": {
+      "R10_mcp_stdio_executable_policy": {
+        "anchor_id": "primary:0",
+        "classification": "canonical_tp",
+        "index": 3
+      },
+      "R17_document_loader_egress_policy": {
+        "anchor_id": "EA_R17_unstructured",
+        "classification": "equivalent_tp",
+        "index": 1
+      },
+      "R21_oauth2_unauth_credential_mutation": {
+        "anchor_id": "primary:1",
+        "classification": "canonical_tp",
+        "index": 0
+      }
+    },
+    "missing_roots": [
+      "R01_enterprise_active_org_binding",
+      "R02_org_user_password_serialization",
+      "R03_chat_message_route_permission",
+      "R04_generic_credential_lookup_scope",
+      "R05_openai_assistant_credential_lookup_scope",
+      "R06_assistant_delete_credential_lookup_scope",
+      "R07_sso_invited_token_proof",
+      "R08_sso_email_only_identity",
+      "R09_bullmq_dashboard_rbac",
+      "R11_mcp_cwd_policy",
+      "R12_realtime_chatflow_workspace_scope",
+      "R13_sqlite_chain_write_capability",
+      "R14_chat_model_baseurl_egress_policy",
+      "R15_upsert_history_route_scope",
+      "R16_memory_session_id_type",
+      "R18_export_variable_secret",
+      "R19_tts_abort_cross_operation",
+      "R20_tts_private_flow_credential_use",
+      "R22_feedback_unauth_cross_flow_access",
+      "R23_get_upload_file_unauth_cross_tenant_read",
+      "R24_dataset_rows_unscoped_delete",
+      "R25_user_create_zero_permission",
+      "R26_apikey_raw_secret_exposure",
+      "R27_documentstore_upsert_zero_permission",
+      "R28_documentstore_query_unscoped",
+      "R29_nvidia_nim_zero_permission_routes",
+      "R30_host_header_chatflow_tool_credential_egress"
+    ],
+    "root_denominator": 30,
+    "unmatched_unreviewed": 0,
+    "validated_novel_tp": 0
+  },
+  "run_id": "formal_t4-sequenced-bootstrap-v1",
+  "run_path": "t4-sequenced-bootstrap-v1-192p/formal_t4-sequenced-bootstrap-v1",
+  "seed": "n4-flowise-completion-calibration-v2-96p"
+}

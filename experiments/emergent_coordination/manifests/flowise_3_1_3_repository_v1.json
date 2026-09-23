@@ -55,6 +55,85 @@
         "max_provider_retries": 1,
         "wall_clock_timeout": 1200
     },
+  "contract_budgets": {
+        "n4m_flowise_calibration_v1": {
+            "hard_team_call_permits": 96,
+            "max_provider_retries": 1,
+            "wall_clock_timeout": 1200
+        },
+        "n4_flowise_completion_calibration_v2": {
+            "hard_team_call_permits": 96,
+            "max_provider_retries": 1,
+            "wall_clock_timeout": 1200
+        },
+        "t4_flowise_completion_budget_diagnostic_v1": {
+            "hard_team_call_permits": 192,
+            "max_provider_retries": 1,
+            "wall_clock_timeout": 1200
+        },
+        "t4_flowise_board_bootstrap_adoption_v1": {
+            "hard_team_call_permits": 192,
+            "max_provider_retries": 1,
+            "wall_clock_timeout": 1200
+        },
+        "t4_flowise_task_lifecycle_v2": {
+            "hard_team_call_permits": 192,
+            "max_provider_retries": 1,
+            "wall_clock_timeout": 1200
+        },
+        "t4_flowise_nonoverlap_v1": {
+            "hard_team_call_permits": 192,
+            "max_provider_retries": 1,
+            "wall_clock_timeout": 1200
+        },
+    "t4_flowise_sequenced_bootstrap_v1": {
+      "hard_team_call_permits": 192,
+      "max_provider_retries": 1,
+      "wall_clock_timeout": 1200
+    },
+    "t4_flowise_sequenced_bootstrap_task_closure_v1": {
+      "hard_team_call_permits": 192,
+      "max_provider_retries": 1,
+      "wall_clock_timeout": 1200
+    },
+    "t4_flowise_result_sync_v1": {
+      "hard_team_call_permits": 192,
+      "max_provider_retries": 1,
+      "wall_clock_timeout": 1200
+    },
+    "t4_flowise_result_inspection_prompt_v1": {
+      "hard_team_call_permits": 192,
+      "max_provider_retries": 1,
+      "wall_clock_timeout": 1200
+    },
+    "t4_flowise_post_sync_inspection_v2": {
+      "hard_team_call_permits": 192,
+      "max_provider_retries": 1,
+      "wall_clock_timeout": 1200
+    },
+    "t4_flowise_post_sync_relevance_v1": {
+      "hard_team_call_permits": 192,
+      "max_provider_retries": 1,
+      "wall_clock_timeout": 1200
+    },
+    "t4_flowise_post_sync_verification_permission_v1": {
+      "hard_team_call_permits": 192,
+      "max_provider_retries": 1,
+      "wall_clock_timeout": 1200
+    },
+    "t4_flowise_post_sync_window_v1": {
+      "hard_team_call_permits": 192,
+      "post_sync_reservation_per_agent": 4,
+      "max_provider_retries": 1,
+      "wall_clock_timeout": 1200
+    },
+    "t4_flowise_post_sync_window_v2": {
+      "hard_team_call_permits": 192,
+      "post_sync_reservation_per_agent": 4,
+      "max_provider_retries": 1,
+      "wall_clock_timeout": 1200
+    }
+    },
     "smoke_budgets": {
         "hard_team_call_permits": 8,
         "token_stop_threshold": null,
@@ -76,7 +155,7 @@
         "evaluator_private_tree_sha256": "76aaef174369769e70b8ef61cda454d96a503fc033e1437a6b6efba934915e12",
         "base_prompt_sha256": "a63820831f9ab8864eb318444cfc8ad0b126043161833f145f8840e68c9581ec",
         "finding_schema_sha256": "97ad0335dde33ffd45a2056d7b8e15b79375fbea5a40c2e82d7f774ba7999c48",
-        "tool_surface_sha256": "fd50774151b621069f3a82aeaf76a3355227318efafcec085c5ca58d72c2e1f0"
+        "tool_surface_sha256": "5aa75b85a6372b378a158203eac80ed213437b4877e1702384480b0594707cd4"
     },
     "leakage_notes": [
         "The target is isolated from evaluator-private assets and source-case provenance.",

@@ -20,11 +20,17 @@ EVENT_TYPES = (
     "llm_retry_scheduled", "tool_call", "file_read", "file_write",
     "shared_list", "shared_read", "shared_create", "shared_mkdir",
     "task_created", "task_claimed", "task_claim_conflict", "task_released", "task_completed", "task_result_observed",
+    "task_initialization_lease_waited", "task_initialization_lease_acquired", "task_initialization_lease_released",
+    "task_closure_gate_rejected", "result_sync_triggered", "result_sync_observed", "result_sync_gate_rejected",
+    "post_sync_window_opened", "post_sync_instruction_model_visible", "post_sync_provider_call_admitted",
+    "verification_action_attempted", "verification_evidence_model_visible", "post_sync_submit_deferred",
     "manager_task_created", "manager_task_assigned", "manager_task_listed", "manager_task_cancelled",
     "manager_task_reassigned", "manager_assignment_observed", "manager_worker_reported",
-    "manager_report_observed", "manager_worker_requested_more",
+    "manager_report_observed", "manager_report_queued", "manager_report_delivered", "manager_report_model_visible", "manager_report_adopted",
+    "manager_worker_requested_more", "team_finalization_started", "worker_terminalized",
+    "final_snapshot_ready", "final_synthesis_started", "final_synthesis_finished", "team_finalization_deadline_exceeded", "late_report",
     "message_sent", "message_read", "artifact_published", "finding_submitted", "finding_submission_rejected",
-    "completion_phase_started", "prohibited_tool_attempt", "budget_exhausted", "timeout", "error", "run_started", "run_finished",
+    "completion_phase_started", "prohibited_tool_attempt", "budget_exhausted", "team_completion", "timeout", "error", "run_started", "run_finished",
 )
 
 _CONTENT_FIELDS = frozenset({

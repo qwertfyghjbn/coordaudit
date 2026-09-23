@@ -58,9 +58,9 @@
 |---|---|---|---|---|
 | submission completion | **0/3** | **3/3** | **3/3** | **3/3** |
 | successful_submit_step | — | 67 / 119 / 87 | 124² / 121² / 76 | 110 / 100 / 102 |
-| voluntary first_convergence_step（trace review）³ | ∅ / ∅ / 120 | 65 / 116 / 86 | ∅ / ∅ / 73⁴ | 107 / 97 / 99 |
+| first cognitive convergence step（classification-v2 trace review）³ | ∅ / ∅ / **120** | 65 / 116 / 86 | ∅ / ∅ / **73** | 107 / 97 / 99 |
 | last_exploration_step | 128 / 128 / 127 | 65 / 118 / 86 | 120 / 120 / 75 | 108 / 98 / 101 |
-| exploration calls after convergence | 9（仅 C） | 0 / ~3 / 0 | —（gate） | 1 / 1 / 2 |
+| exploration calls after convergence | 9（仅 C） | 0 / ~3 / 0 | — / — / 1（C 为 nudge-induced） | 1 / 1 / 2 |
 | permits used / unused | 128+128+128 / 0 | 67,119,87 / 61,9,41 | 124,121,76 / 4,7,52 | 110,100,102 / 18,28,26 |
 | submit attempts（validator 口径） | 0 / 0 / 1 | 2 / 1 / 1 | 3 / 1 / 1 | 1 / 2 / 1 |
 | invalid/rejected（validator+参数） | 0+0 / 0+0 / 1+0 | 1 / 0 / 0 | 2 / 0 / 1+1arg | 0 / 1 / 0 |
@@ -69,7 +69,7 @@
 | unmatched（manual review） | 0 / 0 / 0 | 3 / 1 / 3 | 3 / 1 / 4 | 2 / 1 / 2 |
 | ceiling hits（finish=length） | 0 / 0 / 1 | 0 / 0 / 0 | 0 / 0 / **4** | 0 / 0 / 0 |
 
-² 提交发生在 finalization 窗口内/边界（121 起）。³ ∅=not_observed（不猜测）；编号见 §9。⁴ ceiling 截断 + harness nudge 诱发，非自愿。
+² 提交发生在 finalization 窗口内/边界（121 起）。³ ∅=not_observed（不猜测）；编号见 §9；C/none 的 120 是 `spontaneous` cognitive convergence。C/scheduler 的 73 由 ceiling 截断 + harness nudge 诱发，故 source=`nudge_induced`。
 
 ## 9. Cognitive convergence results（trace review 权威判定）
 
@@ -83,21 +83,21 @@
 - **C/convergent 97→99**：97 "Let me stop and consolidate"（矛盾：宣布停的同时继续探索）→ 99 "I am stuck in a loop and must stop. Let me consolidate my findings and submit."（明确；=机械候选）
 - **C/none 120**："I have enough evidence for several findings. Let me do a couple more targeted checks before submitting."（=机械候选）
 - **A/B-none**：128 步全程 "Let me look at…"，零完成语义 → not_observed。
-- **A/B-scheduler**：自愿收敛 not_observed（120 步仍在探索）；121 的提交意愿为 finalization 注入。**C/scheduler 73**："I'll stop exploring and submit my findings now"——但因果链是 66–72 重复 rambling 撞 4096 ceiling（4 次，逐字重复文本）→ no-tool-call → harness nudge，属危机诱发。
+- **A/B-scheduler**：cognitive convergence `not_observed`（120 步仍在探索）；121 的提交意愿为 finalization 注入。**C/scheduler 73**："I'll stop exploring and submit my findings now"——但因果链是 66–72 重复 rambling 撞 4096 ceiling（4 次，逐字重复文本）→ no-tool-call → harness nudge，属 `nudge_induced`。
 
-结论：**主动认知收敛只出现在有 guidance 的条件下**（guidance_only 3/3、convergent 3/3，且都在 65–116 步之间）；无 guidance 的 6 条 trace 中自愿收敛 0/6（C/none 120 为迟发、C/scheduler 73 为危机诱发）。机械候选 6/12 命中、0 误报（否定防护有效），但漏检 6 例 → 印证"候选信号不替代 trace review"。
+勘误（classification-v2）：**不能再写成“无 guidance 的 6 条 trace 中 convergence=0/6”。** C/none step 120 的 “I have enough evidence … before submitting” 满足 cognitive convergence，来源为 `spontaneous`；C/scheduler step 73 的表达来源为 `nudge_induced`。因此无 guidance 的 6 条 trace 是 1 条 `spontaneous`、1 条 `nudge_induced`、4 条 `not_observed`。有 guidance 的 6 条均为 `guidance_consistent`，不是 spontaneous。机械候选仍只是候选信号，不能替代 trace review。完整逐 run 表见 `docs/research/convergence-classification-v2-20260919.md`。
 
 ## 10. Behavioral stopping results
 
 - guidance 条件收敛后的继续探索全部是整合尺度：guidance_only 0/~3/0 次dispatch，convergent 1/1/2 次（补 evidence ref / 最后一次定点核验），无假设面扩张。
-- **C/none 是对照**：120 说"enough"后仍做了 9 次探索 dispatch（121–125），126 首次提交被 validator 拒（evidence_refs 指向只 shell 看过的文件），127 "I need to read the exact files I cite" 补 read_file，128 步耗尽——**形成了收敛意图但收敛→提交执行失败**。
+- **C/none 是关键三层分离对照**：120 说"enough"后仍做了 9 次探索 dispatch（121–125），所以 cognitive convergence=yes 但 behavioral stopping=no；126 首次提交被 validator 拒（evidence_refs 指向只 shell 看过的文件），127 "I need to read the exact files I cite" 补 read_file，128 步耗尽——最终没有 accepted submission。
 - A/B-none 到 128 仍在开新攻击面（account/auth 路由、saveChatflow path 处理）。
 
 ## 11. Submission completion results
 
-- guidance_only 与 convergent_v2 各 3/3 自主完成提交，全部**早于** finalization 起点 121（65–119 / 97–110），convergence→successful submit gap 分别为 2/3/1 与 3/3/3 步。
-- scheduler_only_v2 3/3 提交但性质不同：A 在窗口内经 2 次 validator 拒绝 + **2 次 prohibited read_file 被拦**后 124 成功；B 在 121 边界即刻合规提交（一次成功，且是全场唯一 TP）；C 在 76 步因 ceiling/nudge 危机提前提交（finalization 未触发）。
-- none 0/3：两条无意图，一条有意图但执行链超预算。
+- guidance_only 与 convergent_v2 各 3/3 在 finalization 前完成 accepted submission（65–119 / 97–110），convergence→successful submit gap 分别为 2/3/1 与 3/3/3 步；其 convergence source 均为 `guidance_consistent`。
+- scheduler_only_v2 3/3 提交但性质不同：A 在窗口内经 2 次 validator 拒绝 + **2 次 prohibited read_file 被拦**后 124 成功；B 在 121 边界即刻合规提交（一次成功，且是全场唯一 TP）；C 在 73 表达 convergence 后仍有 1 次探索，76 步因 ceiling/nudge 危机提前提交（finalization 未触发）。
+- none 0/3：A/B `not_observed` 且持续探索；C 有 `spontaneous` cognitive convergence，但未 behavioral stopping，提交执行链超预算。
 
 ## 12. Hard-finalization binding-rate analysis
 
@@ -106,7 +106,7 @@
 | A/scheduler (`28d2d36e`) | 121 | 未收敛，正在探索 SSO（120 步仍在 "Let me look at SSOBase"） | **2× read_file（122）** | **binding（强）** |
 | B/scheduler (`c3a912ed`) | 121 | 未收敛，120 步仍在查 openai-assistants 路由 | 0（即刻合规） | **binding** |
 | C/scheduler (`8e78df51`) | 未触发（76 提交） | 已（危机性）收敛并提交 | 0 | non-binding |
-| A/B/C-convergent | **均未触发**（110/100/102 提交 ≪ 121） | 已自愿收敛并停止探索 | 0 | **non-binding ×3** |
+| A/B/C-convergent | **均未触发**（110/100/102 提交 ≪ 121） | 已发生 `guidance_consistent` convergence 并停止探索 | 0 | **non-binding ×3** |
 
 **binding rate：scheduler_only_v2 = 2/3；convergent_v2 = 0/3。** 机械规则（binding_strong/binding_candidate/non_binding）与 trace review 在全部 6 个 Factor-B run 上一致。
 
@@ -120,25 +120,25 @@
 
 ## 15. Finding quality / TP results
 
-11 次提交共 21 findings，公开评分 TP = **1**（B/scheduler：unauthenticated file-download 缺 `isUnsafeFilePath` guard，path_traversal/medium/conf 0.45），FN 239/240，20 unmatched 待 condition-blind 人工复核。TP 在 4 格间的分布（0/0/1/0）不构成任何质量归因；forced 提交（A/scheduler 0 TP、3 unmatched）与自主提交质量差异仍待复核——A/scheduler 被 gate 拦截后被迫放弃的正是 shell-only 证据的 finding，与旧世代观察一致（evidence-ref 规则 × shell-heavy 风格交互）。
+11 次提交共 21 findings，公开评分 TP = **1**（B/scheduler：unauthenticated file-download 缺 `isUnsafeFilePath` guard，path_traversal/medium/conf 0.45），FN 239/240，20 unmatched 待 condition-blind 人工复核。TP 在 4 格间的分布（0/0/1/0）不构成任何质量归因；forced 提交（A/scheduler 0 TP、3 unmatched）与 pre-finalization accepted submission 的质量差异仍待复核——A/scheduler 被 gate 拦截后被迫放弃的正是 shell-only 证据的 finding，与旧世代观察一致（evidence-ref 规则 × shell-heavy 风格交互）。
 
 ## 16. H1–H6 assessment
 
-- **H1（guidance 提高主动收敛发生率/更早）— supported**：guidance 6/6 自愿收敛（65–116 步）；无 guidance 0/6 自愿（120 迟发与 73 危机诱发不计）。本世代内这是最干净的二值分离。
-- **H2（hard finalization 提高 submission completion 但≠convergence）— supported**：scheduler_only_v2 中 2 个未收敛 run 被 gate 转化为提交（121/124），且 A 的 trace 显示窗口内模型仍无收敛表达、被拦后仍想读文件；反向，C/none 收敛（120）却未完成提交——completion 与 convergence 可分离，gate 只补 completion 侧。
+- **H1（guidance 提高主动收敛发生率/更早）— partially supported（口径收窄）**：guidance 6/6 出现较早且可复核的 `guidance_consistent` convergence（65–116 步），但无 guidance 并非 0/6 convergence：C/none 是 step 120 的 `spontaneous`，C/scheduler 是 step 73 的 `nudge_induced`，其余 4 条 `not_observed`。更稳健的结论是 guidance 使 convergence 更一致、更早，并更常连接到 stopping/submission；不证明它创造了原本不存在的 cognitive capability。
+- **H2（hard finalization 提高 submission completion 但≠convergence）— supported**：scheduler_only_v2 中 2 个 `not_observed` run 被 gate 转化为提交（121/124），且 A 的 trace 显示窗口内模型仍无收敛表达、被拦后仍想读文件；反向，C/none cognitive convergence（120）却未完成 stopping/submission——completion 与 convergence 可分离，gate 只补 submission 侧。
 - **H3（scheduler_only 的 binding rate 高于 convergent）— supported**：2/3 vs 0/3；convergent 中 finalization 根本没有触发过。
-- **H4（convergent 中 scheduler 主要 fail-safe）— supported**：3/3 non-binding，提交全部在 100–110 步自主完成，gate 纯兜底。
+- **H4（convergent 中 scheduler 主要 fail-safe）— supported**：3/3 non-binding；三条均为 `guidance_consistent` convergence，且在 100–110 步完成 accepted submission，gate 纯兜底。
 - **H5（组合主要缩短 convergence→successful submission 距离）— not supported**：convergent gap 3/3/3 vs guidance_only 2/3/1——无缩短；guidance 单独已把 gap 压到 1–3 步，scheduler 无增量贡献（未触发）。
-- **H6（none@128 仍持续探索而非主动完成）— partially supported**：A/B 严格成立（零收敛、零提交、128 步扩张假设面）；C/none 例外——120 步形成收敛意图、126 尝试提交被 validator 拒、127–128 补救超预算。none 的失败模式不完全是"缺 completion intention"，还有"迟收敛 + 提交执行摩擦"。
+- **H6（none@128 仍持续探索而非主动完成）— partially supported（明确三层）**：A/B 严格成立（`not_observed`、零提交、128 步扩张假设面）；C/none 是 `spontaneous` cognitive convergence，但 behavioral stopping=no，126 尝试提交被 validator 拒、127–128 补救超预算。none 的失败模式不完全是"缺 completion intention"，还有"迟收敛 + 未停止 + 提交执行摩擦"。
 
-Q1–Q6 对应回答：Q1 是（且是本世代最强效应）；Q2 方向成立（guidance 后继续探索 ≤3 次 vs C/none 9 次，n 小）；Q3 scheduler 不是"降低提交步数"而是**截停-转化**（在 121 把未收敛探索转成 1–4 步内的提交）；Q4 是（2/3 vs 0/3）；Q5 convergent 3/3 non-binding（纯 fail-safe）；Q6 不存在该形态的交互——本世代观察到的是**分工/替代**：guidance 负责收敛与提交，scheduler 在无 guidance 时兜底 submission completion，组合无额外增益。
+Q1–Q6 对应回答：Q1 应改为“guidance 提高一致性与提前量”，不能写成从 0 创造 convergence；Q2 方向成立（guidance 后继续探索 ≤3 次 vs C/none 9 次，n 小）；Q3 scheduler 不是"降低提交步数"而是**截停-转化**（在 121 把未收敛探索转成 1–4 步内的提交）；Q4 是（2/3 vs 0/3）；Q5 convergent 3/3 non-binding（纯 fail-safe）；Q6 不存在该形态的交互——本世代观察到的是**分工/替代**：guidance 负责较早 convergence、stopping 与提交，scheduler 在无 guidance 时兜底 submission completion，组合无额外 gap 缩短。
 
 ## 17. Threats to validity
 
 1. 每格 n=3；seed 不发 API、provider 随机 tool_call ID → matched seed 仅为 bookkeeping，轨迹仍是独立抽样（本批未再现旧世代"同 seed 结局相反"，但样本不足以排除）。
 2. C/none 单次已恢复 provider failure（warning 保留）。
 3. 8 个 off-contract 64-permit 执行（含 1 个半程）为操作失误，已全量排除并披露；不影响 12 个正式 run 的合同一致性。
-4. C/scheduler 的收敛/提交由 ceiling 截断 + harness nudge 诱发（与旧世代 scheduler run 同型污染），该 cell 的"自愿提交"解释需打折。
+4. C/scheduler 的 convergence/提交由 ceiling 截断 + harness nudge 诱发（与旧世代 scheduler run 同型污染），该 cell 不能解释为 spontaneous completion。
 5. 机械 binding 规则与 trace review 本批一致，但规则以收敛**候选**为输入，漏检型收敛（B/guidance 型）在无 trace review 时会误分类。
 6. 公开评分稀疏且不披露逐 finding 映射；TP 不作机制结论依据。
 7. 单 case、单模型、thinking disabled、temperature 0。
@@ -149,7 +149,7 @@ Q1–Q6 对应回答：Q1 是（且是本世代最强效应）；Q2 方向成立
 
 ## 19. Recommended frozen completion policy for later S/P/B/T/M
 
-**推荐冻结 `convergent_v2`（guidance + hard dispatch-level finalization）@4096。** 依据：3/3 自主收敛并提交（65–119 步）、gate 0 触发（零强制成本）、保留对病态轨迹（C/scheduler 型循环、none 型不收敛）的硬兜底；即"guidance 干活、hard gate 兜底"的架构。scheduler_only_v2 不推荐作默认：无 guidance 时 2/3 binding 强制转化，提交质量（0/1 TP、放弃 shell-only finding）未证明。`convergent_v1`/2048 世代保留为历史诊断，不再使用。
+**推荐冻结 `convergent_v2`（guidance + hard dispatch-level finalization）@4096。** 依据：3/3 `guidance_consistent` convergence，均在 100–110 步完成 accepted submission，gate 0 触发（零强制成本），并保留对病态轨迹（C/scheduler 型循环、none 型不收敛）的硬兜底；即"guidance 稳定 completion behavior、hard gate 兜底"的架构。scheduler_only_v2 不推荐作默认：无 guidance 时 2/3 binding 强制转化，提交质量（0/1 TP、放弃 shell-only finding）未证明。`convergent_v1`/2048 世代保留为历史诊断，不再使用。公共 runtime contract 已另行冻结于 `docs/research/common_runtime_contract_completion_v2.md`。
 
 ## 20. Recommended next experiment
 

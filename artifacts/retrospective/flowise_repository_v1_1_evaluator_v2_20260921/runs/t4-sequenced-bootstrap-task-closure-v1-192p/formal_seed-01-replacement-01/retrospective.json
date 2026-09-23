@@ -1,0 +1,151 @@
+{
+  "agent_run_derived_gt_overlap": {
+    "discovery_cluster_ids": [],
+    "discovery_equivalent_anchor_ids": [],
+    "discovery_root_ids": [],
+    "discovery_source": false,
+    "independent_generalization_evidence": false,
+    "matched_agent_run_derived_root_ids": [
+      "R21_oauth2_unauth_credential_mutation",
+      "R25_user_create_zero_permission"
+    ],
+    "present": true
+  },
+  "condition": "T",
+  "input_sha256": {
+    "evaluation.json": "aa9b603aaf9e27367bd643c50afb2337feed560876242e6bdf4e07ae0dae3e49",
+    "evaluator_private/verification.json": "13ad8d420685d5ec9e3578b4bc2aab27c64261634d0a05972e154b414ace39f6",
+    "merged_findings.json": "fdf384bad2170aa2ea649dd11ac168f5cda67451ee658b2ea9fb665d8d3c524f",
+    "run_manifest.json": "bfe08e480bf00270a1a083bd3ad7ac364a860b4e39b1b39f6b12d3e602cf675f"
+  },
+  "original": {
+    "evaluator_generation": "repository_v1",
+    "false_negatives": 20,
+    "score_artifact": "experiments/emergent_coordination/runs/t4-sequenced-bootstrap-task-closure-v1-192p/formal_seed-01-replacement-01/evaluation.json",
+    "score_artifact_sha256": "aa9b603aaf9e27367bd643c50afb2337feed560876242e6bdf4e07ae0dae3e49",
+    "true_positives": 0,
+    "unmatched": 11,
+    "verification_artifact": "experiments/emergent_coordination/runs/t4-sequenced-bootstrap-task-closure-v1-192p/formal_seed-01-replacement-01/evaluator_private/verification.json",
+    "verification_artifact_sha256": "13ad8d420685d5ec9e3578b4bc2aab27c64261634d0a05972e154b414ace39f6"
+  },
+  "per_finding_transition": [
+    {
+      "index": 0,
+      "original_disposition": "unmatched_review",
+      "retrospective_classification": "unmatched_unreviewed"
+    },
+    {
+      "index": 1,
+      "original_disposition": "unmatched_review",
+      "retrospective_classification": "unmatched_unreviewed"
+    },
+    {
+      "index": 2,
+      "original_disposition": "unmatched_review",
+      "retrospective_classification": "unmatched_unreviewed"
+    },
+    {
+      "index": 3,
+      "original_disposition": "unmatched_review",
+      "retrospective_classification": "unmatched_unreviewed"
+    },
+    {
+      "index": 4,
+      "original_disposition": "unmatched_review",
+      "retrospective_classification": "unmatched_unreviewed"
+    },
+    {
+      "index": 5,
+      "original_disposition": "unmatched_review",
+      "retrospective_classification": "unmatched_unreviewed"
+    },
+    {
+      "index": 6,
+      "original_disposition": "unmatched_review",
+      "retrospective_classification": "unmatched_unreviewed"
+    },
+    {
+      "anchor_id": "primary:0",
+      "index": 7,
+      "original_disposition": "unmatched_review",
+      "retrospective_classification": "canonical_tp",
+      "root_id": "R25_user_create_zero_permission"
+    },
+    {
+      "index": 8,
+      "original_disposition": "unmatched_review",
+      "retrospective_classification": "unmatched_unreviewed"
+    },
+    {
+      "index": 9,
+      "original_disposition": "unmatched_review",
+      "retrospective_classification": "unmatched_unreviewed"
+    },
+    {
+      "anchor_id": "primary:0",
+      "index": 10,
+      "original_disposition": "unmatched_review",
+      "retrospective_classification": "canonical_tp",
+      "root_id": "R21_oauth2_unauth_credential_mutation"
+    }
+  ],
+  "retrospective": {
+    "canonical_tp": 2,
+    "duplicate_findings": 0,
+    "equivalent_tp": 0,
+    "evaluator_generation": "repository_v1_1",
+    "false_negatives": 28,
+    "false_positive": 0,
+    "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+    "inconclusive": 0,
+    "known_gt_overlap_uncredited": 0,
+    "matched_roots": {
+      "R21_oauth2_unauth_credential_mutation": {
+        "anchor_id": "primary:0",
+        "classification": "canonical_tp",
+        "index": 10
+      },
+      "R25_user_create_zero_permission": {
+        "anchor_id": "primary:0",
+        "classification": "canonical_tp",
+        "index": 7
+      }
+    },
+    "missing_roots": [
+      "R01_enterprise_active_org_binding",
+      "R02_org_user_password_serialization",
+      "R03_chat_message_route_permission",
+      "R04_generic_credential_lookup_scope",
+      "R05_openai_assistant_credential_lookup_scope",
+      "R06_assistant_delete_credential_lookup_scope",
+      "R07_sso_invited_token_proof",
+      "R08_sso_email_only_identity",
+      "R09_bullmq_dashboard_rbac",
+      "R10_mcp_stdio_executable_policy",
+      "R11_mcp_cwd_policy",
+      "R12_realtime_chatflow_workspace_scope",
+      "R13_sqlite_chain_write_capability",
+      "R14_chat_model_baseurl_egress_policy",
+      "R15_upsert_history_route_scope",
+      "R16_memory_session_id_type",
+      "R17_document_loader_egress_policy",
+      "R18_export_variable_secret",
+      "R19_tts_abort_cross_operation",
+      "R20_tts_private_flow_credential_use",
+      "R22_feedback_unauth_cross_flow_access",
+      "R23_get_upload_file_unauth_cross_tenant_read",
+      "R24_dataset_rows_unscoped_delete",
+      "R26_apikey_raw_secret_exposure",
+      "R27_documentstore_upsert_zero_permission",
+      "R28_documentstore_query_unscoped",
+      "R29_nvidia_nim_zero_permission_routes",
+      "R30_host_header_chatflow_tool_credential_egress"
+    ],
+    "root_denominator": 30,
+    "unmatched_unreviewed": 9,
+    "validated_novel_tp": 0
+  },
+  "run_id": "formal_seed-01-replacement-01",
+  "run_path": "t4-sequenced-bootstrap-task-closure-v1-192p/formal_seed-01-replacement-01",
+  "seed": "matched-seed-01-from-t4-sequenced-bootstrap-v1-corrected-3seed-192p"
+}

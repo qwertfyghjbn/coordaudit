@@ -28,6 +28,10 @@ KNOWN_COMPLETION_POLICIES = frozenset({"guidance_only"}) | FINALIZATION_POLICIES
 # The only tools dispatch may authorize while a hard finalization gate is
 # active.  An allowlist at the dispatch layer — never a name blacklist.
 FINALIZATION_ALLOWED_TOOLS = frozenset({"submit_findings"})
+# Team-level calibration keeps the existing tool surface available for the
+# narrow evidence-binding operation that a finding payload may still require.
+# Open-ended shell, coordination, and discovery calls remain gated.
+TEAM_FINALIZATION_ALLOWED_TOOLS = frozenset({"submit_findings", "read_file"})
 
 GATE_REJECTED_BY = "hard_finalization_gate"
 
@@ -49,7 +53,32 @@ def finalization_message(policy: str) -> str:
     return _NEUTRAL_FINALIZATION_MESSAGE
 
 
-def gate_rejection(tool: str) -> dict[str, Any]:
+def team_finalization_message(policy: str, *, task_lifecycle_reminder: bool = False) -> str:
+    """Deterministic team-level signal used by the 96-permit calibration."""
+    if policy in {"convergent_v1", "convergent_v2"}:
+        message = (
+            "Team finalization phase is active because the shared permit ledger reached its "
+            "preregistered reserve. Stop open-ended exploration and submit the complete "
+            "repository-v1 payload now. You may use read_file only to bind strictly necessary "
+            "evidence for a finding already identified; do not use shell or coordination tools. "
+            "If no supported finding remains, submit an empty findings payload."
+        )
+    else:
+        message = (
+        "Team finalization phase is active. Stop open-ended exploration and submit the complete "
+        "finding payload; read_file is allowed only for strictly necessary evidence binding."
+        )
+    if task_lifecycle_reminder:
+        message += " If you still own a claimed task, close it with complete_task before finishing the run."
+    return message
+
+
+def gate_rejection(
+    tool: str,
+    *,
+    team_finalization: bool = False,
+    task_completion_allowed: bool = False,
+) -> dict[str, Any]:
     """Deterministic runtime rejection returned for a prohibited tool call.
 
     The payload never echoes the requested arguments and never includes
@@ -62,7 +91,16 @@ def gate_rejection(tool: str) -> dict[str, Any]:
             "tool": tool,
             "rejected_by": GATE_REJECTED_BY,
             "message": (
-                "The finalization phase is active; only submit_findings may be dispatched. "
+                (
+                    "The team finalization phase is active; only submit_findings, read_file "
+                    "for necessary evidence binding, and complete_task for closing a claimed task "
+                    "may be dispatched."
+                    if task_completion_allowed
+                    else "The team finalization phase is active; only submit_findings and read_file "
+                    "for necessary evidence binding may be dispatched."
+                )
+                if team_finalization
+                else "The finalization phase is active; only submit_findings may be dispatched. "
                 "Build your submission from evidence already acquired."
             ),
         },

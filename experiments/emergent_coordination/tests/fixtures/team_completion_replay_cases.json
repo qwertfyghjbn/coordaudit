@@ -1,0 +1,247 @@
+[
+  {
+    "id": "GEN02",
+    "initial": {"agents": ["a", "b", "c", "d"], "permits": 4, "reserve": 2},
+    "events": [
+      {"id": "e1", "op": "model_call", "agent": "a", "action": "exploration"},
+      {"id": "e2", "op": "model_call", "agent": "b", "action": "exploration"},
+      {"id": "e3", "op": "freeze_if_boundary"},
+      {"id": "e4", "op": "drain"},
+      {"id": "e5", "op": "hard_finalize", "agents": ["a"]},
+      {"id": "e6", "op": "mark_done", "agent": "b"}
+    ],
+    "expected": {
+      "phase": "hard_finalization",
+      "outcome": ["forced_complete", "valid"],
+      "provider_calls": [["a", "exploration"], ["b", "exploration"]],
+      "prohibited": []
+    }
+  },
+  {
+    "id": "GEN05",
+    "initial": {"agents": ["a"], "permits": 2, "reserve": 1},
+    "events": [
+      {"id": "e1", "op": "model_call", "agent": "a", "action": "exploration"},
+      {"id": "e2", "op": "freeze_if_boundary"},
+      {"id": "e3", "op": "drain"},
+      {"id": "e4", "op": "hard_finalize", "agents": ["a"]},
+      {"id": "e5", "op": "expect_error", "error": "GateDenied", "agent": "a", "action": "read_file"}
+    ],
+    "expected": {
+      "phase": "hard_finalization",
+      "outcome": ["forced_complete", "valid"],
+      "provider_calls": [["a", "exploration"]],
+      "prohibited": [["a", "read_file"]]
+    }
+  },
+  {
+    "id": "B04",
+    "initial": {"agents": ["a", "b"], "permits": 4, "reserve": 2},
+    "events": [
+      {"id": "e1", "op": "model_call", "agent": "a", "action": "exploration"},
+      {"id": "e2", "op": "model_call", "agent": "b", "action": "exploration"},
+      {"id": "e3", "op": "produce", "ref": "artifact"},
+      {"id": "e4", "op": "queue_info", "ref": "artifact"},
+      {"id": "e5", "op": "emit", "kind": "artifact_visibility", "ref": "artifact"},
+      {"id": "e6", "op": "freeze"},
+      {"id": "e7", "op": "drain"}
+    ],
+    "expected": {
+      "phase": "drain",
+      "lineage": {"artifact": "delivered"},
+      "provider_calls": [["a", "exploration"], ["b", "exploration"]]
+    }
+  },
+  {
+    "id": "T02",
+    "initial": {"agents": ["worker"], "permits": 2, "reserve": 1},
+    "events": [
+      {"id": "e1", "op": "add_obligation", "value": "task-1"},
+      {"id": "e2", "op": "set_waiting", "agent": "worker"}
+    ],
+    "expected": {
+      "phase": "normal",
+      "outcome": ["forced_complete", "valid"],
+      "statuses": {"worker": "waiting"}
+    }
+  },
+  {
+    "id": "M02",
+    "initial": {"agents": ["manager", "worker"], "permits": 2, "reserve": 1},
+    "events": [
+      {"id": "e1", "op": "add_obligation", "value": "pending-report"},
+      {"id": "e2", "op": "local_submit", "agent": "manager"}
+    ],
+    "expected": {
+      "phase": "normal",
+      "outcome": ["forced_complete", "valid"],
+      "local_submission": {"manager": "accepted", "worker": "none"}
+    }
+  },
+  {
+    "id": "M07",
+    "initial": {"agents": ["manager", "worker"], "permits": 2, "reserve": 1},
+    "events": [
+      {"id": "e1", "op": "local_submit", "agent": "manager"},
+      {"id": "e2", "op": "freeze"},
+      {"id": "e3", "op": "produce", "ref": "late-report"},
+      {"id": "e4", "op": "queue_info", "ref": "late-report"},
+      {"id": "e5", "op": "emit", "kind": "report", "ref": "late-report"},
+      {"id": "e6", "op": "drain"},
+      {"id": "e7", "op": "label", "ref": "late-report", "value": "contradiction_after_close"}
+    ],
+    "expected": {
+      "phase": "drain",
+      "lineage": {"late-report": "queued"},
+      "labels": {"late-report": ["contradiction_after_close"]},
+      "late_events": 1,
+      "local_submission": {"manager": "accepted", "worker": "none"}
+    }
+  },
+  {
+    "id": "BUD01",
+    "initial": {"agents": ["a"], "permits": 0, "reserve": 0},
+    "events": [
+      {"id": "e1", "op": "produce", "ref": "pending-report"},
+      {"id": "e2", "op": "queue_info", "ref": "pending-report"},
+      {"id": "e3", "op": "emit", "kind": "report", "ref": "pending-report"},
+      {"id": "e4", "op": "freeze"},
+      {"id": "e5", "op": "drain"}
+    ],
+    "expected": {
+      "phase": "drain",
+      "lineage": {"pending-report": "delivered"},
+      "provider_calls": []
+    }
+  },
+  {
+    "id": "EVD01",
+    "initial": {"agents": ["manager", "worker"], "permits": 2, "reserve": 1},
+    "events": [
+      {"id": "e1", "op": "produce", "ref": "worker-report"},
+      {"id": "e2", "op": "queue_info", "ref": "worker-report"},
+      {"id": "e3", "op": "emit", "kind": "report", "ref": "worker-report"},
+      {"id": "e4", "op": "freeze"},
+      {"id": "e5", "op": "drain"},
+      {"id": "e6", "op": "label", "ref": "worker-report", "value": "delivered_unadopted_at_close"}
+    ],
+    "expected": {
+      "phase": "drain",
+      "lineage": {"worker-report": "delivered"},
+      "labels": {"worker-report": ["delivered_unadopted_at_close"]},
+      "adopted": []
+    }
+  },
+  {
+    "id": "EVD03",
+    "initial": {"agents": ["manager"], "permits": 2, "reserve": 1},
+    "events": [
+      {"id": "e1", "op": "produce", "ref": "adopted-report"},
+      {"id": "e2", "op": "queue_info", "ref": "adopted-report"},
+      {"id": "e3", "op": "emit", "kind": "report", "ref": "adopted-report"},
+      {"id": "e4", "op": "force_stage", "ref": "adopted-report", "stage": "delivered"},
+      {"id": "e5", "op": "make_model_visible", "ref": "adopted-report"},
+      {"id": "e6", "op": "adopt", "ref": "adopted-report"},
+      {"id": "e7", "op": "freeze"},
+      {"id": "e8", "op": "drain"}
+    ],
+    "expected": {
+      "phase": "drain",
+      "lineage": {"adopted-report": "adopted"},
+      "adopted": ["adopted-report"]
+    }
+  },
+  {
+    "id": "EVD05",
+    "initial": {"agents": ["manager", "worker"], "permits": 2, "reserve": 1},
+    "events": [
+      {"id": "e1", "op": "local_submit", "agent": "manager"},
+      {"id": "e2", "op": "freeze"},
+      {"id": "e3", "op": "produce", "ref": "contradiction"},
+      {"id": "e4", "op": "queue_info", "ref": "contradiction"},
+      {"id": "e5", "op": "emit", "kind": "report", "ref": "contradiction"},
+      {"id": "e6", "op": "drain"},
+      {"id": "e7", "op": "label", "ref": "contradiction", "value": "contradiction_after_close"}
+    ],
+    "expected": {
+      "phase": "drain",
+      "lineage": {"contradiction": "queued"},
+      "labels": {"contradiction": ["contradiction_after_close"]},
+      "late_events": 1,
+      "local_submission": {"manager": "accepted", "worker": "none"}
+    }
+  },
+  {
+    "id": "CANDIDATE_E_NO_CALL_DRAIN",
+    "initial": {"agents": ["manager", "worker"], "permits": 0, "reserve": 0},
+    "events": [
+      {"id": "e1", "op": "produce", "ref": "queued-report", "producer": "worker"},
+      {"id": "e2", "op": "queue_info", "ref": "queued-report"},
+      {"id": "e3", "op": "emit", "kind": "report", "ref": "queued-report"},
+      {"id": "e4", "op": "freeze"},
+      {"id": "e5", "op": "drain"}
+    ],
+    "expected": {
+      "phase": "drain",
+      "lineage": {"queued-report": "delivered"},
+      "provider_calls": [],
+      "adopted": []
+    }
+  },
+  {
+    "id": "CANDIDATE_COORDINATOR_NO_EXTRA_CALL",
+    "initial": {"agents": ["manager", "worker"], "permits": 2, "reserve": 1},
+    "events": [
+      {"id": "e1", "op": "model_call", "agent": "manager", "action": "coordinator_ready"},
+      {"id": "e2", "op": "freeze"},
+      {"id": "e3", "op": "drain"},
+      {"id": "e4", "op": "hard_finalize", "agents": ["manager", "worker"]}
+    ],
+    "expected": {
+      "phase": "hard_finalization",
+      "provider_calls": [["manager", "coordinator_ready"]],
+      "outcome": ["forced_complete", "valid"]
+    }
+  },
+  {
+    "id": "CANDIDATE_WAITING_RESUME",
+    "initial": {"agents": ["manager", "worker"], "permits": 1, "reserve": 1},
+    "events": [
+      {"id": "e1", "op": "local_report", "agent": "worker"},
+      {"id": "e2", "op": "set_waiting", "agent": "worker"},
+      {"id": "e3", "op": "resume", "agent": "worker"},
+      {"id": "e4", "op": "set_waiting", "agent": "worker"},
+      {"id": "e5", "op": "freeze"},
+      {"id": "e6", "op": "drain"},
+      {"id": "e7", "op": "hard_finalize", "agents": ["worker"]},
+      {"id": "e8", "op": "expect_resume_error", "error": "GateDenied", "agent": "worker"}
+    ],
+    "expected": {
+      "phase": "hard_finalization",
+      "statuses": {"manager": "active", "worker": "hard_finalizing"},
+      "local_submission": {"manager": "none", "worker": "reported"},
+      "provider_calls": [],
+      "errors": ["GateDenied"]
+    }
+  },
+  {
+    "id": "M4_PER_AGENT_GATE_BASELINE",
+    "initial": {"agents": ["manager", "worker"], "permits": 1, "reserve": 1},
+    "events": [
+      {"id": "e1", "op": "produce", "ref": "report-1", "producer": "worker"},
+      {"id": "e2", "op": "queue_info", "ref": "report-1"},
+      {"id": "e3", "op": "emit", "kind": "report", "ref": "report-1"},
+      {"id": "e4", "op": "freeze"},
+      {"id": "e5", "op": "drain"},
+      {"id": "e6", "op": "hard_finalize", "agents": ["manager"]},
+      {"id": "e7", "op": "expect_error", "error": "GateDenied", "agent": "manager", "action": "manager_list_tasks"}
+    ],
+    "expected": {
+      "phase": "hard_finalization",
+      "lineage": {"report-1": "delivered"},
+      "provider_calls": [],
+      "prohibited": [["manager", "manager_list_tasks"]],
+      "errors": ["GateDenied"]
+    }
+  }
+]

@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "contract_id": "t4_flowise_post_sync_inspection_v2",
+  "repository": {
+    "id": "flowise_3_1_3_repository_v1",
+    "version": "repository-v1-candidate"
+  },
+  "model": {
+    "provider": "openai_compatible",
+    "requested_model": "deepseek-flash",
+    "thinking_mode": "disabled",
+    "temperature": 0.0,
+    "max_output_tokens": 4096
+  },
+  "budget": {
+    "hard_team_call_permits": 192,
+    "reserved_final_synthesis_permits": 0,
+    "token_stop_threshold": null,
+    "per_agent_token_cap": null
+  },
+  "runtime": {
+    "max_steps": 96,
+    "wall_clock_timeout_seconds": 1200
+  },
+  "retry": {
+    "max_provider_retries": 1,
+    "final_synthesis_retries": 0
+  },
+  "completion_generation": "completion_v2_team",
+  "completion_policy": "convergent_v2",
+  "team_completion_policy": "all_agents_terminal_v1",
+  "team_finalization_policy": "team_remaining_permits_v1",
+  "team_finalization_reserve": 32,
+  "task_board_sequencing_policy": "initialization_lease_v1",
+  "task_closure_policy": "task_closure_gate_v1",
+  "result_sync_policy": "result_sync_v1",
+  "prompt_profile": "repository_v1_t4_post_sync_inspection_v2",
+  "conditions": [
+    {"id": "T4", "mode": "structured_team", "agent_count": 4}
+  ],
+  "preregistration": {
+    "status": "frozen_for_post_sync_inspection_diagnostic",
+    "live_execution_authorized": true,
+    "network_access": false,
+    "provider_live_calls": true,
+    "seed_identity": "t4-result-sync-v1-matched-seed-01",
+    "comparison_reference": "t4-result-sync-v1-192p/matched-seed-01",
+    "research_question": "只在 RESULT_SYNC 后要求检查一项最相关的 foreign completed task，能否将可见性转化为可证实检查以及自然后续行动？",
+    "intervention": "仅修改 RESULT_SYNC user message；初始 system/user prompt 与 result_sync_v1 baseline 逐字一致；不强制 reuse、citation 或 finding 改动",
+    "primary_outcomes": ["R0 not visible", "R1 visible not inspected", "R2 inspected not used", "R3 post-inspection read/search candidate", "R4 foreign evidence incorporated"],
+    "unchanged_semantics": ["result_sync_v1", "initialization_lease_v1", "task_closure_gate_v1", "decomposition", "192 permits", "reserve=32", "model/seed/scheduler/tools", "submission/completion/finalization"],
+    "excluded_conditions": ["S1", "P4", "B4", "M4"],
+    "not_an_architecture_benchmark": true
+  }
+}

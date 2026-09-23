@@ -162,6 +162,18 @@ class ManagerWorkerHarnessTest(unittest.TestCase):
             with self.assertRaises(ToolError):
                 manager.worker_get_assignment()
 
+    def test_manager_worker_identity_contract_uses_canonical_agent_ids(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            layout = prepare_run_workspace(Path(tmp) / "run", TARGET_ROOT, agent_count=2)
+            log = EventLog(layout.logs / "events.jsonl", run_id="manager-identity")
+            board = ManagerBoard(log, "agent_001", ["agent_002"])
+            manager = AgentSandbox("agent_001", layout, log, manager_board=board)
+
+            with self.assertRaises(ToolError):
+                manager.manager_create_task("worker_1", "alias must be rejected")
+            task = manager.manager_create_task("agent_002", "canonical ID is accepted")
+            self.assertEqual(task["worker_id"], "agent_002")
+
 
 if __name__ == "__main__":
     unittest.main()

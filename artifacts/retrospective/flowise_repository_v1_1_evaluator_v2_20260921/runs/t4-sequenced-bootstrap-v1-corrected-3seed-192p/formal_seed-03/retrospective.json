@@ -1,0 +1,177 @@
+{
+  "agent_run_derived_gt_overlap": {
+    "discovery_cluster_ids": [
+      "UC01",
+      "UC14",
+      "UC16",
+      "UC17",
+      "UC18",
+      "UC19",
+      "UC20"
+    ],
+    "discovery_equivalent_anchor_ids": [
+      "EA_R01_login_method_test_config",
+      "EA_R01_org_update",
+      "EA_R01_org_user_create_delete",
+      "EA_R01_role_delete",
+      "EA_R01_workspace_user"
+    ],
+    "discovery_root_ids": [
+      "R21_oauth2_unauth_credential_mutation",
+      "R25_user_create_zero_permission"
+    ],
+    "discovery_source": true,
+    "independent_generalization_evidence": false,
+    "matched_agent_run_derived_root_ids": [
+      "R21_oauth2_unauth_credential_mutation",
+      "R25_user_create_zero_permission"
+    ],
+    "present": true
+  },
+  "condition": "T",
+  "input_sha256": {
+    "evaluation.json": "f816bb02cec258a022062c0e7c8d896797d90207d720aa6ccf2ec37f06f9cce2",
+    "evaluator_private/verification.json": "14d0d97b162dee99a005de0ab121c1d50879d99d9b612ba9c8f4b4873e2de977",
+    "merged_findings.json": "072e075fe373dea66c1b991d346f8b1e26c68794a7c0e179d9dba4edfa185156",
+    "run_manifest.json": "e21c446fec1075b36fcb6545d5fab6f475667959cbc5c3ae011240839cfb650b"
+  },
+  "original": {
+    "evaluator_generation": "repository_v1",
+    "false_negatives": 20,
+    "score_artifact": "experiments/emergent_coordination/runs/t4-sequenced-bootstrap-v1-corrected-3seed-192p/formal_seed-03/evaluation.json",
+    "score_artifact_sha256": "f816bb02cec258a022062c0e7c8d896797d90207d720aa6ccf2ec37f06f9cce2",
+    "true_positives": 0,
+    "unmatched": 9,
+    "verification_artifact": "experiments/emergent_coordination/runs/t4-sequenced-bootstrap-v1-corrected-3seed-192p/formal_seed-03/evaluator_private/verification.json",
+    "verification_artifact_sha256": "14d0d97b162dee99a005de0ab121c1d50879d99d9b612ba9c8f4b4873e2de977"
+  },
+  "per_finding_transition": [
+    {
+      "anchor_id": "primary:1",
+      "historical_cluster_id": "UC01",
+      "index": 0,
+      "original_disposition": "unmatched_review",
+      "retrospective_classification": "canonical_tp",
+      "root_id": "R21_oauth2_unauth_credential_mutation"
+    },
+    {
+      "historical_cluster_id": "UC11",
+      "index": 1,
+      "original_disposition": "unmatched_review",
+      "retrospective_classification": "false_positive"
+    },
+    {
+      "historical_cluster_id": "UC09",
+      "index": 2,
+      "original_disposition": "unmatched_review",
+      "retrospective_classification": "inconclusive"
+    },
+    {
+      "anchor_id": "EA_R01_login_method_test_config",
+      "historical_cluster_id": "UC14",
+      "index": 3,
+      "original_disposition": "unmatched_review",
+      "retrospective_classification": "equivalent_tp",
+      "root_id": "R01_enterprise_active_org_binding"
+    },
+    {
+      "historical_cluster_id": "UC20",
+      "index": 4,
+      "original_disposition": "unmatched_review",
+      "retrospective_classification": "duplicate_root",
+      "root_id": "R01_enterprise_active_org_binding"
+    },
+    {
+      "historical_cluster_id": "UC17",
+      "index": 5,
+      "original_disposition": "unmatched_review",
+      "retrospective_classification": "duplicate_root",
+      "root_id": "R01_enterprise_active_org_binding"
+    },
+    {
+      "historical_cluster_id": "UC18",
+      "index": 6,
+      "original_disposition": "unmatched_review",
+      "retrospective_classification": "duplicate_root",
+      "root_id": "R01_enterprise_active_org_binding"
+    },
+    {
+      "anchor_id": "primary:0",
+      "historical_cluster_id": "UC19",
+      "index": 7,
+      "original_disposition": "unmatched_review",
+      "retrospective_classification": "canonical_tp",
+      "root_id": "R25_user_create_zero_permission"
+    },
+    {
+      "historical_cluster_id": "UC16",
+      "index": 8,
+      "original_disposition": "unmatched_review",
+      "retrospective_classification": "duplicate_root",
+      "root_id": "R01_enterprise_active_org_binding"
+    }
+  ],
+  "retrospective": {
+    "canonical_tp": 2,
+    "duplicate_findings": 4,
+    "equivalent_tp": 1,
+    "evaluator_generation": "repository_v1_1",
+    "false_negatives": 27,
+    "false_positive": 1,
+    "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+    "inconclusive": 1,
+    "known_gt_overlap_uncredited": 0,
+    "matched_roots": {
+      "R01_enterprise_active_org_binding": {
+        "anchor_id": "EA_R01_login_method_test_config",
+        "classification": "equivalent_tp",
+        "index": 3
+      },
+      "R21_oauth2_unauth_credential_mutation": {
+        "anchor_id": "primary:1",
+        "classification": "canonical_tp",
+        "index": 0
+      },
+      "R25_user_create_zero_permission": {
+        "anchor_id": "primary:0",
+        "classification": "canonical_tp",
+        "index": 7
+      }
+    },
+    "missing_roots": [
+      "R02_org_user_password_serialization",
+      "R03_chat_message_route_permission",
+      "R04_generic_credential_lookup_scope",
+      "R05_openai_assistant_credential_lookup_scope",
+      "R06_assistant_delete_credential_lookup_scope",
+      "R07_sso_invited_token_proof",
+      "R08_sso_email_only_identity",
+      "R09_bullmq_dashboard_rbac",
+      "R10_mcp_stdio_executable_policy",
+      "R11_mcp_cwd_policy",
+      "R12_realtime_chatflow_workspace_scope",
+      "R13_sqlite_chain_write_capability",
+      "R14_chat_model_baseurl_egress_policy",
+      "R15_upsert_history_route_scope",
+      "R16_memory_session_id_type",
+      "R17_document_loader_egress_policy",
+      "R18_export_variable_secret",
+      "R19_tts_abort_cross_operation",
+      "R20_tts_private_flow_credential_use",
+      "R22_feedback_unauth_cross_flow_access",
+      "R23_get_upload_file_unauth_cross_tenant_read",
+      "R24_dataset_rows_unscoped_delete",
+      "R26_apikey_raw_secret_exposure",
+      "R27_documentstore_upsert_zero_permission",
+      "R28_documentstore_query_unscoped",
+      "R29_nvidia_nim_zero_permission_routes",
+      "R30_host_header_chatflow_tool_credential_egress"
+    ],
+    "root_denominator": 30,
+    "unmatched_unreviewed": 0,
+    "validated_novel_tp": 0
+  },
+  "run_id": "formal_seed-03",
+  "run_path": "t4-sequenced-bootstrap-v1-corrected-3seed-192p/formal_seed-03",
+  "seed": "t4-sequenced-bootstrap-v1-corrected-192p-replicate-03"
+}

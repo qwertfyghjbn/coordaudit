@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "contract_id": "t4_flowise_post_sync_window_v2",
+  "repository": {"id": "flowise_3_1_3_repository_v1", "version": "repository-v1-candidate"},
+  "model": {"provider": "openai_compatible", "requested_model": "deepseek-flash", "thinking_mode": "disabled", "temperature": 0.0, "max_output_tokens": 4096},
+  "budget": {
+    "hard_team_call_permits": 192,
+    "reserved_final_synthesis_permits": 0,
+    "post_sync_reservation_per_agent": 4,
+    "token_stop_threshold": null,
+    "per_agent_token_cap": null
+  },
+  "runtime": {"max_steps": 96, "wall_clock_timeout_seconds": 1200},
+  "retry": {"max_provider_retries": 1, "final_synthesis_retries": 0},
+  "completion_generation": "completion_v2_team",
+  "completion_policy": "convergent_v2",
+  "team_completion_policy": "all_agents_terminal_v1",
+  "team_finalization_policy": "team_remaining_permits_v1",
+  "team_finalization_reserve": 32,
+  "task_board_sequencing_policy": "initialization_lease_v1",
+  "task_closure_policy": "task_closure_gate_v1",
+  "result_sync_policy": "result_sync_v1",
+  "post_sync_window_policy": "t4_post_sync_window_v2",
+  "prompt_profile": "repository_v1_t4_post_sync_window_v2",
+  "conditions": [{"id": "T4", "mode": "structured_team", "agent_count": 4}],
+  "preregistration": {
+    "status": "frozen_pending_live_execution",
+    "provider_live_calls": true,
+    "execution_instruction": "Do not start live runs as part of this code/freeze change; a later explicit run request is required.",
+    "seed_identities": ["t4-result-sync-v1-matched-seed-01", "t4-result-sync-v1-matched-seed-02", "t4-result-sync-v1-matched-seed-03"],
+    "comparison_reference": "t4-post-sync-window-v1-192p/matched-seed-01-replacement-03",
+    "research_question": "With optional post-sync inspection and bounded submission repair, which actionable foreign leads receive verification, a post-evidence judgment, and final adoption?",
+    "intervention": "Keep 192 team permits, 4 reserved per T4 agent, one optional read_file and the same provider retry semantics. Remove inherited mandatory inspection/relevance wording and unavailable list_tasks guidance. After the initial response or evidence-consumption response, unused per-agent reserved permits may admit submit-only repair calls; no additional verification action is allowed.",
+    "admission_criteria": ["valid_and_reconciliation_valid", "4_of_4_initial_task_closure", "result_sync_exactly_once", "4_of_4_post_sync_window_opened", "4_of_4_post_sync_instruction_model_visible", "4_of_4_post_sync_provider_call_admitted", "no_forced_completion_from_missing_post_sync_opportunity"],
+    "analysis_protocol": "docs/research/t4-post-sync-window-v2-prereg-20260922.md",
+    "unchanged_semantics": ["repository-v1 target", "T4 team size", "result_sync_v1 snapshot and foreign visibility", "initialization_lease_v1", "task_closure_gate_v1", "scheduler and task ownership", "finding schema", "reconciliation", "provider failure and retry permit consumption", "manual inspection/relevance adjudication definitions"],
+    "not_an_architecture_benchmark": true
+  }
+}

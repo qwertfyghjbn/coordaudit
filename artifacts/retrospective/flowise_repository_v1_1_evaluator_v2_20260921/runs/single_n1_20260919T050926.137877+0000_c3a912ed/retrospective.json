@@ -1,0 +1,98 @@
+{
+  "agent_run_derived_gt_overlap": {
+    "discovery_cluster_ids": [],
+    "discovery_equivalent_anchor_ids": [],
+    "discovery_root_ids": [],
+    "discovery_source": false,
+    "independent_generalization_evidence": false,
+    "matched_agent_run_derived_root_ids": [],
+    "present": false
+  },
+  "condition": "S",
+  "input_sha256": {
+    "evaluation.json": "a0056111eba63f14cf4a24dfe660dd74c39e5baa32810e61d78af1f3423a77b0",
+    "evaluator_private/verification.json": "6eff8531b5f4e991b73a992bd9a184819128023379974f0041a0c34379ee7976",
+    "merged_findings.json": "a69c4c9f2561c6b9c5eadb260daa8d363fb79043e1e273e62edf1e9db7ee20f2",
+    "run_manifest.json": "17df9fe09b16570147a5418812ad9a0af76912ca848d73d73fb8ffe5b1537af2"
+  },
+  "original": {
+    "evaluator_generation": "repository_v1",
+    "false_negatives": 19,
+    "score_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T050926.137877+0000_c3a912ed/evaluation.json",
+    "score_artifact_sha256": "a0056111eba63f14cf4a24dfe660dd74c39e5baa32810e61d78af1f3423a77b0",
+    "true_positives": 1,
+    "unmatched": 1,
+    "verification_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T050926.137877+0000_c3a912ed/evaluator_private/verification.json",
+    "verification_artifact_sha256": "6eff8531b5f4e991b73a992bd9a184819128023379974f0041a0c34379ee7976"
+  },
+  "per_finding_transition": [
+    {
+      "historical_cluster_id": "UC06",
+      "index": 0,
+      "original_disposition": "unmatched_review",
+      "retrospective_classification": "false_positive"
+    },
+    {
+      "anchor_id": "primary:0",
+      "index": 1,
+      "original_disposition": "positive",
+      "retrospective_classification": "canonical_tp",
+      "root_id": "R04_generic_credential_lookup_scope"
+    }
+  ],
+  "retrospective": {
+    "canonical_tp": 1,
+    "duplicate_findings": 0,
+    "equivalent_tp": 0,
+    "evaluator_generation": "repository_v1_1",
+    "false_negatives": 29,
+    "false_positive": 1,
+    "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+    "inconclusive": 0,
+    "known_gt_overlap_uncredited": 0,
+    "matched_roots": {
+      "R04_generic_credential_lookup_scope": {
+        "anchor_id": "primary:0",
+        "classification": "canonical_tp",
+        "index": 1
+      }
+    },
+    "missing_roots": [
+      "R01_enterprise_active_org_binding",
+      "R02_org_user_password_serialization",
+      "R03_chat_message_route_permission",
+      "R05_openai_assistant_credential_lookup_scope",
+      "R06_assistant_delete_credential_lookup_scope",
+      "R07_sso_invited_token_proof",
+      "R08_sso_email_only_identity",
+      "R09_bullmq_dashboard_rbac",
+      "R10_mcp_stdio_executable_policy",
+      "R11_mcp_cwd_policy",
+      "R12_realtime_chatflow_workspace_scope",
+      "R13_sqlite_chain_write_capability",
+      "R14_chat_model_baseurl_egress_policy",
+      "R15_upsert_history_route_scope",
+      "R16_memory_session_id_type",
+      "R17_document_loader_egress_policy",
+      "R18_export_variable_secret",
+      "R19_tts_abort_cross_operation",
+      "R20_tts_private_flow_credential_use",
+      "R21_oauth2_unauth_credential_mutation",
+      "R22_feedback_unauth_cross_flow_access",
+      "R23_get_upload_file_unauth_cross_tenant_read",
+      "R24_dataset_rows_unscoped_delete",
+      "R25_user_create_zero_permission",
+      "R26_apikey_raw_secret_exposure",
+      "R27_documentstore_upsert_zero_permission",
+      "R28_documentstore_query_unscoped",
+      "R29_nvidia_nim_zero_permission_routes",
+      "R30_host_header_chatflow_tool_credential_egress"
+    ],
+    "root_denominator": 30,
+    "unmatched_unreviewed": 0,
+    "validated_novel_tp": 0
+  },
+  "run_id": "single_n1_20260919T050926.137877+0000_c3a912ed",
+  "run_path": "single_n1_20260919T050926.137877+0000_c3a912ed",
+  "seed": "flowise-s1-completion-v2-seedB-20260919"
+}

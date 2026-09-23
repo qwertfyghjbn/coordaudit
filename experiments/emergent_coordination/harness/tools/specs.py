@@ -272,7 +272,7 @@ MANAGER_TOOLS = [
         "type": "function",
         "function": {
             "name": "manager_create_task",
-            "description": "Assign one investigation task to one worker.",
+            "description": "Assign one investigation task to one worker. worker_id must be the exact canonical agent ID listed in the manager task prompt; do not use aliases such as worker_1.",
             "parameters": {
                 "type": "object",
                 "properties": {"worker_id": {"type": "string"}, "description": {"type": "string"}},
@@ -296,7 +296,7 @@ MANAGER_TOOLS = [
         "type": "function",
         "function": {
             "name": "manager_reassign_task",
-            "description": "Move an assigned or cancelled task to a worker.",
+            "description": "Move an assigned or cancelled task to a worker. worker_id must be the exact canonical agent ID listed in the manager task prompt; do not use aliases such as worker_1.",
             "parameters": {"type": "object", "properties": {"task_id": {"type": "string"}, "worker_id": {"type": "string"}}, "required": ["task_id", "worker_id"]},
         },
     },

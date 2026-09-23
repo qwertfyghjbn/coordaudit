@@ -5,11 +5,92 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from experiments.emergent_coordination.analysis.analyze_run import analyze_matched_block, analyze_run
+from experiments.emergent_coordination.analysis.analyze_run import _result_sync_metrics, analyze_matched_block, analyze_run
 from experiments.emergent_coordination.harness.events import EventLog
 
 
 class AnalyzeRunTest(unittest.TestCase):
+    def test_result_sync_list_is_not_inspection_or_r3(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            log = EventLog(Path(tmp) / "events.jsonl", run_id="r-inspect")
+            log.emit("result_sync_triggered", payload={"sync_id": "s1"})
+            log.emit("result_sync_observed", agent_id="agent_002", payload={
+                "foreign_completed_task_ids": ["task_a"], "foreign_evidence_refs": ["evt_own_a"],
+                "completed_tasks": [{"id": "task_a", "owner": "agent_001", "result": "X", "evidence_refs": ["evt_own_a"]}],
+            })
+            log.emit("tool_call", agent_id="agent_002", payload={"tool": "list_tasks", "arguments": {}})
+            log.emit("task_result_observed", agent_id="agent_002", payload={
+                "task_id": "task_a", "foreign": True, "observation_phase": "post_result_sync", "evidence_refs": ["evt_own_a"],
+            })
+            metrics = _result_sync_metrics(log.read_all(), [], ["agent_002"], [])
+            agent = metrics["per_agent"]["agent_002"]
+            self.assertEqual(agent["foreign_artifacts_listed"], ["task_a"])
+            self.assertEqual(agent["foreign_artifacts_inspected"], [])
+            self.assertEqual(agent["outcome_level"], "R1")
+            self.assertEqual(agent["post_inspection_search_read_actions"], [])
+
+    def test_result_sync_declared_inspection_requires_later_action_for_r3(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            log = EventLog(Path(tmp) / "events.jsonl", run_id="r-inspect")
+            log.emit("result_sync_triggered", payload={"sync_id": "s1"})
+            log.emit("result_sync_observed", agent_id="agent_002", payload={
+                "foreign_completed_task_ids": ["task_a"], "foreign_evidence_refs": ["evt_own_a"],
+                "completed_tasks": [{"id": "task_a", "owner": "agent_001", "result": "X", "evidence_refs": ["evt_own_a"]}],
+            })
+            response = {"kind": "model_response", "agent_id": "agent_002", "transcript_id": "trn_1",
+                        "content": {"content": "I inspected task_a: its result X is supported by evt_own_a; irrelevant to my finding."}}
+            log.emit("llm_call", agent_id="agent_002", artifact_refs=["trn_1"])
+            inspected = _result_sync_metrics(log.read_all(), [], ["agent_002"], [response])["per_agent"]["agent_002"]
+            self.assertEqual(inspected["foreign_artifacts_inspected"], ["task_a"])
+            self.assertEqual(inspected["foreign_evidence_inspected"], ["evt_own_a"])
+            self.assertEqual(inspected["outcome_level"], "R2")
+            log.emit("tool_call", agent_id="agent_002", payload={"tool": "list_tasks", "arguments": {}})
+            self.assertEqual(_result_sync_metrics(log.read_all(), [], ["agent_002"], [response])["per_agent"]["agent_002"]["outcome_level"], "R2")
+            log.emit("tool_call", agent_id="agent_002", payload={"tool": "read_file", "arguments": {"path": "target/x.py"}})
+            later = _result_sync_metrics(log.read_all(), [], ["agent_002"], [response])["per_agent"]["agent_002"]
+            self.assertEqual(later["outcome_level"], "R2")
+            self.assertEqual(len(later["post_inspection_search_read_actions"]), 1)
+            follow_up = {**response, "content": {"content": "I inspected task_a: evt_own_a supports X; relevant. I will follow this lead with a read."}}
+            guided = _result_sync_metrics(log.read_all(), [], ["agent_002"], [follow_up])["per_agent"]["agent_002"]
+            self.assertEqual(guided["outcome_level"], "R3")
+
+    def test_result_sync_selection_label_allows_discussion_of_other_foreign_tasks(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            log = EventLog(Path(tmp) / "events.jsonl", run_id="r-labelled-inspect")
+            log.emit("result_sync_triggered", payload={"sync_id": "s1"})
+            log.emit("result_sync_observed", agent_id="agent_003", payload={
+                "foreign_completed_task_ids": ["task_a", "task_b"],
+                "foreign_evidence_refs": ["evt_a", "evt_b"],
+                "completed_tasks": [
+                    {"id": "task_a", "owner": "agent_001", "result": "A", "evidence_refs": ["evt_a"]},
+                    {"id": "task_b", "owner": "agent_002", "result": "B", "evidence_refs": ["evt_b"]},
+                ],
+            })
+            response = {"kind": "model_response", "agent_id": "agent_003", "transcript_id": "trn_1", "content": {
+                "content": "**Selected foreign task ID:** `task_a`. I examined evt_a; it is irrelevant. task_b is distinct and not adopted."
+            }}
+            log.emit("llm_call", agent_id="agent_003", artifact_refs=["trn_1"])
+            result = _result_sync_metrics(log.read_all(), [], ["agent_003"], [response])
+            agent = result["per_agent"]["agent_003"]
+            self.assertEqual(agent["foreign_artifacts_inspected"], ["task_a"])
+            self.assertEqual(agent["outcome_level"], "R2")
+
+    def test_result_sync_foreign_evidence_in_final_finding_is_r4_without_auto_merge(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            log = EventLog(Path(tmp) / "events.jsonl", run_id="r-provenance")
+            log.emit("result_sync_triggered", payload={"sync_id": "s1"})
+            log.emit("result_sync_observed", agent_id="agent_002", payload={
+                "foreign_completed_task_ids": ["task_a"], "foreign_evidence_refs": ["evt_foreign"],
+                "completed_tasks": [{"id": "task_a", "owner": "agent_001", "result": "X", "evidence_refs": ["evt_foreign"]}],
+            })
+            own = _result_sync_metrics(log.read_all(), [{"submitted_by": "agent_002", "evidence_refs": ["evt_own"]}], ["agent_002"], [])
+            self.assertEqual(own["per_agent"]["agent_002"]["outcome_level"], "R1")
+            self.assertFalse(own["per_agent"]["agent_002"]["foreign_evidence_incorporated"])
+            self.assertIsNone(own["per_agent"]["agent_002"]["finding_changed"])
+            foreign = _result_sync_metrics(log.read_all(), [{"submitted_by": "agent_002", "evidence_refs": ["evt_foreign"]}], ["agent_002"], [])
+            self.assertEqual(foreign["per_agent"]["agent_002"]["outcome_level"], "R4")
+            self.assertEqual(foreign["per_agent"]["agent_002"]["incorporated_foreign_evidence_refs"], ["evt_foreign"])
+
     def test_summarizes_shared_activity_without_emergence_claims(self):
         with tempfile.TemporaryDirectory() as tmp:
             run_dir = Path(tmp)
@@ -183,6 +264,11 @@ class AnalyzeRunTest(unittest.TestCase):
                 payload={"tool": "list_tasks", "count": 0},
                 parent_event_ids=[dispatch["event_id"]],
             )
+            log.emit(
+                "task_created",
+                agent_id="agent_001",
+                payload={"id": "task_a", "description": "inspect subsystem a"},
+            )
             (run_dir / "summary.json").write_text(
                 json.dumps({"run_id": "r-list-tasks", "mode": "structured_team", "agent_count": 1}),
                 encoding="utf-8",
@@ -194,11 +280,14 @@ class AnalyzeRunTest(unittest.TestCase):
             self.assertEqual(result["schema_version"], 2)
             self.assertTrue(structured["available"])
             self.assertTrue(structured["tool_activity_observed"])
-            self.assertFalse(structured["lifecycle_activity_observed"])
+            self.assertTrue(structured["lifecycle_activity_observed"])
             self.assertEqual(structured["model_tool_invocations"]["list_tasks"], 1)
             self.assertEqual(structured["task_list_reads"]["invocation_count"], 1)
             self.assertEqual(structured["task_list_reads"]["observed_result_count"], 1)
             self.assertEqual(structured["task_list_reads"]["empty_result_count"], 1)
+            self.assertEqual(structured["task_list_reads"]["empty_before_first_create_count"], 1)
+            self.assertEqual(structured["task_list_reads"]["empty_before_first_create_agents"], ["agent_001"])
+            self.assertTrue(structured["task_list_reads"]["all_creators_observed_empty_before_first_create"])
 
             (run_dir / "summary.json").write_text(
                 json.dumps({"run_id": "r-blackboard", "mode": "raw_blackboard", "agent_count": 1}),

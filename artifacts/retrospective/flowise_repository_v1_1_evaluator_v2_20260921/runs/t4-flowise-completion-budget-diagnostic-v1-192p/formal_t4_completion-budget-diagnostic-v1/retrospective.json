@@ -1,0 +1,127 @@
+{
+  "agent_run_derived_gt_overlap": {
+    "discovery_cluster_ids": [
+      "UC01",
+      "UC03"
+    ],
+    "discovery_equivalent_anchor_ids": [
+      "EA_R04_tts_body_credential"
+    ],
+    "discovery_root_ids": [
+      "R21_oauth2_unauth_credential_mutation"
+    ],
+    "discovery_source": true,
+    "independent_generalization_evidence": false,
+    "matched_agent_run_derived_root_ids": [
+      "R21_oauth2_unauth_credential_mutation"
+    ],
+    "present": true
+  },
+  "condition": "T",
+  "input_sha256": {
+    "evaluation.json": "0645d74ff32e7f8761d00d7e3db4a2f5c4ddd4febb7c1042b2340fbce34dd68b",
+    "evaluator_private/verification.json": "42cab59feb7b6397efbc13f446e7e402ad711b86cd02dd0742d413b679faa0e1",
+    "merged_findings.json": "deb51925162d3543f22d072201ff2772ce856c8a2533f893b62bac48e428d967",
+    "run_manifest.json": "ee19de17e5adbcaca2d8443b3a2087e447205a50f987a635d8fcddffa3929f34"
+  },
+  "original": {
+    "evaluator_generation": "repository_v1",
+    "false_negatives": 20,
+    "score_artifact": "experiments/emergent_coordination/runs/t4-flowise-completion-budget-diagnostic-v1-192p/formal_t4_completion-budget-diagnostic-v1/evaluation.json",
+    "score_artifact_sha256": "0645d74ff32e7f8761d00d7e3db4a2f5c4ddd4febb7c1042b2340fbce34dd68b",
+    "true_positives": 0,
+    "unmatched": 4,
+    "verification_artifact": "experiments/emergent_coordination/runs/t4-flowise-completion-budget-diagnostic-v1-192p/formal_t4_completion-budget-diagnostic-v1/evaluator_private/verification.json",
+    "verification_artifact_sha256": "42cab59feb7b6397efbc13f446e7e402ad711b86cd02dd0742d413b679faa0e1"
+  },
+  "per_finding_transition": [
+    {
+      "anchor_id": "primary:1",
+      "historical_cluster_id": "UC01",
+      "index": 0,
+      "original_disposition": "unmatched_review",
+      "retrospective_classification": "canonical_tp",
+      "root_id": "R21_oauth2_unauth_credential_mutation"
+    },
+    {
+      "historical_cluster_id": "UC01",
+      "index": 1,
+      "original_disposition": "unmatched_review",
+      "retrospective_classification": "duplicate_root",
+      "root_id": "R21_oauth2_unauth_credential_mutation"
+    },
+    {
+      "historical_cluster_id": "UC05",
+      "index": 2,
+      "original_disposition": "unmatched_review",
+      "retrospective_classification": "false_positive"
+    },
+    {
+      "anchor_id": "EA_R04_tts_body_credential",
+      "historical_cluster_id": "UC03",
+      "index": 3,
+      "original_disposition": "unmatched_review",
+      "retrospective_classification": "equivalent_tp",
+      "root_id": "R04_generic_credential_lookup_scope"
+    }
+  ],
+  "retrospective": {
+    "canonical_tp": 1,
+    "duplicate_findings": 1,
+    "equivalent_tp": 1,
+    "evaluator_generation": "repository_v1_1",
+    "false_negatives": 28,
+    "false_positive": 1,
+    "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+    "inconclusive": 0,
+    "known_gt_overlap_uncredited": 0,
+    "matched_roots": {
+      "R04_generic_credential_lookup_scope": {
+        "anchor_id": "EA_R04_tts_body_credential",
+        "classification": "equivalent_tp",
+        "index": 3
+      },
+      "R21_oauth2_unauth_credential_mutation": {
+        "anchor_id": "primary:1",
+        "classification": "canonical_tp",
+        "index": 0
+      }
+    },
+    "missing_roots": [
+      "R01_enterprise_active_org_binding",
+      "R02_org_user_password_serialization",
+      "R03_chat_message_route_permission",
+      "R05_openai_assistant_credential_lookup_scope",
+      "R06_assistant_delete_credential_lookup_scope",
+      "R07_sso_invited_token_proof",
+      "R08_sso_email_only_identity",
+      "R09_bullmq_dashboard_rbac",
+      "R10_mcp_stdio_executable_policy",
+      "R11_mcp_cwd_policy",
+      "R12_realtime_chatflow_workspace_scope",
+      "R13_sqlite_chain_write_capability",
+      "R14_chat_model_baseurl_egress_policy",
+      "R15_upsert_history_route_scope",
+      "R16_memory_session_id_type",
+      "R17_document_loader_egress_policy",
+      "R18_export_variable_secret",
+      "R19_tts_abort_cross_operation",
+      "R20_tts_private_flow_credential_use",
+      "R22_feedback_unauth_cross_flow_access",
+      "R23_get_upload_file_unauth_cross_tenant_read",
+      "R24_dataset_rows_unscoped_delete",
+      "R25_user_create_zero_permission",
+      "R26_apikey_raw_secret_exposure",
+      "R27_documentstore_upsert_zero_permission",
+      "R28_documentstore_query_unscoped",
+      "R29_nvidia_nim_zero_permission_routes",
+      "R30_host_header_chatflow_tool_credential_egress"
+    ],
+    "root_denominator": 30,
+    "unmatched_unreviewed": 0,
+    "validated_novel_tp": 0
+  },
+  "run_id": "formal_t4_completion-budget-diagnostic-v1",
+  "run_path": "t4-flowise-completion-budget-diagnostic-v1-192p/formal_t4_completion-budget-diagnostic-v1",
+  "seed": "n4-flowise-completion-calibration-v2-96p"
+}

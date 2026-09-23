@@ -1,0 +1,866 @@
+{
+  "by_run": {
+    "flowise-n4-formal-2048-01/runs/parallel_n4_20260918T141935.833971+0000_512cd1df": {
+      "discovery_cluster_ids": [],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [],
+      "discovery_source": false,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [],
+      "present": false
+    },
+    "flowise-n4-formal-2048-01/runs/raw_blackboard_n4_20260918T142037.672076+0000_b629fbe5": {
+      "discovery_cluster_ids": [],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [],
+      "discovery_source": false,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [],
+      "present": false
+    },
+    "flowise-n4-formal-2048-01/runs/single_n1_20260918T141655.612567+0000_dd0df70d": {
+      "discovery_cluster_ids": [],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [],
+      "discovery_source": false,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [],
+      "present": false
+    },
+    "flowise-n4-formal-2048-01/runs/structured_team_n4_20260918T142132.617685+0000_7d01cd44": {
+      "discovery_cluster_ids": [],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [],
+      "discovery_source": false,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [],
+      "present": false
+    },
+    "manager_worker_n4_20260918T123230.583954+0000_afae3bfe": {
+      "discovery_cluster_ids": [],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [],
+      "discovery_source": false,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [],
+      "present": false
+    },
+    "manager_worker_n4_20260918T123249.621431+0000_c6c19161": {
+      "discovery_cluster_ids": [],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [],
+      "discovery_source": false,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [],
+      "present": false
+    },
+    "n4-flowise-completion-calibration-v2-96p/formal_b4_team-finalization-v1": {
+      "discovery_cluster_ids": [
+        "UC01",
+        "UC04"
+      ],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [
+        "R21_oauth2_unauth_credential_mutation",
+        "R23_get_upload_file_unauth_cross_tenant_read"
+      ],
+      "discovery_source": true,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [
+        "R21_oauth2_unauth_credential_mutation",
+        "R23_get_upload_file_unauth_cross_tenant_read"
+      ],
+      "present": true
+    },
+    "n4-flowise-completion-calibration-v2-96p/formal_p4_team-finalization-v1": {
+      "discovery_cluster_ids": [
+        "UC01",
+        "UC03",
+        "UC04"
+      ],
+      "discovery_equivalent_anchor_ids": [
+        "EA_R04_tts_body_credential"
+      ],
+      "discovery_root_ids": [
+        "R21_oauth2_unauth_credential_mutation",
+        "R23_get_upload_file_unauth_cross_tenant_read"
+      ],
+      "discovery_source": true,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [
+        "R21_oauth2_unauth_credential_mutation",
+        "R23_get_upload_file_unauth_cross_tenant_read"
+      ],
+      "present": true
+    },
+    "n4-flowise-completion-calibration-v2-96p/formal_s1_team-finalization-v1": {
+      "discovery_cluster_ids": [],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [],
+      "discovery_source": false,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [],
+      "present": false
+    },
+    "n4-flowise-completion-calibration-v2-96p/formal_t4_team-finalization-v1": {
+      "discovery_cluster_ids": [],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [],
+      "discovery_source": false,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [],
+      "present": false
+    },
+    "n4m-flowise-calibration-v1-96p/formal_b4_completion-v2": {
+      "discovery_cluster_ids": [],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [],
+      "discovery_source": false,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [],
+      "present": false
+    },
+    "n4m-flowise-calibration-v1-96p/formal_p4_completion-v2": {
+      "discovery_cluster_ids": [],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [],
+      "discovery_source": false,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [],
+      "present": false
+    },
+    "n4m-flowise-calibration-v1-96p/formal_s1_completion-v2": {
+      "discovery_cluster_ids": [
+        "UC01"
+      ],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [
+        "R21_oauth2_unauth_credential_mutation"
+      ],
+      "discovery_source": true,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [],
+      "present": true
+    },
+    "n4m-flowise-calibration-v1-96p/formal_t4_completion-v2": {
+      "discovery_cluster_ids": [],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [],
+      "discovery_source": false,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [],
+      "present": false
+    },
+    "n4m-flowise-calibration-v1-96p/manager_worker_n4_20260920T042731.219124+0000_d3e5f569": {
+      "discovery_cluster_ids": [],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [],
+      "discovery_source": false,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [],
+      "present": false
+    },
+    "n4m-flowise-calibration-v1-96p/parallel_n4_20260920T042339.036294+0000_ed42122f": {
+      "discovery_cluster_ids": [],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [],
+      "discovery_source": false,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [],
+      "present": false
+    },
+    "n4m-flowise-calibration-v1-96p/raw_blackboard_n4_20260920T042454.253585+0000_1b236f2a": {
+      "discovery_cluster_ids": [],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [],
+      "discovery_source": false,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [],
+      "present": false
+    },
+    "n4m-flowise-calibration-v1-96p/single_n1_20260920T042041.413565+0000_6629e1e3": {
+      "discovery_cluster_ids": [
+        "UC02"
+      ],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [
+        "R22_feedback_unauth_cross_flow_access"
+      ],
+      "discovery_source": true,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [
+        "R22_feedback_unauth_cross_flow_access"
+      ],
+      "present": true
+    },
+    "n4m-flowise-calibration-v1-96p/structured_team_n4_20260920T042602.261170+0000_c6519973": {
+      "discovery_cluster_ids": [],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [],
+      "discovery_source": false,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [],
+      "present": false
+    },
+    "parallel_n4_20260918T123211.154541+0000_66e1ed08": {
+      "discovery_cluster_ids": [],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [],
+      "discovery_source": false,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [],
+      "present": false
+    },
+    "raw_blackboard_n4_20260918T123217.498894+0000_858f97e5": {
+      "discovery_cluster_ids": [],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [],
+      "discovery_source": false,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [],
+      "present": false
+    },
+    "single_n1_20260918T123208.408495+0000_ecaf33f8": {
+      "discovery_cluster_ids": [],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [],
+      "discovery_source": false,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [],
+      "present": false
+    },
+    "single_n1_20260918T124405.776944+0000_c792f2cc": {
+      "discovery_cluster_ids": [],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [],
+      "discovery_source": false,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [],
+      "present": false
+    },
+    "single_n1_20260918T141114.622570+0000_5b4db6fa": {
+      "discovery_cluster_ids": [],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [],
+      "discovery_source": false,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [],
+      "present": false
+    },
+    "single_n1_20260919T002540.053881+0000_4e86afcf": {
+      "discovery_cluster_ids": [],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [],
+      "discovery_source": false,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [],
+      "present": false
+    },
+    "single_n1_20260919T003239.655288+0000_bcbf7ec3": {
+      "discovery_cluster_ids": [
+        "UC01"
+      ],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [
+        "R21_oauth2_unauth_credential_mutation"
+      ],
+      "discovery_source": true,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [
+        "R21_oauth2_unauth_credential_mutation"
+      ],
+      "present": true
+    },
+    "single_n1_20260919T004958.035995+0000_2c9edb89": {
+      "discovery_cluster_ids": [
+        "UC04"
+      ],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [
+        "R23_get_upload_file_unauth_cross_tenant_read"
+      ],
+      "discovery_source": true,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [
+        "R23_get_upload_file_unauth_cross_tenant_read"
+      ],
+      "present": true
+    },
+    "single_n1_20260919T005712.105877+0000_9f6f60b1": {
+      "discovery_cluster_ids": [
+        "UC01",
+        "UC02"
+      ],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [
+        "R21_oauth2_unauth_credential_mutation",
+        "R22_feedback_unauth_cross_flow_access"
+      ],
+      "discovery_source": true,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [
+        "R21_oauth2_unauth_credential_mutation",
+        "R22_feedback_unauth_cross_flow_access"
+      ],
+      "present": true
+    },
+    "single_n1_20260919T013923.221314+0000_14e9da39": {
+      "discovery_cluster_ids": [],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [],
+      "discovery_source": false,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [],
+      "present": false
+    },
+    "single_n1_20260919T015554.026898+0000_f8b46033": {
+      "discovery_cluster_ids": [],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [],
+      "discovery_source": false,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [],
+      "present": false
+    },
+    "single_n1_20260919T020929.584601+0000_5e034b57": {
+      "discovery_cluster_ids": [
+        "UC01",
+        "UC36"
+      ],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [
+        "R21_oauth2_unauth_credential_mutation",
+        "R29_nvidia_nim_zero_permission_routes"
+      ],
+      "discovery_source": true,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [
+        "R21_oauth2_unauth_credential_mutation",
+        "R29_nvidia_nim_zero_permission_routes"
+      ],
+      "present": true
+    },
+    "single_n1_20260919T021423.935064+0000_1a6244b9": {
+      "discovery_cluster_ids": [
+        "UC03",
+        "UC04",
+        "UC27"
+      ],
+      "discovery_equivalent_anchor_ids": [
+        "EA_R04_tts_body_credential"
+      ],
+      "discovery_root_ids": [
+        "R23_get_upload_file_unauth_cross_tenant_read",
+        "R27_documentstore_upsert_zero_permission"
+      ],
+      "discovery_source": true,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [
+        "R23_get_upload_file_unauth_cross_tenant_read",
+        "R27_documentstore_upsert_zero_permission"
+      ],
+      "present": true
+    },
+    "single_n1_20260919T021948.640024+0000_40bd3d2e": {
+      "discovery_cluster_ids": [
+        "UC02",
+        "UC04"
+      ],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [
+        "R22_feedback_unauth_cross_flow_access",
+        "R23_get_upload_file_unauth_cross_tenant_read"
+      ],
+      "discovery_source": true,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [
+        "R22_feedback_unauth_cross_flow_access"
+      ],
+      "present": true
+    },
+    "single_n1_20260919T035548.514070+0000_517bcf94": {
+      "discovery_cluster_ids": [
+        "UC15"
+      ],
+      "discovery_equivalent_anchor_ids": [
+        "EA_R01_org_read"
+      ],
+      "discovery_root_ids": [],
+      "discovery_source": true,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [],
+      "present": true
+    },
+    "single_n1_20260919T040004.254731+0000_0038df2e": {
+      "discovery_cluster_ids": [
+        "UC02"
+      ],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [
+        "R22_feedback_unauth_cross_flow_access"
+      ],
+      "discovery_source": true,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [
+        "R22_feedback_unauth_cross_flow_access"
+      ],
+      "present": true
+    },
+    "single_n1_20260919T043236.562030+0000_0906e04e": {
+      "discovery_cluster_ids": [],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [],
+      "discovery_source": false,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [],
+      "present": false
+    },
+    "single_n1_20260919T043422.038396+0000_7115f4c1": {
+      "discovery_cluster_ids": [],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [],
+      "discovery_source": false,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [],
+      "present": false
+    },
+    "single_n1_20260919T043607.735505+0000_d2527e90": {
+      "discovery_cluster_ids": [],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [],
+      "discovery_source": false,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [],
+      "present": false
+    },
+    "single_n1_20260919T043752.931894+0000_ee9271bb": {
+      "discovery_cluster_ids": [],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [],
+      "discovery_source": false,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [],
+      "present": false
+    },
+    "single_n1_20260919T043947.149201+0000_a8afbe28": {
+      "discovery_cluster_ids": [],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [],
+      "discovery_source": false,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [],
+      "present": false
+    },
+    "single_n1_20260919T044128.426804+0000_ddaadeb0": {
+      "discovery_cluster_ids": [],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [],
+      "discovery_source": false,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [],
+      "present": false
+    },
+    "single_n1_20260919T044314.544537+0000_08633048": {
+      "discovery_cluster_ids": [],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [],
+      "discovery_source": false,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [],
+      "present": false
+    },
+    "single_n1_20260919T044647.138261+0000_bec52002": {
+      "discovery_cluster_ids": [],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [],
+      "discovery_source": false,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [],
+      "present": false
+    },
+    "single_n1_20260919T045055.779809+0000_77081634": {
+      "discovery_cluster_ids": [
+        "UC01",
+        "UC02",
+        "UC03"
+      ],
+      "discovery_equivalent_anchor_ids": [
+        "EA_R04_tts_body_credential"
+      ],
+      "discovery_root_ids": [
+        "R21_oauth2_unauth_credential_mutation",
+        "R22_feedback_unauth_cross_flow_access"
+      ],
+      "discovery_source": true,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [
+        "R21_oauth2_unauth_credential_mutation"
+      ],
+      "present": true
+    },
+    "single_n1_20260919T045304.598787+0000_28d2d36e": {
+      "discovery_cluster_ids": [
+        "UC13"
+      ],
+      "discovery_equivalent_anchor_ids": [
+        "EA_R07_verify_and_login",
+        "EA_R08_verify_and_login"
+      ],
+      "discovery_root_ids": [],
+      "discovery_source": true,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [],
+      "present": true
+    },
+    "single_n1_20260919T045736.278175+0000_4455ede1": {
+      "discovery_cluster_ids": [
+        "UC03",
+        "UC08"
+      ],
+      "discovery_equivalent_anchor_ids": [
+        "EA_R04_tts_body_credential"
+      ],
+      "discovery_root_ids": [
+        "R24_dataset_rows_unscoped_delete"
+      ],
+      "discovery_source": true,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [
+        "R24_dataset_rows_unscoped_delete"
+      ],
+      "present": true
+    },
+    "single_n1_20260919T050111.482674+0000_a6409f3c": {
+      "discovery_cluster_ids": [],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [],
+      "discovery_source": false,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [],
+      "present": false
+    },
+    "single_n1_20260919T050526.679955+0000_6793723c": {
+      "discovery_cluster_ids": [
+        "UC28"
+      ],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [
+        "R28_documentstore_query_unscoped"
+      ],
+      "discovery_source": true,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [
+        "R28_documentstore_query_unscoped"
+      ],
+      "present": true
+    },
+    "single_n1_20260919T050926.137877+0000_c3a912ed": {
+      "discovery_cluster_ids": [],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [],
+      "discovery_source": false,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [],
+      "present": false
+    },
+    "single_n1_20260919T051314.688086+0000_54b1add0": {
+      "discovery_cluster_ids": [
+        "UC08"
+      ],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [
+        "R24_dataset_rows_unscoped_delete"
+      ],
+      "discovery_source": true,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [
+        "R24_dataset_rows_unscoped_delete"
+      ],
+      "present": true
+    },
+    "single_n1_20260919T051634.656613+0000_3be2e511": {
+      "discovery_cluster_ids": [],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [],
+      "discovery_source": false,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [],
+      "present": false
+    },
+    "single_n1_20260919T052100.005951+0000_953dd098": {
+      "discovery_cluster_ids": [
+        "UC03",
+        "UC04"
+      ],
+      "discovery_equivalent_anchor_ids": [
+        "EA_R04_tts_body_credential"
+      ],
+      "discovery_root_ids": [
+        "R23_get_upload_file_unauth_cross_tenant_read"
+      ],
+      "discovery_source": true,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [
+        "R23_get_upload_file_unauth_cross_tenant_read"
+      ],
+      "present": true
+    },
+    "single_n1_20260919T052352.707783+0000_8e78df51": {
+      "discovery_cluster_ids": [
+        "UC01",
+        "UC38"
+      ],
+      "discovery_equivalent_anchor_ids": [
+        "EA_R20_prediction_ispublic"
+      ],
+      "discovery_root_ids": [
+        "R21_oauth2_unauth_credential_mutation"
+      ],
+      "discovery_source": true,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [
+        "R21_oauth2_unauth_credential_mutation"
+      ],
+      "present": true
+    },
+    "single_n1_20260919T052703.310841+0000_fb71500f": {
+      "discovery_cluster_ids": [
+        "UC02"
+      ],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [
+        "R22_feedback_unauth_cross_flow_access"
+      ],
+      "discovery_source": true,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [
+        "R22_feedback_unauth_cross_flow_access"
+      ],
+      "present": true
+    },
+    "structured_team_n4_20260918T123223.960058+0000_f463a12f": {
+      "discovery_cluster_ids": [],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [],
+      "discovery_source": false,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [],
+      "present": false
+    },
+    "t4-board-bootstrap-adoption-v1-192p/formal_t4-board-bootstrap-adoption-v1": {
+      "discovery_cluster_ids": [
+        "UC01",
+        "UC02",
+        "UC03"
+      ],
+      "discovery_equivalent_anchor_ids": [
+        "EA_R04_tts_body_credential"
+      ],
+      "discovery_root_ids": [
+        "R21_oauth2_unauth_credential_mutation",
+        "R22_feedback_unauth_cross_flow_access"
+      ],
+      "discovery_source": true,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [
+        "R21_oauth2_unauth_credential_mutation",
+        "R22_feedback_unauth_cross_flow_access"
+      ],
+      "present": true
+    },
+    "t4-flowise-completion-budget-diagnostic-v1-192p/formal_t4_completion-budget-diagnostic-v1": {
+      "discovery_cluster_ids": [
+        "UC01",
+        "UC03"
+      ],
+      "discovery_equivalent_anchor_ids": [
+        "EA_R04_tts_body_credential"
+      ],
+      "discovery_root_ids": [
+        "R21_oauth2_unauth_credential_mutation"
+      ],
+      "discovery_source": true,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [
+        "R21_oauth2_unauth_credential_mutation"
+      ],
+      "present": true
+    },
+    "t4-nonoverlap-v1-192p/formal_t4-nonoverlap-v1": {
+      "discovery_cluster_ids": [
+        "UC01",
+        "UC02",
+        "UC04"
+      ],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [
+        "R21_oauth2_unauth_credential_mutation",
+        "R22_feedback_unauth_cross_flow_access",
+        "R23_get_upload_file_unauth_cross_tenant_read"
+      ],
+      "discovery_source": true,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [
+        "R21_oauth2_unauth_credential_mutation",
+        "R22_feedback_unauth_cross_flow_access",
+        "R23_get_upload_file_unauth_cross_tenant_read"
+      ],
+      "present": true
+    },
+    "t4-result-inspection-prompt-v1-192p/matched-seed-01": {
+      "discovery_cluster_ids": [],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [],
+      "discovery_source": false,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [],
+      "present": false
+    },
+    "t4-result-inspection-prompt-v1-192p/matched-seed-01-replacement-01": {
+      "discovery_cluster_ids": [],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [],
+      "discovery_source": false,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [
+        "R22_feedback_unauth_cross_flow_access"
+      ],
+      "present": true
+    },
+    "t4-result-sync-v1-192p/matched-seed-01": {
+      "discovery_cluster_ids": [],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [],
+      "discovery_source": false,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [
+        "R21_oauth2_unauth_credential_mutation"
+      ],
+      "present": true
+    },
+    "t4-sequenced-bootstrap-task-closure-v1-192p/formal_seed-01": {
+      "discovery_cluster_ids": [],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [],
+      "discovery_source": false,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [
+        "R21_oauth2_unauth_credential_mutation"
+      ],
+      "present": true
+    },
+    "t4-sequenced-bootstrap-task-closure-v1-192p/formal_seed-01-replacement-01": {
+      "discovery_cluster_ids": [],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [],
+      "discovery_source": false,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [
+        "R21_oauth2_unauth_credential_mutation",
+        "R25_user_create_zero_permission"
+      ],
+      "present": true
+    },
+    "t4-sequenced-bootstrap-v1-192p/formal_t4-sequenced-bootstrap-v1": {
+      "discovery_cluster_ids": [
+        "UC01",
+        "UC10"
+      ],
+      "discovery_equivalent_anchor_ids": [
+        "EA_R17_unstructured"
+      ],
+      "discovery_root_ids": [
+        "R21_oauth2_unauth_credential_mutation"
+      ],
+      "discovery_source": true,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [
+        "R21_oauth2_unauth_credential_mutation"
+      ],
+      "present": true
+    },
+    "t4-sequenced-bootstrap-v1-corrected-192p/formal_t4-sequenced-bootstrap-v1-corrected": {
+      "discovery_cluster_ids": [
+        "UC03",
+        "UC12"
+      ],
+      "discovery_equivalent_anchor_ids": [
+        "EA_R04_tts_body_credential",
+        "EA_R08_github_unverified_fallback"
+      ],
+      "discovery_root_ids": [],
+      "discovery_source": true,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [],
+      "present": true
+    },
+    "t4-sequenced-bootstrap-v1-corrected-3seed-192p/formal_seed-02": {
+      "discovery_cluster_ids": [
+        "UC01",
+        "UC23"
+      ],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [
+        "R21_oauth2_unauth_credential_mutation",
+        "R26_apikey_raw_secret_exposure"
+      ],
+      "discovery_source": true,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [
+        "R21_oauth2_unauth_credential_mutation"
+      ],
+      "present": true
+    },
+    "t4-sequenced-bootstrap-v1-corrected-3seed-192p/formal_seed-03": {
+      "discovery_cluster_ids": [
+        "UC01",
+        "UC14",
+        "UC16",
+        "UC17",
+        "UC18",
+        "UC19",
+        "UC20"
+      ],
+      "discovery_equivalent_anchor_ids": [
+        "EA_R01_login_method_test_config",
+        "EA_R01_org_update",
+        "EA_R01_org_user_create_delete",
+        "EA_R01_role_delete",
+        "EA_R01_workspace_user"
+      ],
+      "discovery_root_ids": [
+        "R21_oauth2_unauth_credential_mutation",
+        "R25_user_create_zero_permission"
+      ],
+      "discovery_source": true,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [
+        "R21_oauth2_unauth_credential_mutation",
+        "R25_user_create_zero_permission"
+      ],
+      "present": true
+    },
+    "t4-task-lifecycle-v2-192p/formal_t4-task-lifecycle-v2": {
+      "discovery_cluster_ids": [
+        "UC01",
+        "UC02"
+      ],
+      "discovery_equivalent_anchor_ids": [],
+      "discovery_root_ids": [
+        "R21_oauth2_unauth_credential_mutation",
+        "R22_feedback_unauth_cross_flow_access"
+      ],
+      "discovery_source": true,
+      "independent_generalization_evidence": false,
+      "matched_agent_run_derived_root_ids": [
+        "R21_oauth2_unauth_credential_mutation",
+        "R22_feedback_unauth_cross_flow_access"
+      ],
+      "present": true
+    }
+  },
+  "rule": "Any retrospective score, especially a GT-discovery source run, is not independent benchmark generalization evidence.",
+  "runs_that_contributed_gt_additions": 28,
+  "runs_with_overlap": 32,
+  "schema_version": "repository-v1.1-retrospective-circularity"
+}

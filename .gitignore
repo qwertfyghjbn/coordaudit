@@ -5,7 +5,10 @@
 # Runtime output
 experiments/emergent_coordination/runs/*
 !experiments/emergent_coordination/runs/.gitkeep
-artifacts/
+artifacts/*
+!artifacts/retrospective/
+artifacts/retrospective/*
+!artifacts/retrospective/flowise_repository_v1_1_evaluator_v2_20260921/
 
 # Python cache
 __pycache__/

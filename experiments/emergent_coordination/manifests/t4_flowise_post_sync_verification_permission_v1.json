@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "contract_id": "t4_flowise_post_sync_verification_permission_v1",
+  "repository": {
+    "id": "flowise_3_1_3_repository_v1",
+    "version": "repository-v1-candidate"
+  },
+  "model": {
+    "provider": "openai_compatible",
+    "requested_model": "deepseek-flash",
+    "thinking_mode": "disabled",
+    "temperature": 0.0,
+    "max_output_tokens": 4096
+  },
+  "budget": {
+    "hard_team_call_permits": 192,
+    "reserved_final_synthesis_permits": 0,
+    "token_stop_threshold": null,
+    "per_agent_token_cap": null
+  },
+  "runtime": {
+    "max_steps": 96,
+    "wall_clock_timeout_seconds": 1200
+  },
+  "retry": {
+    "max_provider_retries": 1,
+    "final_synthesis_retries": 0
+  },
+  "completion_generation": "completion_v2_team",
+  "completion_policy": "convergent_v2",
+  "team_completion_policy": "all_agents_terminal_v1",
+  "team_finalization_policy": "team_remaining_permits_v1",
+  "team_finalization_reserve": 32,
+  "task_board_sequencing_policy": "initialization_lease_v1",
+  "task_closure_policy": "task_closure_gate_v1",
+  "result_sync_policy": "result_sync_v1",
+  "prompt_profile": "repository_v1_t4_post_sync_verification_permission_v1",
+  "conditions": [
+    {"id": "T4", "mode": "structured_team", "agent_count": 4}
+  ],
+  "preregistration": {
+    "status": "frozen_pending_live_execution",
+    "provider_live_calls": true,
+    "execution_instruction": "Do not start live runs as part of this code/freeze change; a later explicit run request is required.",
+    "seed_identities": [
+      "t4-result-sync-v1-matched-seed-01",
+      "t4-result-sync-v1-matched-seed-02",
+      "t4-result-sync-v1-matched-seed-03"
+    ],
+    "comparison_reference": "t4-post-sync-relevance-v1-192p/matched-seed-01-replacement-01,matched-seed-02,matched-seed-03",
+    "research_question": "Among agents that form an actionable foreign verification lead, does clarifying permission for one bounded post-sync verification action produce target-aligned follow-through and a judgment update?",
+    "intervention": "Append only a post-RESULT_SYNC permission clarification to relevance-v1: one optional target-aligned read_file during team finalization, or one bounded read-only search only if the existing tool is actually available before finalization; no runtime, tool, budget, reserve, scheduler, or sync change.",
+    "primary_outcomes": [
+      "inspection -> direct relevance",
+      "direct relevance -> actionable lead",
+      "actionable lead -> target-aligned verification action",
+      "verification action -> judgment update",
+      "judgment update -> final finding adoption"
+    ],
+    "secondary_outcomes": [
+      "R0-R4 visibility/inspection/adoption ladder",
+      "foreign evidence body read and final finding incorporation",
+      "finding count and evaluator outcomes"
+    ],
+    "analysis_protocol": "docs/research/t4-post-sync-verification-permission-v1-prereg-20260922.md",
+    "validity_gate": "run valid, 4/4 initial task closure, result_sync exactly once, complete provenance, no deadlock",
+    "interpretation_limit": "The permission text does not reserve a post-sync permit or force action; zero action cannot alone establish model-policy refusal.",
+    "unchanged_semantics": [
+      "result_sync_v1",
+      "initialization_lease_v1",
+      "task_closure_gate_v1",
+      "decomposition and task lifecycle",
+      "hard_team_call_permits=192",
+      "team_finalization_reserve=32",
+      "model/seed/scheduler/tools/target/evaluator",
+      "submission/completion/finalization runtime"
+    ],
+    "excluded_conditions": ["S1", "P4", "B4", "M4"],
+    "not_an_architecture_benchmark": true
+  }
+}

@@ -149,6 +149,42 @@ class HardFinalizationGateTest(unittest.TestCase):
         self.assertEqual([tool["function"]["name"] for tool in requests[6]["tools"]], ["submit_findings"])
         self.assertIn("Finalization phase", requests[5]["messages"][-1]["content"])
 
+    def test_sequenced_bootstrap_preserves_complete_task_in_finalization_surface(self):
+        llm = MockLLMClient(
+            scripts={
+                "agent_001": [
+                    _response(_tool_call("read_file", {"path": "target/README.md"}, f"c{step}"))
+                    for step in range(1, 5)
+                ]
+                + [_response(_tool_call("submit_findings", {"findings": []}, "c5"))]
+            }
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            summary = run_experiment(
+                RunConfig(
+                    mode="structured_team",
+                    agent_count=1,
+                    model="mock",
+                    budgets={
+                        "hard_team_call_permits": 12,
+                        "max_provider_retries": 0,
+                        "team_finalization_policy": "team_remaining_permits_v1",
+                        "team_finalization_reserve": 7,
+                    },
+                    runs_dir=Path(tmp),
+                    max_steps=12,
+                    completion_policy="convergent_v2",
+                    team_completion_policy="all_agents_terminal_v1",
+                    team_finalization_policy="team_remaining_permits_v1",
+                    team_finalization_reserve=7,
+                    prompt_profile="repository_v1_t4_sequenced_bootstrap_v1",
+                ),
+                llm,
+            )
+            transcripts = _load_transcripts(Path(summary["run_dir"]))
+        requests = _requests(transcripts)
+        self.assertIn("complete_task", [tool["function"]["name"] for tool in requests[5]["tools"]])
+
     def test_shell_search_and_coordination_tools_are_all_rejected(self):
         llm = MockLLMClient(
             scripts={

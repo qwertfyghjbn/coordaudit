@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "contract_id": "n4m_flowise_calibration_v1",
+  "repository": {
+    "id": "flowise_3_1_3_repository_v1",
+    "version": "repository-v1-candidate"
+  },
+  "model": {
+    "provider": "openai_compatible",
+    "requested_model": "deepseek-flash",
+    "thinking_mode": "disabled",
+    "temperature": 0.0,
+    "max_output_tokens": 4096
+  },
+  "budget": {
+    "hard_team_call_permits": 96,
+    "reserved_final_synthesis_permits": 0,
+    "token_stop_threshold": null,
+    "per_agent_token_cap": null
+  },
+  "runtime": {
+    "max_steps": 96,
+    "wall_clock_timeout_seconds": 1200
+  },
+  "retry": {
+    "max_provider_retries": 1,
+    "final_synthesis_retries": 0
+  },
+  "completion_generation": "mixed_v2_v3",
+  "completion_policy": "convergent_v2",
+  "team_completion_policy": null,
+  "team_finalization_deadline_seconds": null,
+  "condition_runtime": {
+    "S1": {
+      "completion_generation": "completion_v2",
+      "completion_policy": "convergent_v2",
+      "team_completion_policy": "all_agents_terminal_v1",
+      "max_provider_retries": 1,
+      "reserved_final_synthesis_permits": 0,
+      "team_finalization_deadline_seconds": null,
+      "submission_owner": "participating_agents",
+      "merge_semantics": "deterministic_concat_with_submitted_by_then_evaluator_fingerprint_dedup",
+      "stop_labels": [
+        "submitted",
+        "budget_exhausted",
+        "max_steps",
+        "model_format_failure",
+        "timeout",
+        "timed_out",
+        "error",
+        "cancelled"
+      ]
+    },
+    "P4": {
+      "completion_generation": "completion_v2",
+      "completion_policy": "convergent_v2",
+      "team_completion_policy": "all_agents_terminal_v1",
+      "max_provider_retries": 1,
+      "reserved_final_synthesis_permits": 0,
+      "team_finalization_deadline_seconds": null,
+      "submission_owner": "participating_agents",
+      "merge_semantics": "deterministic_concat_with_submitted_by_then_evaluator_fingerprint_dedup",
+      "stop_labels": [
+        "submitted",
+        "budget_exhausted",
+        "max_steps",
+        "model_format_failure",
+        "timeout",
+        "timed_out",
+        "error",
+        "cancelled"
+      ]
+    },
+    "B4": {
+      "completion_generation": "completion_v2",
+      "completion_policy": "convergent_v2",
+      "team_completion_policy": "all_agents_terminal_v1",
+      "max_provider_retries": 1,
+      "reserved_final_synthesis_permits": 0,
+      "team_finalization_deadline_seconds": null,
+      "submission_owner": "participating_agents",
+      "merge_semantics": "deterministic_concat_with_submitted_by_then_evaluator_fingerprint_dedup",
+      "stop_labels": [
+        "submitted",
+        "budget_exhausted",
+        "max_steps",
+        "model_format_failure",
+        "timeout",
+        "timed_out",
+        "error",
+        "cancelled"
+      ]
+    },
+    "T4": {
+      "completion_generation": "completion_v2",
+      "completion_policy": "convergent_v2",
+      "team_completion_policy": "all_agents_terminal_v1",
+      "max_provider_retries": 1,
+      "reserved_final_synthesis_permits": 0,
+      "team_finalization_deadline_seconds": null,
+      "submission_owner": "participating_agents",
+      "merge_semantics": "deterministic_concat_with_submitted_by_then_evaluator_fingerprint_dedup",
+      "stop_labels": [
+        "submitted",
+        "budget_exhausted",
+        "max_steps",
+        "model_format_failure",
+        "timeout",
+        "timed_out",
+        "error",
+        "cancelled"
+      ]
+    },
+    "M4": {
+      "completion_generation": "completion_v3",
+      "completion_policy": "convergent_v2",
+      "team_completion_policy": "team_completion_v3",
+      "max_provider_retries": 1,
+      "reserved_final_synthesis_permits": 1,
+      "team_finalization_deadline_seconds": 60,
+      "submission_owner": "manager_agent_001",
+      "merge_semantics": "manager_final_synthesis_payload_with_submitted_by_then_evaluator_fingerprint_dedup",
+      "stop_labels": [
+        "submitted",
+        "budget_exhausted",
+        "max_steps",
+        "model_format_failure",
+        "timeout",
+        "timed_out",
+        "error",
+        "cancelled"
+      ]
+    }
+  },
+  "conditions": [
+    {"id": "S1", "mode": "single", "agent_count": 1},
+    {"id": "P4", "mode": "parallel", "agent_count": 4},
+    {"id": "B4", "mode": "raw_blackboard", "agent_count": 4},
+    {"id": "T4", "mode": "structured_team", "agent_count": 4},
+    {"id": "M4", "mode": "manager_worker", "agent_count": 4}
+  ],
+  "preregistration": {
+    "status": "pending_freeze_review",
+    "live_execution_authorized": false,
+    "network_access": false,
+    "provider_live_calls": false,
+    "shared_budget_note": "96 is one shared team ledger per condition; it is not a per-agent allocation.",
+    "legacy_contracts_untouched": ["n4_flowise_v1", "n4m_flowise_v1"]
+  }
+}

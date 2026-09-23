@@ -141,6 +141,43 @@ class IsolationAndSharedTest(unittest.TestCase):
         self.assertEqual(claimed["status"], "claimed")
         self.assertIn("task_claim_conflict", [event["event_type"] for event in self.log.read_all()])
 
+    def test_initialization_lease_orders_visibility_before_first_claim(self):
+        board = TaskBoard(
+            self.layout.runtime / "coordination",
+            self.log,
+            initialization_policy="initialization_lease_v1",
+            agent_ids=["agent_001", "agent_002", "agent_003", "agent_004"],
+        )
+        agent_002_result: list[list[dict]] = []
+        agent_002_done = threading.Event()
+
+        def observe_agent_002() -> None:
+            agent_002_result.append(board.list_tasks("agent_002"))
+            agent_002_done.set()
+
+        waiting = threading.Thread(target=observe_agent_002)
+        waiting.start()
+        self.assertFalse(agent_002_done.wait(0.05))
+
+        self.assertEqual(board.list_tasks("agent_001"), [])
+        task = board.create_task("agent_001", "inspect an uncovered subsystem")
+        board.claim_task("agent_001", task["id"])
+
+        self.assertTrue(agent_002_done.wait(1.0))
+        waiting.join(timeout=1.0)
+        self.assertEqual(len(agent_002_result), 1)
+        self.assertEqual(agent_002_result[0][0]["status"], "claimed")
+        lease_events = [event for event in self.log.read_all() if event["event_type"].startswith("task_initialization_lease_")]
+        self.assertEqual(sum(event["event_type"] == "task_initialization_lease_waited" for event in lease_events), 1)
+        self.assertEqual(
+            [event["agent_id"] for event in lease_events if event["event_type"] == "task_initialization_lease_acquired"],
+            ["agent_001", "agent_002"],
+        )
+        self.assertEqual(
+            [event["agent_id"] for event in lease_events if event["event_type"] == "task_initialization_lease_released"],
+            ["agent_001"],
+        )
+
     def test_completed_task_evidence_receipt_is_recorded_for_observer(self):
         board = TaskBoard(self.layout.runtime / "coordination", self.log)
         task = board.create_task("agent_001", "inspect routes")
@@ -184,7 +221,7 @@ class BudgetTest(unittest.TestCase):
 
         snapshot = tracker.snapshot()
 
-        self.assertEqual(snapshot["schema_version"], 2)
+        self.assertEqual(snapshot["schema_version"], 3)
         self.assertEqual(snapshot["enforced_limits"], {"hard_team_call_permits": 2})
         self.assertEqual(snapshot["runtime_limits"], {"wall_clock_timeout_seconds": 30})
         self.assertEqual(snapshot["soft_stops"]["token_stop_threshold"], 10)
@@ -408,7 +445,7 @@ class MockedHarnessTest(unittest.TestCase):
             self.assertIn("agent_finished", events)
             self.assertIn("llm_call", events)
             run_manifest = json.loads((Path(summary["run_dir"]) / "run_manifest.json").read_text(encoding="utf-8"))
-            self.assertEqual(run_manifest["budget_semantics"]["schema_version"], 2)
+            self.assertEqual(run_manifest["budget_semantics"]["schema_version"], 3)
             self.assertEqual(run_manifest["budget_semantics"]["primary_budget_unit"], "attempted_model_call")
             self.assertEqual(run_manifest["budget_semantics"]["token_usage_role"], "observed_outcome")
             self.assertEqual(run_manifest["max_steps"], 6)

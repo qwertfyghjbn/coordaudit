@@ -26,6 +26,10 @@ BLOCK_COMPARISON_SCHEMA_VERSION = 1
 _SEARCH_COMMANDS = frozenset({"rg", "grep", "git-grep", "ag", "ack"})
 _TEST_COMMANDS = frozenset({"pytest", "unittest", "tox", "nox"})
 _CEILING_FINISH_REASONS = frozenset({"length"})
+_SELECTED_FOREIGN_TASK_RE = re.compile(
+    r"\bselected\s+foreign\s+task(?:\s+id)?[\s*`]*[:#-]?[\s*`]*(task_[A-Za-z0-9_-]+)`?",
+    re.IGNORECASE,
+)
 _EXPLORATION_TOOL_NAMES = frozenset({"read_file", "list_files", "run_shell"}) | COORDINATION_TOOLS
 _CEILING_FINISH_REASONS = frozenset({"length"})
 
@@ -52,6 +56,8 @@ def analyze_run(run_dir: Path, *, write: bool = True) -> dict[str, Any]:
     structured_team = _structured_team_metrics(events, artifacts, findings, mode=mode)
     output_ceiling = _output_ceiling(events, run_dir)
     completion = _completion_metrics(events, run_dir)
+    transcripts = [record for path in sorted((run_dir / "logs" / "transcripts").glob("*.jsonl")) for record in _read_jsonl(path)]
+    result_sync = _result_sync_metrics(events, findings, agent_ids, transcripts)
     result = {
         "schema_version": METRICS_SCHEMA_VERSION,
         "run_id": summary.get("run_id"),
@@ -67,6 +73,7 @@ def analyze_run(run_dir: Path, *, write: bool = True) -> dict[str, Any]:
         "structured_team": structured_team,
         "output_ceiling": output_ceiling,
         "completion": completion,
+        "result_sync": result_sync,
         "event_counts": dict(sorted(counts.items())),
         # Compatibility fields retained for the small existing analyzer API.
         "agents_started": len(_events_of(events, "agent_started")),
@@ -369,6 +376,17 @@ def _completion_metrics(events: list[dict[str, Any]], run_dir: Path) -> dict[str
     if started:
         finalization_start = min(_int((event.get("payload") or {}).get("step")) for event in started)
         policy = (started[0].get("payload") or {}).get("policy") or policy
+    team_started = _events_of(events, "team_finalization_started")
+    team_payload = (team_started[0].get("payload") or {}) if team_started else {}
+    team_finalization = {
+        "triggered": bool(team_started),
+        "trigger_call_index": team_payload.get("trigger_call_index"),
+        "trigger_remaining_permits": team_payload.get("trigger_remaining_permits"),
+        "reserve": team_payload.get("reserve"),
+        "policy": team_payload.get("policy") or manifest.get("team_finalization_policy"),
+        "exactly_once": len(team_started) <= 1,
+        "active_agents_at_trigger": team_payload.get("active_agents") or [],
+    }
 
     step_by_event: dict[str, int | None] = {}
     llm_calls_by_agent: dict[str, list[tuple[int, int]]] = defaultdict(list)
@@ -447,7 +465,10 @@ def _completion_metrics(events: list[dict[str, Any]], run_dir: Path) -> dict[str
         record: dict[str, Any] = {
             "finalization_policy": policy,
             "finalization_generation": generation,
-            "finalization_start_step": finalization_start,
+            "finalization_start_step": min(
+                (_int((event.get("payload") or {}).get("step")) for event in started if str(event.get("agent_id")) == agent),
+                default=finalization_start,
+            ),
             "first_convergence_candidate_step": convergence_step,
             "first_convergence_candidate_cue": convergence.get("cue") if convergence else None,
             "last_exploration_step": last_exploration,
@@ -498,6 +519,7 @@ def _completion_metrics(events: list[dict[str, Any]], run_dir: Path) -> dict[str
         "policy": manifest.get("completion_policy"),
         "generation": generation,
         "finalization_start_step": finalization_start,
+        "team_finalization": team_finalization,
         "per_agent": per_agent,
         "measurement_notes": [
             "first_convergence_candidate 是对 transcript 的否定词防护正则命中，仅是候选信号；权威判定以 trace review 为准，未观察到时不应猜测。",
@@ -701,6 +723,9 @@ def _structured_team_metrics(
     released = _events_of(events, "task_released")
     conflicts = _events_of(events, "task_claim_conflict")
     observed = _events_of(events, "task_result_observed")
+    lease_waits = _events_of(events, "task_initialization_lease_waited")
+    lease_acquires = _events_of(events, "task_initialization_lease_acquired")
+    lease_releases = _events_of(events, "task_initialization_lease_released")
     tool_invocations = _model_tool_invocations(
         events,
         ("list_tasks", "create_task", "claim_task", "release_task", "complete_task"),
@@ -718,6 +743,21 @@ def _structured_team_metrics(
         and "count" in (event.get("payload") or {})
         and bool(task_list_dispatches & set(event.get("parent_event_ids") or []))
     ]
+    empty_task_list_results = [
+        event for event in task_list_results if (event.get("payload") or {}).get("count") == 0
+    ]
+    first_create_sequence = min((_int(event.get("sequence")) for event in created), default=None)
+    empty_before_first_create = [
+        event
+        for event in empty_task_list_results
+        if first_create_sequence is not None and _int(event.get("sequence")) < first_create_sequence
+    ]
+    created_agents = {str(event.get("agent_id")) for event in created if event.get("agent_id")}
+    empty_before_first_create_agents = {
+        str(event.get("agent_id"))
+        for event in empty_before_first_create
+        if event.get("agent_id")
+    }
     created_by_id = {(event.get("payload") or {}).get("id"): event for event in created}
     completed_by_id = {(event.get("payload") or {}).get("task_id"): event for event in completed}
     claimed_by_id = {(event.get("payload") or {}).get("task_id"): event for event in claimed}
@@ -755,6 +795,15 @@ def _structured_team_metrics(
             "observed_result_count": len(task_list_results),
             "empty_result_count": sum((event.get("payload") or {}).get("count") == 0 for event in task_list_results),
             "nonempty_result_count": sum(_int((event.get("payload") or {}).get("count")) > 0 for event in task_list_results),
+            "first_create_sequence": first_create_sequence,
+            "empty_before_first_create_count": len(empty_before_first_create),
+            "empty_before_first_create_agents": sorted(empty_before_first_create_agents),
+            "all_creators_observed_empty_before_first_create": bool(created_agents)
+            and created_agents <= empty_before_first_create_agents,
+            "race_note": (
+                "这是并发可见性的观测代理：若所有 create_task 的 agent 都在首个 create_task 事件前观察到空 board，"
+                "prompt 无法从该观察中排除重叠；它不证明调用在同一时刻发生。"
+            ),
             "result_note": "结果计数只关联到对应 model-selected list_tasks dispatch 的工具侧事件，避免把一次调用的双重日志误计为两次调用。",
         },
         "tasks_created": len(created),
@@ -766,7 +815,239 @@ def _structured_team_metrics(
         "duplicate_task_descriptions": duplicate_tasks,
         "task_result_observations": {"count": len(observed), "events": [event.get("event_id") for event in observed]},
         "task_result_evidence_adoption": {"count": len(adoptions), "records": adoptions},
+        "initialization_lease": {
+            "wait_count": len(lease_waits),
+            "acquire_count": len(lease_acquires),
+            "release_count": len(lease_releases),
+            "acquisition_order": [event.get("agent_id") for event in lease_acquires],
+            "release_order": [event.get("agent_id") for event in lease_releases],
+            "wait_events": [
+                {
+                    "event_id": event.get("event_id"),
+                    "agent_id": event.get("agent_id"),
+                    "expected_agent": (event.get("payload") or {}).get("expected_agent"),
+                    "owner": (event.get("payload") or {}).get("owner"),
+                }
+                for event in lease_waits
+            ],
+            "exact_ordered_hand_off": [event.get("agent_id") for event in lease_acquires]
+            == [event.get("agent_id") for event in lease_releases],
+            "note": "runtime initialization lease only sequences first board visibility; it does not assign audit scopes or create tasks.",
+        },
         "adoption_note": "仅当后续 finding 显式复用 completed task 的 evidence_ref 时计为 adoption；任务被列出或时间相邻不计。",
+    }
+
+
+def _result_sync_metrics(
+    events: list[dict[str, Any]], findings: list[dict[str, Any]], agent_ids: list[str],
+    transcripts: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
+    """Classify the traceable visibility → inspection → adoption ladder.
+
+    The runtime makes the raw completed-task snapshot model-visible.  An
+    Listing exposes artifacts but does not establish focused inspection. A
+    model-visible, evidence-backed selection is required for R2; a subsequent
+    read/search is an R3 candidate, not proof of cognitive reliance.
+    """
+    triggered = _events_of(events, "result_sync_triggered")
+    observed = _events_of(events, "result_sync_observed")
+    post_sync_opened = _events_of(events, "post_sync_window_opened")
+    post_sync_visible = _events_of(events, "post_sync_instruction_model_visible")
+    post_sync_admitted = _events_of(events, "post_sync_provider_call_admitted")
+    verification_attempted = _events_of(events, "verification_action_attempted")
+    verification_visible = _events_of(events, "verification_evidence_model_visible")
+    trigger = triggered[0] if triggered else {}
+    trigger_payload = trigger.get("payload") or {}
+    trigger_sequence = _int(trigger.get("sequence")) if trigger else None
+    sync_id = trigger_payload.get("sync_id")
+    observations_by_agent: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for event in observed:
+        observations_by_agent[str(event.get("agent_id"))].append(event)
+
+    task_observations = _events_of(events, "task_result_observed")
+    tool_calls = _events_of(events, "tool_call")
+    file_reads = _events_of(events, "file_read")
+    response_by_id = {
+        str(record.get("transcript_id")): record
+        for record in (transcripts or []) if record.get("kind") == "model_response"
+    }
+    response_events = [
+        (event, response_by_id[reference])
+        for event in _events_of(events, "llm_call")
+        for reference in (event.get("artifact_refs") or [])
+        if reference in response_by_id
+    ]
+    findings_by_agent: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for finding in findings:
+        if finding.get("submitted_by"):
+            findings_by_agent[str(finding["submitted_by"])].append(finding)
+
+    per_agent: dict[str, Any] = {}
+    outcome_counts: Counter[str] = Counter()
+    for agent_id in agent_ids:
+        opened_for_agent = [event for event in post_sync_opened if event.get("agent_id") == agent_id]
+        visible_for_agent = [event for event in post_sync_visible if event.get("agent_id") == agent_id]
+        admitted_for_agent = [event for event in post_sync_admitted if event.get("agent_id") == agent_id]
+        verification_for_agent = [event for event in verification_attempted if event.get("agent_id") == agent_id]
+        evidence_visible_for_agent = [event for event in verification_visible if event.get("agent_id") == agent_id]
+        agent_observations = observations_by_agent.get(agent_id, [])
+        first_observation = min(agent_observations, key=lambda item: _int(item.get("sequence")), default=None)
+        visible_foreign = sorted({
+            task_id
+            for event in agent_observations
+            for task_id in ((event.get("payload") or {}).get("foreign_completed_task_ids") or [])
+        })
+        foreign_inspected_events = [
+            event
+            for event in task_observations
+            if event.get("agent_id") == agent_id
+            and (event.get("payload") or {}).get("foreign") is True
+            and (event.get("payload") or {}).get("observation_phase") == "post_result_sync"
+        ]
+        listed_task_ids = sorted({(event.get("payload") or {}).get("task_id") for event in foreign_inspected_events})
+        foreign_tasks = {
+            str(task.get("id")): task
+            for observation in agent_observations
+            for task in ((observation.get("payload") or {}).get("completed_tasks") or [])
+            if task.get("owner") != agent_id and task.get("id") in visible_foreign
+        }
+        observation_sequence = _int(first_observation.get("sequence")) if first_observation else None
+        inspection_events = []
+        for event, response in response_events:
+            if event.get("agent_id") != agent_id or observation_sequence is None or _int(event.get("sequence")) <= observation_sequence:
+                continue
+            text = str((response.get("content") or {}).get("content") or "")
+            # The inspection record may discuss other foreign tasks while
+            # explicitly selecting one. Prefer that labelled selection over
+            # the weaker "only task ID mentioned" fallback.
+            declared = [match.group(1) for match in _SELECTED_FOREIGN_TASK_RE.finditer(text) if match.group(1) in foreign_tasks]
+            selected = sorted(set(declared)) or [
+                task_id for task_id in foreign_tasks
+                if re.search(r"(?<!\w)" + re.escape(task_id) + r"(?!\w)", text)
+            ]
+            if len(selected) != 1 or not re.search(r"\b(changes?|strengthens?|contradicts?|irrelevant|relevant|unchanged)\b", text, re.I):
+                continue
+            refs = [ref for ref in (foreign_tasks[selected[0]].get("evidence_refs") or []) if ref and ref in text]
+            if not refs:
+                continue
+            inspection_events.append((event, response, selected[0], refs))
+        inspected_task_ids = sorted({item[2] for item in inspection_events})
+        inspected_refs = sorted({ref for item in inspection_events for ref in item[3]})
+        first_inspection_sequence = min((_int(item[0].get("sequence")) for item in inspection_events), default=None)
+        follow_up_sequences = [
+            _int(event.get("sequence")) for event, response, _, _ in inspection_events
+            if re.search(r"\b(changes?|strengthens?|contradicts?|relevant)\b", str((response.get("content") or {}).get("content") or ""), re.I)
+            and re.search(r"\b(follow|check|verify|read|search|investigate|trace)\b", str((response.get("content") or {}).get("content") or ""), re.I)
+        ]
+        post_sync_actions = [
+            event
+            for event in tool_calls
+            if event.get("agent_id") == agent_id
+            and observation_sequence is not None
+            and _int(event.get("sequence")) > observation_sequence
+            and (event.get("payload") or {}).get("tool") in {"read_file", "list_files", "run_shell"}
+            and "arguments" in (event.get("payload") or {})
+        ]
+        post_sync_file_reads = [
+            event
+            for event in file_reads
+            if event.get("agent_id") == agent_id
+            and observation_sequence is not None
+            and _int(event.get("sequence")) > observation_sequence
+        ]
+        post_inspection_actions = [
+            event for event in post_sync_actions + post_sync_file_reads
+            if first_inspection_sequence is not None and _int(event.get("sequence")) > first_inspection_sequence
+        ]
+        foreign_visible_refs = sorted({
+            reference
+            for event in agent_observations
+            for reference in ((event.get("payload") or {}).get("foreign_evidence_refs") or [])
+        })
+        incorporated_refs = sorted({
+            reference
+            for finding in findings_by_agent.get(agent_id, [])
+            for reference in (finding.get("evidence_refs") or [])
+            if reference in foreign_visible_refs
+        })
+        if not visible_foreign:
+            level = "R0"
+        elif incorporated_refs:
+            level = "R4"
+        elif not inspected_task_ids:
+            level = "R1"
+        elif follow_up_sequences and any(_int(event.get("sequence")) > min(follow_up_sequences) for event in post_inspection_actions):
+            level = "R3"
+        else:
+            level = "R2"
+        outcome_counts[level] += 1
+        per_agent[agent_id] = {
+            "initial_task_completed": bool(
+                (trigger_payload.get("initial_claims") or {}).get(agent_id)
+                and (trigger_payload.get("initial_claims") or {}).get(agent_id) in {
+                    (event.get("payload") or {}).get("task_id") for event in _events_of(events, "task_completed")
+                }
+            ),
+            "foreign_completed_tasks_visible": visible_foreign,
+            "foreign_artifacts_listed": listed_task_ids,
+            "foreign_artifacts_inspected": inspected_task_ids,
+            "foreign_evidence_inspected": inspected_refs,
+            "inspection_response_transcript_ids": [item[1].get("transcript_id") for item in inspection_events],
+            "post_sync_search_read_actions": [event.get("event_id") for event in post_sync_actions + post_sync_file_reads],
+            "post_inspection_search_read_actions": [event.get("event_id") for event in post_inspection_actions],
+            "reasoning_changed": None,
+            "finding_changed": None,
+            "foreign_evidence_incorporated": bool(incorporated_refs),
+            "incorporated_foreign_evidence_refs": incorporated_refs,
+            "outcome_level": level,
+            "sync_observation_event_ids": [event.get("event_id") for event in agent_observations],
+            "post_sync_window_opened": bool(opened_for_agent),
+            "post_sync_window_event_ids": [event.get("event_id") for event in opened_for_agent],
+            "post_sync_instruction_model_visible": bool(visible_for_agent),
+            "post_sync_instruction_event_ids": [event.get("event_id") for event in visible_for_agent],
+            "post_sync_provider_call_admitted": bool(admitted_for_agent),
+            "post_sync_provider_admission_event_ids": [event.get("event_id") for event in admitted_for_agent],
+            "verification_action_attempted": bool(verification_for_agent),
+            "verification_target": [
+                (event.get("payload") or {}).get("verification_target") for event in verification_for_agent
+            ],
+            "verification_evidence_model_visible": bool(evidence_visible_for_agent),
+            "verification_evidence_visibility_event_ids": [event.get("event_id") for event in evidence_visible_for_agent],
+            "verification_opportunity_status": (
+                "verification_attempted" if verification_for_agent
+                else "opportunity_delivered_model_chose_not_to_verify" if admitted_for_agent
+                else "no_post_sync_provider_opportunity"
+            ),
+        }
+    return {
+        "policy": "result_sync_v1" if triggered or observed else None,
+        "measurement_version": "result_inspection_trace_v2_1",
+        "triggered": bool(triggered),
+        "trigger_event_id": trigger.get("event_id") if trigger else None,
+        "trigger_event_sequence": trigger_sequence,
+        "sync_id": sync_id,
+        "trigger_count": len(triggered),
+        "exactly_once": len(triggered) == 1,
+        "participating_agents": trigger_payload.get("participating_agents") or agent_ids,
+        "completed_initial_task_ids": trigger_payload.get("completed_initial_task_ids") or [],
+        "per_agent": per_agent,
+        "outcome_counts": dict(sorted(outcome_counts.items())),
+        "post_sync_opportunity": {
+            "window_opened_count": len(post_sync_opened),
+            "instruction_model_visible_count": len(post_sync_visible),
+            "provider_call_admitted_count": len(post_sync_admitted),
+            "verification_action_attempted_count": len(verification_attempted),
+            "verification_evidence_model_visible_count": len(verification_visible),
+            "note": "Opportunity provenance is runtime-recorded. Selection, direct relevance, actionable lead, post-verification judgment, and final adoption remain analyzer/manual-adjudication labels.",
+        },
+        "notes": [
+            "result_sync_observed 是 raw completed-task snapshot 进入该 agent model-visible context 的 lineage 事件。",
+            "list_tasks 仅证明列出；R2 要求同步后的 model_response 明确选出一个 foreign task、其 evidence_ref 和 relevance 判断。选择以 labelled Selected foreign task 字段为准，允许其后讨论其他未采用 artifact；未显式留下检查记录的行为仍为 R1/未证实。",
+            "reasoning_changed 无法从不保存 hidden chain-of-thought 的 trace 直接判断；R3 要求明确检查、正向 relevance/跟进表述，以及之后的 read/search，但仍需人工确认行动与 foreign lead 有关；R4 要求 foreign evidence_ref 进入 final finding。",
+            "finding_changed 不能从最终存在 finding 推断；没有可靠的 pre/post finding revision lineage 时保持 null。",
+            "R4 是 evidence reuse 观察，不是 security effectiveness 或 TP 提升结论。",
+            "verification_opportunity_status 区分 runtime 未交付 post-sync provider opportunity 与已交付而未观察到 verification action；它不从未行动推断模型动机。",
+        ],
     }
 
 
@@ -797,6 +1078,11 @@ def _comparison_projection(metrics: dict[str, Any]) -> dict[str, Any]:
         "resource": (allocation.get("team") or {}),
         "blackboard": {key: (metrics.get("blackboard") or {}).get(key) for key in ("available", "tool_activity_observed", "model_tool_invocations", "write_count", "read_count", "cross_agent_read_count", "first_write_latency_seconds", "first_read_latency_seconds")},
         "structured_team": {key: (metrics.get("structured_team") or {}).get(key) for key in ("available", "tool_activity_observed", "lifecycle_activity_observed", "model_tool_invocations", "task_list_reads", "tasks_created", "tasks_claimed", "tasks_completed", "claim_conflicts", "task_result_evidence_adoption")},
+        "result_sync": {
+            "triggered": (metrics.get("result_sync") or {}).get("triggered"),
+            "exactly_once": (metrics.get("result_sync") or {}).get("exactly_once"),
+            "outcome_counts": (metrics.get("result_sync") or {}).get("outcome_counts"),
+        },
     }
 
 

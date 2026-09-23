@@ -93,3 +93,9 @@ git commit：`f624fda`（本契约随同一提交入库；live runs 的 `run_man
 ## 6. 旧世代处理
 
 旧 2048 runs（advisory finalization）保持冻结：不重写、不重评分、不回填 matched block、不假装其 Factor B 是 hard gate。报告中仅作 historical diagnostic evidence。
+
+## 7. Post-hoc classification-v2 amendment
+
+正式 12-run 回溯后，`first_convergence_step` 的 trace-review 口径升级为 classification schema v2：cognitive convergence、behavioral stopping、submission completion 三者严格分离，并为首次 expression 记录 `spontaneous`、`guidance_consistent`、`nudge_induced`、`finalization_induced`、`ambiguous` 或 `not_observed` 来源。该勘误不修改本 prereg 的 run、events、transcripts、finding score 或原始 metrics；派生结果与 rubric 见 `docs/research/convergence-classification-v2-20260919.md`。因此本文件中 H1 的 prereg wording 不应被当作最终分类结果，最终表述以 classification-v2 amendment 和主报告勘误为准。
+
+后续 S/P/B/T/M 共用的 completion primitives 已冻结于 `docs/research/common_runtime_contract_completion_v2.md`；该 contract 明确 `team completion trigger = TBD`，不把 S1 finalization timing 偷渡为 team semantics。

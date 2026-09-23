@@ -50,6 +50,7 @@ def main() -> int:
         help="Explicit provider thinking mode; overrides LLM_THINKING_MODE for this run.",
     )
     parser.add_argument("--seed", default="0")
+    parser.add_argument("--run-id", help="Stable run directory identifier for a preregistered diagnostic.")
     parser.add_argument(
         "--max-output-tokens",
         type=int,
@@ -69,6 +70,57 @@ def main() -> int:
         ),
     )
     parser.add_argument(
+        "--team-completion-policy",
+        choices=["none", "all_agents_terminal_v1"],
+        default="none",
+        help="Runtime team barrier; independent from the agent completion policy.",
+    )
+    parser.add_argument(
+        "--team-finalization-policy",
+        choices=["none", "team_remaining_permits_v1"],
+        default="none",
+        help="Shared-ledger finalization trigger; formal calibration freezes team_remaining_permits_v1.",
+    )
+    parser.add_argument(
+        "--team-finalization-reserve",
+        type=int,
+        default=0,
+        help="Team permit threshold that activates finalization.",
+    )
+    parser.add_argument(
+        "--task-closure-policy",
+        choices=["none", "task_closure_gate_v1"],
+        default="none",
+        help="Optional versioned runtime gate requiring claimed tasks to close before submission.",
+    )
+    parser.add_argument(
+        "--result-sync-policy",
+        choices=["none", "result_sync_v1"],
+        default="none",
+        help="Optional deterministic post-task result visibility barrier.",
+    )
+    parser.add_argument(
+        "--post-sync-window-policy",
+        choices=["none", "t4_post_sync_window_v1", "t4_post_sync_window_v2"],
+        default="none",
+        help="Opt-in neutral POST_SYNC execution window; requires result_sync_v1.",
+    )
+    parser.add_argument(
+        "--post-sync-reservation-per-agent",
+        type=int,
+        help="Permits statically reserved inside the team cap for each POST_SYNC-eligible agent.",
+    )
+    parser.add_argument(
+        "--task-board-sequencing-policy",
+        choices=["none", "initialization_lease_v1"],
+        default="none",
+        help="Optional versioned first-board visibility lease.",
+    )
+    parser.add_argument(
+        "--prompt-profile",
+        help="Explicit versioned prompt profile; result_sync_v1 defaults to repository_v1_t4_result_sync_v1.",
+    )
+    parser.add_argument(
         "--hard-team-call-permits",
         type=int,
         help="Override the manifest team call-permit cap for a non-formal calibration run.",
@@ -80,11 +132,17 @@ def main() -> int:
         parser.error("--max-output-tokens must be positive")
     if args.hard_team_call_permits is not None and args.hard_team_call_permits <= 0:
         parser.error("--hard-team-call-permits must be positive")
+    if args.post_sync_reservation_per_agent is not None and args.post_sync_reservation_per_agent < 0:
+        parser.error("--post-sync-reservation-per-agent must be non-negative")
+    if args.post_sync_window_policy != "none" and args.result_sync_policy != "result_sync_v1":
+        parser.error("--post-sync-window-policy requires --result-sync-policy result_sync_v1")
 
     experiment = load_manifest(args.case)
     budgets = dict(experiment["smoke_budgets"] if args.smoke_budget else experiment["default_budgets"])
     if args.hard_team_call_permits is not None:
         budgets["hard_team_call_permits"] = args.hard_team_call_permits
+    if args.post_sync_reservation_per_agent is not None:
+        budgets["post_sync_reservation_per_agent"] = args.post_sync_reservation_per_agent
     if args.live and not args.mock:
         llm = client_from_env(
             model=args.model,
@@ -116,10 +174,36 @@ def main() -> int:
                 else {"requested_model": "mock"}
             ),
             seed=args.seed,
+            run_id=args.run_id,
             budgets=budgets,
             max_steps=args.max_steps,
             max_provider_retries=int(budgets.get("max_provider_retries", 0)),
             completion_policy=None if args.completion_policy == "none" else args.completion_policy,
+            team_completion_policy=None if args.team_completion_policy == "none" else args.team_completion_policy,
+            team_finalization_policy=None if args.team_finalization_policy == "none" else args.team_finalization_policy,
+            team_finalization_reserve=args.team_finalization_reserve,
+            task_board_sequencing_policy=(
+                None if args.task_board_sequencing_policy == "none" else args.task_board_sequencing_policy
+            ),
+            task_closure_policy=None if args.task_closure_policy == "none" else args.task_closure_policy,
+            result_sync_policy=None if args.result_sync_policy == "none" else args.result_sync_policy,
+            post_sync_window_policy=(
+                None if args.post_sync_window_policy == "none" else args.post_sync_window_policy
+            ),
+            prompt_profile=(
+                args.prompt_profile
+                or (
+                    (
+                        "repository_v1_t4_post_sync_window_v2"
+                        if args.post_sync_window_policy == "t4_post_sync_window_v2"
+                        else "repository_v1_t4_post_sync_window_v1"
+                    )
+                    if args.post_sync_window_policy in {"t4_post_sync_window_v1", "t4_post_sync_window_v2"}
+                    else "repository_v1_t4_result_sync_v1"
+                    if args.result_sync_policy == "result_sync_v1"
+                    else None
+                )
+            ),
             require_os_sandbox=bool(args.live and not args.mock),
             runs_dir=Path(args.runs_dir),
             case_id=args.case,

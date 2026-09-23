@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "contract_id": "t4_flowise_sequenced_bootstrap_task_closure_v1",
+  "repository": {
+    "id": "flowise_3_1_3_repository_v1",
+    "version": "repository-v1-candidate"
+  },
+  "model": {
+    "provider": "openai_compatible",
+    "requested_model": "deepseek-flash",
+    "thinking_mode": "disabled",
+    "temperature": 0.0,
+    "max_output_tokens": 4096
+  },
+  "budget": {
+    "hard_team_call_permits": 192,
+    "reserved_final_synthesis_permits": 0,
+    "token_stop_threshold": null,
+    "per_agent_token_cap": null
+  },
+  "runtime": {
+    "max_steps": 96,
+    "wall_clock_timeout_seconds": 1200
+  },
+  "retry": {
+    "max_provider_retries": 1,
+    "final_synthesis_retries": 0
+  },
+  "completion_generation": "completion_v2_team",
+  "completion_policy": "convergent_v2",
+  "team_completion_policy": "all_agents_terminal_v1",
+  "team_finalization_policy": "team_remaining_permits_v1",
+  "team_finalization_reserve": 32,
+  "task_board_sequencing_policy": "initialization_lease_v1",
+  "task_closure_policy": "task_closure_gate_v1",
+  "prompt_profile": "repository_v1_t4_sequenced_bootstrap_v1",
+  "conditions": [
+    {"id": "T4", "mode": "structured_team", "agent_count": 4}
+  ],
+  "preregistration": {
+    "status": "frozen_for_task_lifecycle_closure_diagnostic",
+    "live_execution_authorized": true,
+    "network_access": false,
+    "provider_live_calls": true,
+    "seed_identity": "matched-seed-01-from-t4-sequenced-bootstrap-v1-corrected-3seed-192p",
+    "comparison_reference": "t4-sequenced-bootstrap-v1-corrected-3seed-192p/formal_seed-01",
+    "research_question": "当 trace 已证明 task-board sequencing/decomposition 不变且模型已采用 task board 时，runtime task_closure_gate_v1 是否能稳定阻止 claimed task 在 complete_task 之前直接 submit，并恢复 claim → complete → submit 顺序？",
+    "intervention": "add versioned runtime task_closure_gate_v1; reject submit_findings while the submitting agent owns a claimed task; do not auto-complete, allocate permits, or alter sequencing/decomposition",
+    "primary_outcomes": [
+      "create/claim/complete",
+      "claimed_without_completion",
+      "complete-before-submit ordering",
+      "task artifacts with result/evidence_refs",
+      "team completion validity"
+    ],
+    "secondary_outcomes": ["finding count", "evaluator TP/unmatched/FP"],
+    "unchanged_semantics": [
+      "hard_team_call_permits=192",
+      "team_finalization_reserve=32",
+      "model, seed, prompt text, decomposition, sequencing, tools and scheduler",
+      "completion and team-completion policies",
+      "target, evaluator, retry and wall-clock"
+    ],
+    "excluded_conditions": ["S1", "P4", "B4", "M4"],
+    "not_an_architecture_benchmark": true
+  }
+}

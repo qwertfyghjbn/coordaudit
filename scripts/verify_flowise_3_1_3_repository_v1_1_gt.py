@@ -65,7 +65,11 @@ def main() -> None:
     require(gt["case_id"] == manifest["repository_id"] == "flowise_3_1_3_repository_v1_1", "case identity")
     require(manifest["schema_version"] == "repository-v1.1-case-manifest", "manifest schema")
     require(manifest["live_gate"] == "blocked", "live gate must remain blocked")
-    require(manifest["activation_status"].endswith("runtime_case_unregistered"), "runtime activation boundary")
+    require(
+        manifest["activation_status"]
+        == "gt_content_candidate; evaluator_v2_implemented; runtime_case_registered; live_gate_blocked",
+        "runtime activation boundary",
+    )
     require(len(gt["roots"]) == gt["counts"]["roots_total"] == manifest["gt_lineage"]["root_denominator"] == 30, "root denominator")
     require(len({root["id"] for root in gt["roots"]}) == 30, "unique root IDs")
     require(len({anchor["id"] for root in gt["roots"] for anchor in root.get("equivalent_anchors_v1_1", [])}) == gt["counts"]["equivalent_anchor_expansions"], "unique equivalent anchors")

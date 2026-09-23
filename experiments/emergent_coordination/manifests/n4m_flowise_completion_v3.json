@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "contract_id": "n4m_flowise_completion_v3",
+  "repository": {
+    "id": "flowise_3_1_3_repository_v1",
+    "version": "repository-v1-candidate"
+  },
+  "model": {
+    "provider": "openai_compatible",
+    "requested_model": "deepseek-flash",
+    "thinking_mode": "disabled",
+    "temperature": 0.0,
+    "max_output_tokens": 4096
+  },
+  "budget": {
+    "hard_team_call_permits": 64,
+    "reserved_final_synthesis_permits": 1,
+    "token_stop_threshold": null,
+    "per_agent_token_cap": null
+  },
+  "runtime": {
+    "max_steps": 64,
+    "wall_clock_timeout_seconds": 1200
+  },
+  "retry": {"max_provider_retries": 1},
+  "completion_generation": "completion_v3",
+  "completion_policy": "convergent_v2",
+  "team_completion_policy": "team_completion_v3",
+  "team_finalization_deadline_seconds": 60,
+  "conditions": [
+    {"id": "S1", "mode": "single", "agent_count": 1},
+    {"id": "P4", "mode": "parallel", "agent_count": 4},
+    {"id": "B4", "mode": "raw_blackboard", "agent_count": 4},
+    {"id": "T4", "mode": "structured_team", "agent_count": 4},
+    {"id": "M4", "mode": "manager_worker", "agent_count": 4}
+  ]
+}

@@ -142,5 +142,5 @@
     "root_denominator": 30,
     "normative_rules": "ADR-0007/2026-09-21"
   },
-  "activation_status": "gt_content_candidate; evaluator_v2_unimplemented; runtime_case_unregistered"
+  "activation_status": "gt_content_candidate; evaluator_v2_implemented; runtime_case_registered; live_gate_blocked"
 }

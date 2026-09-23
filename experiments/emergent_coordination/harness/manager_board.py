@@ -139,15 +139,81 @@ class ManagerBoard:
                 "result": result,
                 "evidence_refs": list(evidence_refs or []),
                 "reported_at": utc_now(),
+                "transport_state": "produced",
+                "model_visible": False,
+                "adopted": False,
             }
             task["reports"].append(report)
             task["status"] = "reported"
         self.event_log.emit(
             "manager_worker_reported",
             agent_id=worker_id,
-            payload={"report_id": report["id"], "task_id": task_id, "evidence_refs": report["evidence_refs"]},
+            payload={"report_id": report["id"], "task_id": task_id, "evidence_refs": report["evidence_refs"], "transport_state": "produced"},
         )
         return {"task_id": task_id, "report_id": report["id"], "accepted": True}
+
+    def drain_reports(self) -> list[dict[str, Any]]:
+        """Advance queued reports only; never imply model visibility/adoption."""
+        delivered: list[dict[str, Any]] = []
+        with self._lock:
+            for task in self._tasks.values():
+                for report in task["reports"]:
+                    if report["transport_state"] == "produced":
+                        report["transport_state"] = "queued"
+                        self.event_log.emit(
+                            "manager_report_queued",
+                            agent_id=self.manager_id,
+                            payload={"report_id": report["id"], "task_id": report["task_id"], "worker_id": report["worker_id"]},
+                        )
+                    if report["transport_state"] == "queued":
+                        report["transport_state"] = "delivered"
+                        delivered.append(dict(report))
+        for report in delivered:
+            self.event_log.emit(
+                "manager_report_delivered",
+                agent_id=self.manager_id,
+                payload={"report_id": report["id"], "task_id": report["task_id"], "worker_id": report["worker_id"]},
+            )
+        return delivered
+
+    def final_snapshot(self, *, completion_reason: str = "barrier") -> dict[str, Any]:
+        """Return a deterministic, detached final snapshot of board state."""
+        with self._lock:
+            reports = [dict(report) for task in self._tasks.values() for report in task["reports"] if report["transport_state"] == "delivered"]
+            tasks = [_manager_task_view(task) for task in self._tasks.values() if task["status"] in {"assigned", "cancelled"}]
+        return {
+            "reports": reports,
+            "unresolved_tasks": [task["id"] for task in tasks],
+            "completion_reason": completion_reason,
+        }
+
+    def mark_final_synthesis_visible(self, report_ids: list[str]) -> None:
+        """Record visibility only when the frozen snapshot enters model input."""
+        wanted = set(report_ids)
+        visible_refs: dict[str, list[str]] = {}
+        with self._lock:
+            reports = [report for task in self._tasks.values() for report in task["reports"]]
+            for report in reports:
+                if report["id"] in wanted:
+                    report["model_visible"] = True
+                    visible_refs[report["id"]] = list(report["evidence_refs"])
+        for report_id in sorted(wanted):
+            self.event_log.emit(
+                "manager_report_model_visible",
+                agent_id=self.manager_id,
+                payload={"report_id": report_id, "evidence_refs": visible_refs.get(report_id, [])},
+            )
+
+    def adopt_report(self, report_id: str) -> None:
+        with self._lock:
+            report = next(
+                (item for task in self._tasks.values() for item in task["reports"] if item["id"] == report_id),
+                None,
+            )
+            if report is None or not report["model_visible"]:
+                raise ManagerCoordinationError("report adoption requires final synthesis visibility")
+            report["adopted"] = True
+        self.event_log.emit("manager_report_adopted", agent_id=self.manager_id, payload={"report_id": report_id})
 
     def request_more(self, worker_id: str) -> dict[str, Any]:
         self._require_worker(worker_id)

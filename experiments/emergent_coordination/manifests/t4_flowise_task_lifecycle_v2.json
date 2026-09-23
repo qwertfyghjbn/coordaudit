@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "contract_id": "t4_flowise_task_lifecycle_v2",
+  "repository": {
+    "id": "flowise_3_1_3_repository_v1",
+    "version": "repository-v1-candidate"
+  },
+  "model": {
+    "provider": "openai_compatible",
+    "requested_model": "deepseek-flash",
+    "thinking_mode": "disabled",
+    "temperature": 0.0,
+    "max_output_tokens": 4096
+  },
+  "budget": {
+    "hard_team_call_permits": 192,
+    "reserved_final_synthesis_permits": 0,
+    "token_stop_threshold": null,
+    "per_agent_token_cap": null
+  },
+  "runtime": {
+    "max_steps": 96,
+    "wall_clock_timeout_seconds": 1200
+  },
+  "retry": {
+    "max_provider_retries": 1,
+    "final_synthesis_retries": 0
+  },
+  "completion_generation": "completion_v2_team",
+  "completion_policy": "convergent_v2",
+  "team_completion_policy": "all_agents_terminal_v1",
+  "team_finalization_policy": "team_remaining_permits_v1",
+  "team_finalization_reserve": 32,
+  "prompt_profile": "repository_v1_t4_task_lifecycle_v2",
+  "conditions": [
+    {"id": "T4", "mode": "structured_team", "agent_count": 4}
+  ],
+  "preregistration": {
+    "status": "frozen_for_matched_lifecycle_diagnostic",
+    "live_execution_authorized": true,
+    "network_access": false,
+    "provider_live_calls": true,
+    "seed_identity": "n4-flowise-completion-calibration-v2-96p",
+    "comparison_reference": "t4-board-bootstrap-adoption-v1-192p/formal_t4-board-bootstrap-adoption-v1",
+    "research_question": "模型已经采用 task board 后，明确的 lifecycle instruction 是否足以让 claimed task 转化为 completed artifact？",
+    "intervention": "add claimed-task completion-before-submission instruction and finalization reminder; preserve bootstrap/decomposition prompt verbatim",
+    "unchanged_semantics": [
+      "hard_team_call_permits=192",
+      "team_finalization_reserve=32",
+      "model, seed, tools, scheduler and decomposition prompt",
+      "completion and team-completion policies",
+      "target, evaluator, retry and wall-clock"
+    ],
+    "excluded_conditions": ["S1", "P4", "B4", "M4"],
+    "not_an_architecture_benchmark": true
+  }
+}

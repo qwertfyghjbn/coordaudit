@@ -27,7 +27,7 @@ class BlockRunnerError(RuntimeError):
     pass
 
 
-def condition_hashes(condition: ConditionSpec, case: CaseDefinition) -> dict[str, Any]:
+def condition_hashes(condition: ConditionSpec, case: CaseDefinition, prompt_profile: str | None = None) -> dict[str, Any]:
     """Hash the frozen per-condition prompt and tool surfaces.
 
     Prompt hashes use a sentinel agent identity. The actual identity mapping is
@@ -35,14 +35,20 @@ def condition_hashes(condition: ConditionSpec, case: CaseDefinition) -> dict[str
     deterministic identity assignment without duplicating hashes per agent.
     """
     if condition.mode == "manager_worker":
-        return {role: _role_hashes(condition, case, role) for role in ("manager", "worker")}
-    return _role_hashes(condition, case, None)
+        return {role: _role_hashes(condition, case, role, prompt_profile) for role in ("manager", "worker")}
+    return _role_hashes(condition, case, None, prompt_profile)
 
 
-def _role_hashes(condition: ConditionSpec, case: CaseDefinition, role: str | None) -> dict[str, str]:
+def _role_hashes(
+    condition: ConditionSpec,
+    case: CaseDefinition,
+    role: str | None,
+    prompt_profile: str | None = None,
+) -> dict[str, str]:
     agent_id = "__AGENT_ID__"
-    system = system_prompt(condition.mode, agent_id, case.prompt_profile, role=role)
-    user = user_prompt(condition.mode, agent_id, condition.agent_count, case.prompt_profile, role=role)
+    profile = prompt_profile or case.prompt_profile
+    system = system_prompt(condition.mode, agent_id, profile, role=role)
+    user = user_prompt(condition.mode, agent_id, condition.agent_count, profile, role=role)
     if role == "manager":
         identity_rule = "agent_001"
     elif role == "worker":
@@ -88,15 +94,25 @@ class BlockRunner:
     def _build_manifest(self, block_id: str) -> dict[str, Any]:
         case = load_case(self.config.repository_id)
         self._check_case_contract_consistency(case)
+        if case.evaluator == "repository_v1_1" and case.manifest.get("live_gate") != "open":
+            raise BlockRunnerError("repository-v1.1 case live gate is blocked")
+        runtime = self.config.condition_runtime or {}
+        if any(
+            isinstance(spec, dict) and spec.get("evaluator_generation", case.evaluator) != case.evaluator
+            for spec in runtime.values()
+        ):
+            raise BlockRunnerError("formal block cannot mix evaluator generations")
+        prompt_profile = self.config.prompt_profile or case.prompt_profile
         per_condition_hashes = {
-            condition.id: condition_hashes(condition, case) for condition in self.config.conditions
+            condition.id: condition_hashes(condition, case, prompt_profile) for condition in self.config.conditions
         }
-        common, schema = base_prompt(case.prompt_profile)
+        common, schema = base_prompt(prompt_profile)
         return {
             "schema_version": 2,
             "block_id": block_id,
             "frozen_at": datetime.now(timezone.utc).isoformat(),
             "contract": self.config.as_dict(),
+            "evaluator_generation": case.evaluator,
             "hashes": {
                 "common_prompt": _sha256_text(common + "\n" + schema),
                 "conditions": per_condition_hashes,
@@ -145,6 +161,34 @@ class BlockRunner:
                             "evaluator_verification separately from agent verification claims"
                         ),
                     },
+                    *(
+                        [
+                            {
+                                "requirement": "bounded_team_finalization_deadline",
+                                "evidence": (
+                                    "completion_v3 freezes team_finalization_deadline_seconds=60;"
+                                    " TeamFinalizationCoordinator records deadline expiry and emits"
+                                    " team_finalization_deadline_exceeded without an extra permit"
+                                ),
+                            }
+                        ]
+                        if self.config.completion_generation == "completion_v3"
+                        else []
+                    ),
+                    *(
+                        [
+                            {
+                                "requirement": "team_level_finalization_trigger",
+                                "evidence": (
+                                    "BudgetTracker atomically triggers team_remaining_permits_v1 when remaining "
+                                    "team permits are <= the frozen reserve=32; transition is exactly-once and "
+                                    "all active agents enter the same finalization epoch without extra permits."
+                                ),
+                            }
+                        ]
+                        if self.config.completion_generation == "completion_v2_team"
+                        else []
+                    ),
                 ],
             },
         }
@@ -173,8 +217,16 @@ class BlockRunner:
                         f"{self.config.repository_id} case matched_conditions"
                     )
         defaults = manifest.get("default_budgets")
-        if isinstance(defaults, dict) and "hard_team_call_permits" in defaults:
-            case_permits = int(defaults["hard_team_call_permits"])
+        contract_budgets = manifest.get("contract_budgets")
+        selected = (
+            contract_budgets.get(self.config.contract_id)
+            if isinstance(contract_budgets, dict)
+            else None
+        )
+        if not isinstance(selected, dict):
+            selected = defaults
+        if isinstance(selected, dict) and "hard_team_call_permits" in selected:
+            case_permits = int(selected["hard_team_call_permits"])
             if case_permits != self.config.hard_team_call_permits:
                 raise BlockRunnerError(
                     f"block permits ({self.config.hard_team_call_permits}) disagree with the "

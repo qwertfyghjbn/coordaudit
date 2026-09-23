@@ -1,0 +1,110 @@
+{
+  "agent_run_derived_gt_overlap": {
+    "discovery_cluster_ids": [
+      "UC13"
+    ],
+    "discovery_equivalent_anchor_ids": [
+      "EA_R07_verify_and_login",
+      "EA_R08_verify_and_login"
+    ],
+    "discovery_root_ids": [],
+    "discovery_source": true,
+    "independent_generalization_evidence": false,
+    "matched_agent_run_derived_root_ids": [],
+    "present": true
+  },
+  "condition": "S",
+  "input_sha256": {
+    "evaluation.json": "e77f38898e2e5ca0c6c37fd08f5867caa20030dd23da151bf6a2a0db12d0b18e",
+    "evaluator_private/verification.json": "456ecaa780b45311307aad7b22a6767408ed95a896dbdcec368412eb69c2bacc",
+    "merged_findings.json": "9cead4019c4443d94d5bd29dcb1d6a98216608b5b3f40ed108dcc84654659e48",
+    "run_manifest.json": "9e5460ad551f07596bc80a2dca600f5bf8d0feb083c90d326c598a1480533cd7"
+  },
+  "original": {
+    "evaluator_generation": "repository_v1",
+    "false_negatives": 20,
+    "score_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T045304.598787+0000_28d2d36e/evaluation.json",
+    "score_artifact_sha256": "e77f38898e2e5ca0c6c37fd08f5867caa20030dd23da151bf6a2a0db12d0b18e",
+    "true_positives": 0,
+    "unmatched": 3,
+    "verification_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T045304.598787+0000_28d2d36e/evaluator_private/verification.json",
+    "verification_artifact_sha256": "456ecaa780b45311307aad7b22a6767408ed95a896dbdcec368412eb69c2bacc"
+  },
+  "per_finding_transition": [
+    {
+      "anchor_id": "EA_R08_verify_and_login",
+      "historical_cluster_id": "UC13",
+      "index": 0,
+      "original_disposition": "unmatched_review",
+      "retrospective_classification": "equivalent_tp",
+      "root_id": "R08_sso_email_only_identity"
+    },
+    {
+      "historical_cluster_id": "UC22",
+      "index": 1,
+      "original_disposition": "unmatched_review",
+      "retrospective_classification": "false_positive"
+    },
+    {
+      "historical_cluster_id": "UC29",
+      "index": 2,
+      "original_disposition": "unmatched_review",
+      "retrospective_classification": "false_positive"
+    }
+  ],
+  "retrospective": {
+    "canonical_tp": 0,
+    "duplicate_findings": 0,
+    "equivalent_tp": 1,
+    "evaluator_generation": "repository_v1_1",
+    "false_negatives": 29,
+    "false_positive": 2,
+    "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+    "inconclusive": 0,
+    "known_gt_overlap_uncredited": 0,
+    "matched_roots": {
+      "R08_sso_email_only_identity": {
+        "anchor_id": "EA_R08_verify_and_login",
+        "classification": "equivalent_tp",
+        "index": 0
+      }
+    },
+    "missing_roots": [
+      "R01_enterprise_active_org_binding",
+      "R02_org_user_password_serialization",
+      "R03_chat_message_route_permission",
+      "R04_generic_credential_lookup_scope",
+      "R05_openai_assistant_credential_lookup_scope",
+      "R06_assistant_delete_credential_lookup_scope",
+      "R07_sso_invited_token_proof",
+      "R09_bullmq_dashboard_rbac",
+      "R10_mcp_stdio_executable_policy",
+      "R11_mcp_cwd_policy",
+      "R12_realtime_chatflow_workspace_scope",
+      "R13_sqlite_chain_write_capability",
+      "R14_chat_model_baseurl_egress_policy",
+      "R15_upsert_history_route_scope",
+      "R16_memory_session_id_type",
+      "R17_document_loader_egress_policy",
+      "R18_export_variable_secret",
+      "R19_tts_abort_cross_operation",
+      "R20_tts_private_flow_credential_use",
+      "R21_oauth2_unauth_credential_mutation",
+      "R22_feedback_unauth_cross_flow_access",
+      "R23_get_upload_file_unauth_cross_tenant_read",
+      "R24_dataset_rows_unscoped_delete",
+      "R25_user_create_zero_permission",
+      "R26_apikey_raw_secret_exposure",
+      "R27_documentstore_upsert_zero_permission",
+      "R28_documentstore_query_unscoped",
+      "R29_nvidia_nim_zero_permission_routes",
+      "R30_host_header_chatflow_tool_credential_egress"
+    ],
+    "root_denominator": 30,
+    "unmatched_unreviewed": 0,
+    "validated_novel_tp": 0
+  },
+  "run_id": "single_n1_20260919T045304.598787+0000_28d2d36e",
+  "run_path": "single_n1_20260919T045304.598787+0000_28d2d36e",
+  "seed": "flowise-s1-completion-v2-seedA-20260919"
+}

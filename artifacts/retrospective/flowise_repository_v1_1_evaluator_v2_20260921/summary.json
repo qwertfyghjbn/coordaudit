@@ -1,0 +1,2691 @@
+{
+  "case_id": "flowise_3_1_3_repository_v1_1",
+  "condition_descriptives": {
+    "B": [
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 0,
+        "run_path": "flowise-n4-formal-2048-01/runs/raw_blackboard_n4_20260918T142037.672076+0000_b629fbe5"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 2,
+        "run_path": "n4-flowise-completion-calibration-v2-96p/formal_b4_team-finalization-v1"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 0,
+        "run_path": "n4m-flowise-calibration-v1-96p/formal_b4_completion-v2"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 0,
+        "run_path": "n4m-flowise-calibration-v1-96p/raw_blackboard_n4_20260920T042454.253585+0000_1b236f2a"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 0,
+        "run_path": "raw_blackboard_n4_20260918T123217.498894+0000_858f97e5"
+      }
+    ],
+    "M": [
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 0,
+        "run_path": "manager_worker_n4_20260918T123230.583954+0000_afae3bfe"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 0,
+        "run_path": "manager_worker_n4_20260918T123249.621431+0000_c6c19161"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 0,
+        "run_path": "n4m-flowise-calibration-v1-96p/manager_worker_n4_20260920T042731.219124+0000_d3e5f569"
+      }
+    ],
+    "P": [
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 0,
+        "run_path": "flowise-n4-formal-2048-01/runs/parallel_n4_20260918T141935.833971+0000_512cd1df"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 3,
+        "run_path": "n4-flowise-completion-calibration-v2-96p/formal_p4_team-finalization-v1"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 0,
+        "run_path": "n4m-flowise-calibration-v1-96p/formal_p4_completion-v2"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 0,
+        "run_path": "n4m-flowise-calibration-v1-96p/parallel_n4_20260920T042339.036294+0000_ed42122f"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 0,
+        "run_path": "parallel_n4_20260918T123211.154541+0000_66e1ed08"
+      }
+    ],
+    "S": [
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 0,
+        "run_path": "flowise-n4-formal-2048-01/runs/single_n1_20260918T141655.612567+0000_dd0df70d"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 0,
+        "run_path": "n4-flowise-completion-calibration-v2-96p/formal_s1_team-finalization-v1"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 1,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 1,
+        "run_path": "n4m-flowise-calibration-v1-96p/formal_s1_completion-v2"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 1,
+        "run_path": "n4m-flowise-calibration-v1-96p/single_n1_20260920T042041.413565+0000_6629e1e3"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 0,
+        "run_path": "single_n1_20260918T123208.408495+0000_ecaf33f8"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 0,
+        "run_path": "single_n1_20260918T124405.776944+0000_c792f2cc"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 0,
+        "run_path": "single_n1_20260918T141114.622570+0000_5b4db6fa"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 0,
+        "run_path": "single_n1_20260919T002540.053881+0000_4e86afcf"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 1,
+        "run_path": "single_n1_20260919T003239.655288+0000_bcbf7ec3"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 1,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 2,
+        "run_path": "single_n1_20260919T004958.035995+0000_2c9edb89"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 2,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 4,
+        "run_path": "single_n1_20260919T005712.105877+0000_9f6f60b1"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 0,
+        "run_path": "single_n1_20260919T013923.221314+0000_14e9da39"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 0,
+        "run_path": "single_n1_20260919T015554.026898+0000_f8b46033"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 1,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 3,
+        "run_path": "single_n1_20260919T020929.584601+0000_5e034b57"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 3,
+        "run_path": "single_n1_20260919T021423.935064+0000_1a6244b9"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 1,
+        "run_path": "single_n1_20260919T021948.640024+0000_40bd3d2e"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 1,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 2,
+        "run_path": "single_n1_20260919T035548.514070+0000_517bcf94"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 1,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 2,
+        "run_path": "single_n1_20260919T040004.254731+0000_0038df2e"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 0,
+        "run_path": "single_n1_20260919T043236.562030+0000_0906e04e"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 0,
+        "run_path": "single_n1_20260919T043422.038396+0000_7115f4c1"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 0,
+        "run_path": "single_n1_20260919T043607.735505+0000_d2527e90"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 0,
+        "run_path": "single_n1_20260919T043752.931894+0000_ee9271bb"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 0,
+        "run_path": "single_n1_20260919T043947.149201+0000_a8afbe28"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 0,
+        "run_path": "single_n1_20260919T044128.426804+0000_ddaadeb0"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 0,
+        "run_path": "single_n1_20260919T044314.544537+0000_08633048"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 0,
+        "run_path": "single_n1_20260919T044647.138261+0000_bec52002"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 2,
+        "run_path": "single_n1_20260919T045055.779809+0000_77081634"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 1,
+        "run_path": "single_n1_20260919T045304.598787+0000_28d2d36e"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 2,
+        "run_path": "single_n1_20260919T045736.278175+0000_4455ede1"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 0,
+        "run_path": "single_n1_20260919T050111.482674+0000_a6409f3c"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 1,
+        "run_path": "single_n1_20260919T050526.679955+0000_6793723c"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 1,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 1,
+        "run_path": "single_n1_20260919T050926.137877+0000_c3a912ed"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 1,
+        "run_path": "single_n1_20260919T051314.688086+0000_54b1add0"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 0,
+        "run_path": "single_n1_20260919T051634.656613+0000_3be2e511"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 2,
+        "run_path": "single_n1_20260919T052100.005951+0000_953dd098"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 2,
+        "run_path": "single_n1_20260919T052352.707783+0000_8e78df51"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 1,
+        "run_path": "single_n1_20260919T052703.310841+0000_fb71500f"
+      }
+    ],
+    "T": [
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 0,
+        "run_path": "flowise-n4-formal-2048-01/runs/structured_team_n4_20260918T142132.617685+0000_7d01cd44"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 0,
+        "run_path": "n4-flowise-completion-calibration-v2-96p/formal_t4_team-finalization-v1"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 0,
+        "run_path": "n4m-flowise-calibration-v1-96p/formal_t4_completion-v2"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 0,
+        "run_path": "n4m-flowise-calibration-v1-96p/structured_team_n4_20260920T042602.261170+0000_c6519973"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 0,
+        "run_path": "structured_team_n4_20260918T123223.960058+0000_f463a12f"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 1,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 3,
+        "run_path": "t4-board-bootstrap-adoption-v1-192p/formal_t4-board-bootstrap-adoption-v1"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 2,
+        "run_path": "t4-flowise-completion-budget-diagnostic-v1-192p/formal_t4_completion-budget-diagnostic-v1"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 1,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 4,
+        "run_path": "t4-nonoverlap-v1-192p/formal_t4-nonoverlap-v1"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 0,
+        "run_path": "t4-result-inspection-prompt-v1-192p/matched-seed-01"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 1,
+        "run_path": "t4-result-inspection-prompt-v1-192p/matched-seed-01-replacement-01"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 1,
+        "run_path": "t4-result-sync-v1-192p/matched-seed-01"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 1,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 3,
+        "run_path": "t4-sequenced-bootstrap-task-closure-v1-192p/formal_seed-01"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 2,
+        "run_path": "t4-sequenced-bootstrap-task-closure-v1-192p/formal_seed-01-replacement-01"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 1,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 3,
+        "run_path": "t4-sequenced-bootstrap-v1-192p/formal_t4-sequenced-bootstrap-v1"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 2,
+        "run_path": "t4-sequenced-bootstrap-v1-corrected-192p/formal_t4-sequenced-bootstrap-v1-corrected"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 1,
+        "run_path": "t4-sequenced-bootstrap-v1-corrected-3seed-192p/formal_seed-02"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 0,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 3,
+        "run_path": "t4-sequenced-bootstrap-v1-corrected-3seed-192p/formal_seed-03"
+      },
+      {
+        "original_denominator": 20,
+        "original_tp": 1,
+        "retrospective_denominator": 30,
+        "retrospective_tp": 3,
+        "run_path": "t4-task-lifecycle-v2-192p/formal_t4-task-lifecycle-v2"
+      }
+    ]
+  },
+  "evaluator_generation": "repository_v1_1",
+  "excluded_runs": [
+    {
+      "missing": "merged_findings.json, evaluation.json, evaluator_private/verification.json",
+      "reason": "incomplete_original_run",
+      "run": "single_n1_20260919T044459.225844+0000_d31ce38b"
+    }
+  ],
+  "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+  "historical_adjudicated_unmatched_findings": 94,
+  "historical_adjudication_source_runs": 63,
+  "interpretation": "Retrospective descriptive adjudication only; no topology ranking or independent generalization claim.",
+  "old_case_id": "flowise_3_1_3_repository_v1",
+  "old_unmatched_findings_all_rescored_runs": 122,
+  "reused_historical_run_ids": {
+    "matched-seed-01": [
+      "t4-result-inspection-prompt-v1-192p/matched-seed-01",
+      "t4-result-sync-v1-192p/matched-seed-01"
+    ]
+  },
+  "run_count": 68,
+  "run_index": [
+    {
+      "agent_run_derived_gt_overlap": false,
+      "artifact": "runs/flowise-n4-formal-2048-01/runs/parallel_n4_20260918T141935.833971+0000_512cd1df/retrospective.json",
+      "condition": "P",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/flowise-n4-formal-2048-01/runs/parallel_n4_20260918T141935.833971+0000_512cd1df/evaluation.json",
+        "score_artifact_sha256": "87ca0e568f888104d25483669b11838e8470572af3206e610a69fbd7602db995",
+        "true_positives": 0,
+        "unmatched": 0,
+        "verification_artifact": "experiments/emergent_coordination/runs/flowise-n4-formal-2048-01/runs/parallel_n4_20260918T141935.833971+0000_512cd1df/evaluator_private/verification.json",
+        "verification_artifact_sha256": "b4147f077c139a01d508d115e4938264508dbb193f87f3bf6e6806765b3564c2"
+      },
+      "retrospective": {
+        "canonical_tp": 0,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 30,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "parallel_n4_20260918T141935.833971+0000_512cd1df",
+      "run_path": "flowise-n4-formal-2048-01/runs/parallel_n4_20260918T141935.833971+0000_512cd1df",
+      "seed": "flowise-n4-formal-2048-01"
+    },
+    {
+      "agent_run_derived_gt_overlap": false,
+      "artifact": "runs/flowise-n4-formal-2048-01/runs/raw_blackboard_n4_20260918T142037.672076+0000_b629fbe5/retrospective.json",
+      "condition": "B",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/flowise-n4-formal-2048-01/runs/raw_blackboard_n4_20260918T142037.672076+0000_b629fbe5/evaluation.json",
+        "score_artifact_sha256": "87ca0e568f888104d25483669b11838e8470572af3206e610a69fbd7602db995",
+        "true_positives": 0,
+        "unmatched": 0,
+        "verification_artifact": "experiments/emergent_coordination/runs/flowise-n4-formal-2048-01/runs/raw_blackboard_n4_20260918T142037.672076+0000_b629fbe5/evaluator_private/verification.json",
+        "verification_artifact_sha256": "b4147f077c139a01d508d115e4938264508dbb193f87f3bf6e6806765b3564c2"
+      },
+      "retrospective": {
+        "canonical_tp": 0,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 30,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "raw_blackboard_n4_20260918T142037.672076+0000_b629fbe5",
+      "run_path": "flowise-n4-formal-2048-01/runs/raw_blackboard_n4_20260918T142037.672076+0000_b629fbe5",
+      "seed": "flowise-n4-formal-2048-01"
+    },
+    {
+      "agent_run_derived_gt_overlap": false,
+      "artifact": "runs/flowise-n4-formal-2048-01/runs/single_n1_20260918T141655.612567+0000_dd0df70d/retrospective.json",
+      "condition": "S",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/flowise-n4-formal-2048-01/runs/single_n1_20260918T141655.612567+0000_dd0df70d/evaluation.json",
+        "score_artifact_sha256": "87ca0e568f888104d25483669b11838e8470572af3206e610a69fbd7602db995",
+        "true_positives": 0,
+        "unmatched": 0,
+        "verification_artifact": "experiments/emergent_coordination/runs/flowise-n4-formal-2048-01/runs/single_n1_20260918T141655.612567+0000_dd0df70d/evaluator_private/verification.json",
+        "verification_artifact_sha256": "b4147f077c139a01d508d115e4938264508dbb193f87f3bf6e6806765b3564c2"
+      },
+      "retrospective": {
+        "canonical_tp": 0,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 30,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "single_n1_20260918T141655.612567+0000_dd0df70d",
+      "run_path": "flowise-n4-formal-2048-01/runs/single_n1_20260918T141655.612567+0000_dd0df70d",
+      "seed": "flowise-n4-formal-2048-01"
+    },
+    {
+      "agent_run_derived_gt_overlap": false,
+      "artifact": "runs/flowise-n4-formal-2048-01/runs/structured_team_n4_20260918T142132.617685+0000_7d01cd44/retrospective.json",
+      "condition": "T",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/flowise-n4-formal-2048-01/runs/structured_team_n4_20260918T142132.617685+0000_7d01cd44/evaluation.json",
+        "score_artifact_sha256": "87ca0e568f888104d25483669b11838e8470572af3206e610a69fbd7602db995",
+        "true_positives": 0,
+        "unmatched": 0,
+        "verification_artifact": "experiments/emergent_coordination/runs/flowise-n4-formal-2048-01/runs/structured_team_n4_20260918T142132.617685+0000_7d01cd44/evaluator_private/verification.json",
+        "verification_artifact_sha256": "b4147f077c139a01d508d115e4938264508dbb193f87f3bf6e6806765b3564c2"
+      },
+      "retrospective": {
+        "canonical_tp": 0,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 30,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "structured_team_n4_20260918T142132.617685+0000_7d01cd44",
+      "run_path": "flowise-n4-formal-2048-01/runs/structured_team_n4_20260918T142132.617685+0000_7d01cd44",
+      "seed": "flowise-n4-formal-2048-01"
+    },
+    {
+      "agent_run_derived_gt_overlap": false,
+      "artifact": "runs/manager_worker_n4_20260918T123230.583954+0000_afae3bfe/retrospective.json",
+      "condition": "M",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/manager_worker_n4_20260918T123230.583954+0000_afae3bfe/evaluation.json",
+        "score_artifact_sha256": "87ca0e568f888104d25483669b11838e8470572af3206e610a69fbd7602db995",
+        "true_positives": 0,
+        "unmatched": 0,
+        "verification_artifact": "experiments/emergent_coordination/runs/manager_worker_n4_20260918T123230.583954+0000_afae3bfe/evaluator_private/verification.json",
+        "verification_artifact_sha256": "b4147f077c139a01d508d115e4938264508dbb193f87f3bf6e6806765b3564c2"
+      },
+      "retrospective": {
+        "canonical_tp": 0,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 30,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "manager_worker_n4_20260918T123230.583954+0000_afae3bfe",
+      "run_path": "manager_worker_n4_20260918T123230.583954+0000_afae3bfe",
+      "seed": "0"
+    },
+    {
+      "agent_run_derived_gt_overlap": false,
+      "artifact": "runs/manager_worker_n4_20260918T123249.621431+0000_c6c19161/retrospective.json",
+      "condition": "M",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/manager_worker_n4_20260918T123249.621431+0000_c6c19161/evaluation.json",
+        "score_artifact_sha256": "87ca0e568f888104d25483669b11838e8470572af3206e610a69fbd7602db995",
+        "true_positives": 0,
+        "unmatched": 0,
+        "verification_artifact": "experiments/emergent_coordination/runs/manager_worker_n4_20260918T123249.621431+0000_c6c19161/evaluator_private/verification.json",
+        "verification_artifact_sha256": "b4147f077c139a01d508d115e4938264508dbb193f87f3bf6e6806765b3564c2"
+      },
+      "retrospective": {
+        "canonical_tp": 0,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 30,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "manager_worker_n4_20260918T123249.621431+0000_c6c19161",
+      "run_path": "manager_worker_n4_20260918T123249.621431+0000_c6c19161",
+      "seed": "0"
+    },
+    {
+      "agent_run_derived_gt_overlap": true,
+      "artifact": "runs/n4-flowise-completion-calibration-v2-96p/formal_b4_team-finalization-v1/retrospective.json",
+      "condition": "B",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/n4-flowise-completion-calibration-v2-96p/formal_b4_team-finalization-v1/evaluation.json",
+        "score_artifact_sha256": "a740d19d8c50a6f7da11fe7a9ff01fb143ab1ce878be5c3aeb09ffedd845b590",
+        "true_positives": 0,
+        "unmatched": 2,
+        "verification_artifact": "experiments/emergent_coordination/runs/n4-flowise-completion-calibration-v2-96p/formal_b4_team-finalization-v1/evaluator_private/verification.json",
+        "verification_artifact_sha256": "1c6a0590469cab92dbd213badd63a376a484fc91db419ffb35416ce6c5f0c51f"
+      },
+      "retrospective": {
+        "canonical_tp": 2,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 28,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "formal_b4_team-finalization-v1",
+      "run_path": "n4-flowise-completion-calibration-v2-96p/formal_b4_team-finalization-v1",
+      "seed": "n4-flowise-completion-calibration-v2-96p"
+    },
+    {
+      "agent_run_derived_gt_overlap": true,
+      "artifact": "runs/n4-flowise-completion-calibration-v2-96p/formal_p4_team-finalization-v1/retrospective.json",
+      "condition": "P",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/n4-flowise-completion-calibration-v2-96p/formal_p4_team-finalization-v1/evaluation.json",
+        "score_artifact_sha256": "75c2a20e2ac61899368ebb6df16bff7514f69445b35bbc7ee5e4546ad261676c",
+        "true_positives": 0,
+        "unmatched": 5,
+        "verification_artifact": "experiments/emergent_coordination/runs/n4-flowise-completion-calibration-v2-96p/formal_p4_team-finalization-v1/evaluator_private/verification.json",
+        "verification_artifact_sha256": "825b7a71fa7a7b39818aacb997a9716531191c0d9b23856718af10684d4bd592"
+      },
+      "retrospective": {
+        "canonical_tp": 2,
+        "duplicate_findings": 1,
+        "equivalent_tp": 1,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 27,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 1,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "formal_p4_team-finalization-v1",
+      "run_path": "n4-flowise-completion-calibration-v2-96p/formal_p4_team-finalization-v1",
+      "seed": "n4-flowise-completion-calibration-v2-96p"
+    },
+    {
+      "agent_run_derived_gt_overlap": false,
+      "artifact": "runs/n4-flowise-completion-calibration-v2-96p/formal_s1_team-finalization-v1/retrospective.json",
+      "condition": "S",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/n4-flowise-completion-calibration-v2-96p/formal_s1_team-finalization-v1/evaluation.json",
+        "score_artifact_sha256": "d11c8259a182e14175c8afb498a50d3e93d997cd5b4b41c3cc90f79adf95b224",
+        "true_positives": 0,
+        "unmatched": 2,
+        "verification_artifact": "experiments/emergent_coordination/runs/n4-flowise-completion-calibration-v2-96p/formal_s1_team-finalization-v1/evaluator_private/verification.json",
+        "verification_artifact_sha256": "1c6a0590469cab92dbd213badd63a376a484fc91db419ffb35416ce6c5f0c51f"
+      },
+      "retrospective": {
+        "canonical_tp": 0,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 30,
+        "false_positive": 2,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "formal_s1_team-finalization-v1",
+      "run_path": "n4-flowise-completion-calibration-v2-96p/formal_s1_team-finalization-v1",
+      "seed": "n4-flowise-completion-calibration-v2-96p"
+    },
+    {
+      "agent_run_derived_gt_overlap": false,
+      "artifact": "runs/n4-flowise-completion-calibration-v2-96p/formal_t4_team-finalization-v1/retrospective.json",
+      "condition": "T",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/n4-flowise-completion-calibration-v2-96p/formal_t4_team-finalization-v1/evaluation.json",
+        "score_artifact_sha256": "2701fbbd1f7482ed0a70bfb8990d875830dfed4e4ac286cdf0d40764d7e63a8d",
+        "true_positives": 0,
+        "unmatched": 4,
+        "verification_artifact": "experiments/emergent_coordination/runs/n4-flowise-completion-calibration-v2-96p/formal_t4_team-finalization-v1/evaluator_private/verification.json",
+        "verification_artifact_sha256": "42cab59feb7b6397efbc13f446e7e402ad711b86cd02dd0742d413b679faa0e1"
+      },
+      "retrospective": {
+        "canonical_tp": 0,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 30,
+        "false_positive": 4,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "formal_t4_team-finalization-v1",
+      "run_path": "n4-flowise-completion-calibration-v2-96p/formal_t4_team-finalization-v1",
+      "seed": "n4-flowise-completion-calibration-v2-96p"
+    },
+    {
+      "agent_run_derived_gt_overlap": false,
+      "artifact": "runs/n4m-flowise-calibration-v1-96p/formal_b4_completion-v2/retrospective.json",
+      "condition": "B",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/n4m-flowise-calibration-v1-96p/formal_b4_completion-v2/evaluation.json",
+        "score_artifact_sha256": "87ca0e568f888104d25483669b11838e8470572af3206e610a69fbd7602db995",
+        "true_positives": 0,
+        "unmatched": 0,
+        "verification_artifact": "experiments/emergent_coordination/runs/n4m-flowise-calibration-v1-96p/formal_b4_completion-v2/evaluator_private/verification.json",
+        "verification_artifact_sha256": "b4147f077c139a01d508d115e4938264508dbb193f87f3bf6e6806765b3564c2"
+      },
+      "retrospective": {
+        "canonical_tp": 0,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 30,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "formal_b4_completion-v2",
+      "run_path": "n4m-flowise-calibration-v1-96p/formal_b4_completion-v2",
+      "seed": "n4m-flowise-calibration-v1-96p"
+    },
+    {
+      "agent_run_derived_gt_overlap": false,
+      "artifact": "runs/n4m-flowise-calibration-v1-96p/formal_p4_completion-v2/retrospective.json",
+      "condition": "P",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/n4m-flowise-calibration-v1-96p/formal_p4_completion-v2/evaluation.json",
+        "score_artifact_sha256": "87ca0e568f888104d25483669b11838e8470572af3206e610a69fbd7602db995",
+        "true_positives": 0,
+        "unmatched": 0,
+        "verification_artifact": "experiments/emergent_coordination/runs/n4m-flowise-calibration-v1-96p/formal_p4_completion-v2/evaluator_private/verification.json",
+        "verification_artifact_sha256": "b4147f077c139a01d508d115e4938264508dbb193f87f3bf6e6806765b3564c2"
+      },
+      "retrospective": {
+        "canonical_tp": 0,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 30,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "formal_p4_completion-v2",
+      "run_path": "n4m-flowise-calibration-v1-96p/formal_p4_completion-v2",
+      "seed": "n4m-flowise-calibration-v1-96p"
+    },
+    {
+      "agent_run_derived_gt_overlap": true,
+      "artifact": "runs/n4m-flowise-calibration-v1-96p/formal_s1_completion-v2/retrospective.json",
+      "condition": "S",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 19,
+        "score_artifact": "experiments/emergent_coordination/runs/n4m-flowise-calibration-v1-96p/formal_s1_completion-v2/evaluation.json",
+        "score_artifact_sha256": "a0056111eba63f14cf4a24dfe660dd74c39e5baa32810e61d78af1f3423a77b0",
+        "true_positives": 1,
+        "unmatched": 1,
+        "verification_artifact": "experiments/emergent_coordination/runs/n4m-flowise-calibration-v1-96p/formal_s1_completion-v2/evaluator_private/verification.json",
+        "verification_artifact_sha256": "934508818cb8ae28245051f459fa6baa25eb5f4c8e434dd59e2654a440f06187"
+      },
+      "retrospective": {
+        "canonical_tp": 1,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 29,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 1,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "formal_s1_completion-v2",
+      "run_path": "n4m-flowise-calibration-v1-96p/formal_s1_completion-v2",
+      "seed": "n4m-flowise-calibration-v1-96p"
+    },
+    {
+      "agent_run_derived_gt_overlap": false,
+      "artifact": "runs/n4m-flowise-calibration-v1-96p/formal_t4_completion-v2/retrospective.json",
+      "condition": "T",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/n4m-flowise-calibration-v1-96p/formal_t4_completion-v2/evaluation.json",
+        "score_artifact_sha256": "87ca0e568f888104d25483669b11838e8470572af3206e610a69fbd7602db995",
+        "true_positives": 0,
+        "unmatched": 0,
+        "verification_artifact": "experiments/emergent_coordination/runs/n4m-flowise-calibration-v1-96p/formal_t4_completion-v2/evaluator_private/verification.json",
+        "verification_artifact_sha256": "b4147f077c139a01d508d115e4938264508dbb193f87f3bf6e6806765b3564c2"
+      },
+      "retrospective": {
+        "canonical_tp": 0,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 30,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "formal_t4_completion-v2",
+      "run_path": "n4m-flowise-calibration-v1-96p/formal_t4_completion-v2",
+      "seed": "n4m-flowise-calibration-v1-96p"
+    },
+    {
+      "agent_run_derived_gt_overlap": false,
+      "artifact": "runs/n4m-flowise-calibration-v1-96p/manager_worker_n4_20260920T042731.219124+0000_d3e5f569/retrospective.json",
+      "condition": "M",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/n4m-flowise-calibration-v1-96p/manager_worker_n4_20260920T042731.219124+0000_d3e5f569/evaluation.json",
+        "score_artifact_sha256": "c178a1479a2f578aa531ae2bba7aa14534d334534d404ece0517a0be033cb4f6",
+        "true_positives": 0,
+        "unmatched": 0,
+        "verification_artifact": "experiments/emergent_coordination/runs/n4m-flowise-calibration-v1-96p/manager_worker_n4_20260920T042731.219124+0000_d3e5f569/evaluator_private/verification.json",
+        "verification_artifact_sha256": "b4147f077c139a01d508d115e4938264508dbb193f87f3bf6e6806765b3564c2"
+      },
+      "retrospective": {
+        "canonical_tp": 0,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 30,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "manager_worker_n4_20260920T042731.219124+0000_d3e5f569",
+      "run_path": "n4m-flowise-calibration-v1-96p/manager_worker_n4_20260920T042731.219124+0000_d3e5f569",
+      "seed": "n4m-flowise-calibration-v1-96p"
+    },
+    {
+      "agent_run_derived_gt_overlap": false,
+      "artifact": "runs/n4m-flowise-calibration-v1-96p/parallel_n4_20260920T042339.036294+0000_ed42122f/retrospective.json",
+      "condition": "P",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/n4m-flowise-calibration-v1-96p/parallel_n4_20260920T042339.036294+0000_ed42122f/evaluation.json",
+        "score_artifact_sha256": "87ca0e568f888104d25483669b11838e8470572af3206e610a69fbd7602db995",
+        "true_positives": 0,
+        "unmatched": 0,
+        "verification_artifact": "experiments/emergent_coordination/runs/n4m-flowise-calibration-v1-96p/parallel_n4_20260920T042339.036294+0000_ed42122f/evaluator_private/verification.json",
+        "verification_artifact_sha256": "b4147f077c139a01d508d115e4938264508dbb193f87f3bf6e6806765b3564c2"
+      },
+      "retrospective": {
+        "canonical_tp": 0,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 30,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "parallel_n4_20260920T042339.036294+0000_ed42122f",
+      "run_path": "n4m-flowise-calibration-v1-96p/parallel_n4_20260920T042339.036294+0000_ed42122f",
+      "seed": "n4m-flowise-calibration-v1-96p"
+    },
+    {
+      "agent_run_derived_gt_overlap": false,
+      "artifact": "runs/n4m-flowise-calibration-v1-96p/raw_blackboard_n4_20260920T042454.253585+0000_1b236f2a/retrospective.json",
+      "condition": "B",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/n4m-flowise-calibration-v1-96p/raw_blackboard_n4_20260920T042454.253585+0000_1b236f2a/evaluation.json",
+        "score_artifact_sha256": "87ca0e568f888104d25483669b11838e8470572af3206e610a69fbd7602db995",
+        "true_positives": 0,
+        "unmatched": 0,
+        "verification_artifact": "experiments/emergent_coordination/runs/n4m-flowise-calibration-v1-96p/raw_blackboard_n4_20260920T042454.253585+0000_1b236f2a/evaluator_private/verification.json",
+        "verification_artifact_sha256": "b4147f077c139a01d508d115e4938264508dbb193f87f3bf6e6806765b3564c2"
+      },
+      "retrospective": {
+        "canonical_tp": 0,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 30,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "raw_blackboard_n4_20260920T042454.253585+0000_1b236f2a",
+      "run_path": "n4m-flowise-calibration-v1-96p/raw_blackboard_n4_20260920T042454.253585+0000_1b236f2a",
+      "seed": "n4m-flowise-calibration-v1-96p"
+    },
+    {
+      "agent_run_derived_gt_overlap": true,
+      "artifact": "runs/n4m-flowise-calibration-v1-96p/single_n1_20260920T042041.413565+0000_6629e1e3/retrospective.json",
+      "condition": "S",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/n4m-flowise-calibration-v1-96p/single_n1_20260920T042041.413565+0000_6629e1e3/evaluation.json",
+        "score_artifact_sha256": "a740d19d8c50a6f7da11fe7a9ff01fb143ab1ce878be5c3aeb09ffedd845b590",
+        "true_positives": 0,
+        "unmatched": 2,
+        "verification_artifact": "experiments/emergent_coordination/runs/n4m-flowise-calibration-v1-96p/single_n1_20260920T042041.413565+0000_6629e1e3/evaluator_private/verification.json",
+        "verification_artifact_sha256": "1c6a0590469cab92dbd213badd63a376a484fc91db419ffb35416ce6c5f0c51f"
+      },
+      "retrospective": {
+        "canonical_tp": 1,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 29,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 1,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "single_n1_20260920T042041.413565+0000_6629e1e3",
+      "run_path": "n4m-flowise-calibration-v1-96p/single_n1_20260920T042041.413565+0000_6629e1e3",
+      "seed": "n4m-flowise-calibration-v1-96p"
+    },
+    {
+      "agent_run_derived_gt_overlap": false,
+      "artifact": "runs/n4m-flowise-calibration-v1-96p/structured_team_n4_20260920T042602.261170+0000_c6519973/retrospective.json",
+      "condition": "T",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/n4m-flowise-calibration-v1-96p/structured_team_n4_20260920T042602.261170+0000_c6519973/evaluation.json",
+        "score_artifact_sha256": "87ca0e568f888104d25483669b11838e8470572af3206e610a69fbd7602db995",
+        "true_positives": 0,
+        "unmatched": 0,
+        "verification_artifact": "experiments/emergent_coordination/runs/n4m-flowise-calibration-v1-96p/structured_team_n4_20260920T042602.261170+0000_c6519973/evaluator_private/verification.json",
+        "verification_artifact_sha256": "b4147f077c139a01d508d115e4938264508dbb193f87f3bf6e6806765b3564c2"
+      },
+      "retrospective": {
+        "canonical_tp": 0,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 30,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "structured_team_n4_20260920T042602.261170+0000_c6519973",
+      "run_path": "n4m-flowise-calibration-v1-96p/structured_team_n4_20260920T042602.261170+0000_c6519973",
+      "seed": "n4m-flowise-calibration-v1-96p"
+    },
+    {
+      "agent_run_derived_gt_overlap": false,
+      "artifact": "runs/parallel_n4_20260918T123211.154541+0000_66e1ed08/retrospective.json",
+      "condition": "P",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/parallel_n4_20260918T123211.154541+0000_66e1ed08/evaluation.json",
+        "score_artifact_sha256": "87ca0e568f888104d25483669b11838e8470572af3206e610a69fbd7602db995",
+        "true_positives": 0,
+        "unmatched": 0,
+        "verification_artifact": "experiments/emergent_coordination/runs/parallel_n4_20260918T123211.154541+0000_66e1ed08/evaluator_private/verification.json",
+        "verification_artifact_sha256": "b4147f077c139a01d508d115e4938264508dbb193f87f3bf6e6806765b3564c2"
+      },
+      "retrospective": {
+        "canonical_tp": 0,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 30,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "parallel_n4_20260918T123211.154541+0000_66e1ed08",
+      "run_path": "parallel_n4_20260918T123211.154541+0000_66e1ed08",
+      "seed": "0"
+    },
+    {
+      "agent_run_derived_gt_overlap": false,
+      "artifact": "runs/raw_blackboard_n4_20260918T123217.498894+0000_858f97e5/retrospective.json",
+      "condition": "B",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/raw_blackboard_n4_20260918T123217.498894+0000_858f97e5/evaluation.json",
+        "score_artifact_sha256": "87ca0e568f888104d25483669b11838e8470572af3206e610a69fbd7602db995",
+        "true_positives": 0,
+        "unmatched": 0,
+        "verification_artifact": "experiments/emergent_coordination/runs/raw_blackboard_n4_20260918T123217.498894+0000_858f97e5/evaluator_private/verification.json",
+        "verification_artifact_sha256": "b4147f077c139a01d508d115e4938264508dbb193f87f3bf6e6806765b3564c2"
+      },
+      "retrospective": {
+        "canonical_tp": 0,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 30,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "raw_blackboard_n4_20260918T123217.498894+0000_858f97e5",
+      "run_path": "raw_blackboard_n4_20260918T123217.498894+0000_858f97e5",
+      "seed": "0"
+    },
+    {
+      "agent_run_derived_gt_overlap": false,
+      "artifact": "runs/single_n1_20260918T123208.408495+0000_ecaf33f8/retrospective.json",
+      "condition": "S",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/single_n1_20260918T123208.408495+0000_ecaf33f8/evaluation.json",
+        "score_artifact_sha256": "87ca0e568f888104d25483669b11838e8470572af3206e610a69fbd7602db995",
+        "true_positives": 0,
+        "unmatched": 0,
+        "verification_artifact": "experiments/emergent_coordination/runs/single_n1_20260918T123208.408495+0000_ecaf33f8/evaluator_private/verification.json",
+        "verification_artifact_sha256": "b4147f077c139a01d508d115e4938264508dbb193f87f3bf6e6806765b3564c2"
+      },
+      "retrospective": {
+        "canonical_tp": 0,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 30,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "single_n1_20260918T123208.408495+0000_ecaf33f8",
+      "run_path": "single_n1_20260918T123208.408495+0000_ecaf33f8",
+      "seed": "0"
+    },
+    {
+      "agent_run_derived_gt_overlap": false,
+      "artifact": "runs/single_n1_20260918T124405.776944+0000_c792f2cc/retrospective.json",
+      "condition": "S",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/single_n1_20260918T124405.776944+0000_c792f2cc/evaluation.json",
+        "score_artifact_sha256": "87ca0e568f888104d25483669b11838e8470572af3206e610a69fbd7602db995",
+        "true_positives": 0,
+        "unmatched": 0,
+        "verification_artifact": "experiments/emergent_coordination/runs/single_n1_20260918T124405.776944+0000_c792f2cc/evaluator_private/verification.json",
+        "verification_artifact_sha256": "b4147f077c139a01d508d115e4938264508dbb193f87f3bf6e6806765b3564c2"
+      },
+      "retrospective": {
+        "canonical_tp": 0,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 30,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "single_n1_20260918T124405.776944+0000_c792f2cc",
+      "run_path": "single_n1_20260918T124405.776944+0000_c792f2cc",
+      "seed": "0"
+    },
+    {
+      "agent_run_derived_gt_overlap": false,
+      "artifact": "runs/single_n1_20260918T141114.622570+0000_5b4db6fa/retrospective.json",
+      "condition": "S",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/single_n1_20260918T141114.622570+0000_5b4db6fa/evaluation.json",
+        "score_artifact_sha256": "87ca0e568f888104d25483669b11838e8470572af3206e610a69fbd7602db995",
+        "true_positives": 0,
+        "unmatched": 0,
+        "verification_artifact": "experiments/emergent_coordination/runs/single_n1_20260918T141114.622570+0000_5b4db6fa/evaluator_private/verification.json",
+        "verification_artifact_sha256": "b4147f077c139a01d508d115e4938264508dbb193f87f3bf6e6806765b3564c2"
+      },
+      "retrospective": {
+        "canonical_tp": 0,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 30,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "single_n1_20260918T141114.622570+0000_5b4db6fa",
+      "run_path": "single_n1_20260918T141114.622570+0000_5b4db6fa",
+      "seed": "flowise-s1-live-2048-20260918"
+    },
+    {
+      "agent_run_derived_gt_overlap": false,
+      "artifact": "runs/single_n1_20260919T002540.053881+0000_4e86afcf/retrospective.json",
+      "condition": "S",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T002540.053881+0000_4e86afcf/evaluation.json",
+        "score_artifact_sha256": "87ca0e568f888104d25483669b11838e8470572af3206e610a69fbd7602db995",
+        "true_positives": 0,
+        "unmatched": 0,
+        "verification_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T002540.053881+0000_4e86afcf/evaluator_private/verification.json",
+        "verification_artifact_sha256": "b4147f077c139a01d508d115e4938264508dbb193f87f3bf6e6806765b3564c2"
+      },
+      "retrospective": {
+        "canonical_tp": 0,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 30,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "single_n1_20260919T002540.053881+0000_4e86afcf",
+      "run_path": "single_n1_20260919T002540.053881+0000_4e86afcf",
+      "seed": "flowise-s1-completion-v1-20260919"
+    },
+    {
+      "agent_run_derived_gt_overlap": true,
+      "artifact": "runs/single_n1_20260919T003239.655288+0000_bcbf7ec3/retrospective.json",
+      "condition": "S",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T003239.655288+0000_bcbf7ec3/evaluation.json",
+        "score_artifact_sha256": "d11c8259a182e14175c8afb498a50d3e93d997cd5b4b41c3cc90f79adf95b224",
+        "true_positives": 0,
+        "unmatched": 2,
+        "verification_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T003239.655288+0000_bcbf7ec3/evaluator_private/verification.json",
+        "verification_artifact_sha256": "1c6a0590469cab92dbd213badd63a376a484fc91db419ffb35416ce6c5f0c51f"
+      },
+      "retrospective": {
+        "canonical_tp": 1,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 29,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 1,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "single_n1_20260919T003239.655288+0000_bcbf7ec3",
+      "run_path": "single_n1_20260919T003239.655288+0000_bcbf7ec3",
+      "seed": "flowise-s1-completion-v2-20260919"
+    },
+    {
+      "agent_run_derived_gt_overlap": true,
+      "artifact": "runs/single_n1_20260919T004958.035995+0000_2c9edb89/retrospective.json",
+      "condition": "S",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 19,
+        "score_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T004958.035995+0000_2c9edb89/evaluation.json",
+        "score_artifact_sha256": "00f133fdf70edfffecbb8dbf53f877910495b0e469be197f8db6c98fe752e4bc",
+        "true_positives": 1,
+        "unmatched": 2,
+        "verification_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T004958.035995+0000_2c9edb89/evaluator_private/verification.json",
+        "verification_artifact_sha256": "c557431d52a3103de0149e13c09ed1a014ae717ce267ee534f809e94881c3403"
+      },
+      "retrospective": {
+        "canonical_tp": 2,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 28,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 1,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "single_n1_20260919T004958.035995+0000_2c9edb89",
+      "run_path": "single_n1_20260919T004958.035995+0000_2c9edb89",
+      "seed": "flowise-s1-96perm-diagnostic-20260919"
+    },
+    {
+      "agent_run_derived_gt_overlap": true,
+      "artifact": "runs/single_n1_20260919T005712.105877+0000_9f6f60b1/retrospective.json",
+      "condition": "S",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 18,
+        "score_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T005712.105877+0000_9f6f60b1/evaluation.json",
+        "score_artifact_sha256": "493146e7ee87ef207cd24a810a686c9d11f63fc04d8ec36499648a76bdd44151",
+        "true_positives": 2,
+        "unmatched": 2,
+        "verification_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T005712.105877+0000_9f6f60b1/evaluator_private/verification.json",
+        "verification_artifact_sha256": "827f162c6089d4362c1afa0908c8787ff5b8a6d609833c9a47931a41f033e38c"
+      },
+      "retrospective": {
+        "canonical_tp": 4,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 26,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "single_n1_20260919T005712.105877+0000_9f6f60b1",
+      "run_path": "single_n1_20260919T005712.105877+0000_9f6f60b1",
+      "seed": "flowise-s1-128perm-diagnostic-20260919"
+    },
+    {
+      "agent_run_derived_gt_overlap": false,
+      "artifact": "runs/single_n1_20260919T013923.221314+0000_14e9da39/retrospective.json",
+      "condition": "S",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T013923.221314+0000_14e9da39/evaluation.json",
+        "score_artifact_sha256": "87ca0e568f888104d25483669b11838e8470572af3206e610a69fbd7602db995",
+        "true_positives": 0,
+        "unmatched": 0,
+        "verification_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T013923.221314+0000_14e9da39/evaluator_private/verification.json",
+        "verification_artifact_sha256": "b4147f077c139a01d508d115e4938264508dbb193f87f3bf6e6806765b3564c2"
+      },
+      "retrospective": {
+        "canonical_tp": 0,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 30,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "single_n1_20260919T013923.221314+0000_14e9da39",
+      "run_path": "single_n1_20260919T013923.221314+0000_14e9da39",
+      "seed": "flowise-s1-128perm-completion-none-20260919"
+    },
+    {
+      "agent_run_derived_gt_overlap": false,
+      "artifact": "runs/single_n1_20260919T015554.026898+0000_f8b46033/retrospective.json",
+      "condition": "S",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T015554.026898+0000_f8b46033/evaluation.json",
+        "score_artifact_sha256": "87ca0e568f888104d25483669b11838e8470572af3206e610a69fbd7602db995",
+        "true_positives": 0,
+        "unmatched": 0,
+        "verification_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T015554.026898+0000_f8b46033/evaluator_private/verification.json",
+        "verification_artifact_sha256": "b4147f077c139a01d508d115e4938264508dbb193f87f3bf6e6806765b3564c2"
+      },
+      "retrospective": {
+        "canonical_tp": 0,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 30,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "single_n1_20260919T015554.026898+0000_f8b46033",
+      "run_path": "single_n1_20260919T015554.026898+0000_f8b46033",
+      "seed": "flowise-s1-128perm-diagnostic-20260919"
+    },
+    {
+      "agent_run_derived_gt_overlap": true,
+      "artifact": "runs/single_n1_20260919T020929.584601+0000_5e034b57/retrospective.json",
+      "condition": "S",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 19,
+        "score_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T020929.584601+0000_5e034b57/evaluation.json",
+        "score_artifact_sha256": "00f133fdf70edfffecbb8dbf53f877910495b0e469be197f8db6c98fe752e4bc",
+        "true_positives": 1,
+        "unmatched": 2,
+        "verification_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T020929.584601+0000_5e034b57/evaluator_private/verification.json",
+        "verification_artifact_sha256": "c557431d52a3103de0149e13c09ed1a014ae717ce267ee534f809e94881c3403"
+      },
+      "retrospective": {
+        "canonical_tp": 3,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 27,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "single_n1_20260919T020929.584601+0000_5e034b57",
+      "run_path": "single_n1_20260919T020929.584601+0000_5e034b57",
+      "seed": "flowise-s1-128perm-diagnostic-20260919"
+    },
+    {
+      "agent_run_derived_gt_overlap": true,
+      "artifact": "runs/single_n1_20260919T021423.935064+0000_1a6244b9/retrospective.json",
+      "condition": "S",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T021423.935064+0000_1a6244b9/evaluation.json",
+        "score_artifact_sha256": "e77f38898e2e5ca0c6c37fd08f5867caa20030dd23da151bf6a2a0db12d0b18e",
+        "true_positives": 0,
+        "unmatched": 3,
+        "verification_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T021423.935064+0000_1a6244b9/evaluator_private/verification.json",
+        "verification_artifact_sha256": "456ecaa780b45311307aad7b22a6767408ed95a896dbdcec368412eb69c2bacc"
+      },
+      "retrospective": {
+        "canonical_tp": 2,
+        "duplicate_findings": 0,
+        "equivalent_tp": 1,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 27,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "single_n1_20260919T021423.935064+0000_1a6244b9",
+      "run_path": "single_n1_20260919T021423.935064+0000_1a6244b9",
+      "seed": "flowise-s1-128perm-diagnostic-20260919"
+    },
+    {
+      "agent_run_derived_gt_overlap": true,
+      "artifact": "runs/single_n1_20260919T021948.640024+0000_40bd3d2e/retrospective.json",
+      "condition": "S",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T021948.640024+0000_40bd3d2e/evaluation.json",
+        "score_artifact_sha256": "791a156680d495c21b041a6bbc165bc737c59e16d1938aab5072093b24991b71",
+        "true_positives": 0,
+        "unmatched": 2,
+        "verification_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T021948.640024+0000_40bd3d2e/evaluator_private/verification.json",
+        "verification_artifact_sha256": "1c6a0590469cab92dbd213badd63a376a484fc91db419ffb35416ce6c5f0c51f"
+      },
+      "retrospective": {
+        "canonical_tp": 1,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 29,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 1,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "single_n1_20260919T021948.640024+0000_40bd3d2e",
+      "run_path": "single_n1_20260919T021948.640024+0000_40bd3d2e",
+      "seed": "flowise-s1-128perm-diagnostic-20260919"
+    },
+    {
+      "agent_run_derived_gt_overlap": true,
+      "artifact": "runs/single_n1_20260919T035548.514070+0000_517bcf94/retrospective.json",
+      "condition": "S",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 19,
+        "score_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T035548.514070+0000_517bcf94/evaluation.json",
+        "score_artifact_sha256": "dc99de4554e4e4d1dab0e4ec228bc8e89a83e0e7e9112ffd86fb90ef9b382b40",
+        "true_positives": 1,
+        "unmatched": 1,
+        "verification_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T035548.514070+0000_517bcf94/evaluator_private/verification.json",
+        "verification_artifact_sha256": "934508818cb8ae28245051f459fa6baa25eb5f4c8e434dd59e2654a440f06187"
+      },
+      "retrospective": {
+        "canonical_tp": 1,
+        "duplicate_findings": 0,
+        "equivalent_tp": 1,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 28,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "single_n1_20260919T035548.514070+0000_517bcf94",
+      "run_path": "single_n1_20260919T035548.514070+0000_517bcf94",
+      "seed": "flowise-s1-conv-v1-ceiling2048-20260919"
+    },
+    {
+      "agent_run_derived_gt_overlap": true,
+      "artifact": "runs/single_n1_20260919T040004.254731+0000_0038df2e/retrospective.json",
+      "condition": "S",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 19,
+        "score_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T040004.254731+0000_0038df2e/evaluation.json",
+        "score_artifact_sha256": "a0056111eba63f14cf4a24dfe660dd74c39e5baa32810e61d78af1f3423a77b0",
+        "true_positives": 1,
+        "unmatched": 1,
+        "verification_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T040004.254731+0000_0038df2e/evaluator_private/verification.json",
+        "verification_artifact_sha256": "934508818cb8ae28245051f459fa6baa25eb5f4c8e434dd59e2654a440f06187"
+      },
+      "retrospective": {
+        "canonical_tp": 2,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 28,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "single_n1_20260919T040004.254731+0000_0038df2e",
+      "run_path": "single_n1_20260919T040004.254731+0000_0038df2e",
+      "seed": "flowise-s1-conv-v1-ceiling4096-20260919"
+    },
+    {
+      "agent_run_derived_gt_overlap": false,
+      "artifact": "runs/single_n1_20260919T043236.562030+0000_0906e04e/retrospective.json",
+      "condition": "S",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T043236.562030+0000_0906e04e/evaluation.json",
+        "score_artifact_sha256": "87ca0e568f888104d25483669b11838e8470572af3206e610a69fbd7602db995",
+        "true_positives": 0,
+        "unmatched": 0,
+        "verification_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T043236.562030+0000_0906e04e/evaluator_private/verification.json",
+        "verification_artifact_sha256": "b4147f077c139a01d508d115e4938264508dbb193f87f3bf6e6806765b3564c2"
+      },
+      "retrospective": {
+        "canonical_tp": 0,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 30,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "single_n1_20260919T043236.562030+0000_0906e04e",
+      "run_path": "single_n1_20260919T043236.562030+0000_0906e04e",
+      "seed": "flowise-s1-completion-v2-seedA-20260919"
+    },
+    {
+      "agent_run_derived_gt_overlap": false,
+      "artifact": "runs/single_n1_20260919T043422.038396+0000_7115f4c1/retrospective.json",
+      "condition": "S",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T043422.038396+0000_7115f4c1/evaluation.json",
+        "score_artifact_sha256": "87ca0e568f888104d25483669b11838e8470572af3206e610a69fbd7602db995",
+        "true_positives": 0,
+        "unmatched": 0,
+        "verification_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T043422.038396+0000_7115f4c1/evaluator_private/verification.json",
+        "verification_artifact_sha256": "b4147f077c139a01d508d115e4938264508dbb193f87f3bf6e6806765b3564c2"
+      },
+      "retrospective": {
+        "canonical_tp": 0,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 30,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "single_n1_20260919T043422.038396+0000_7115f4c1",
+      "run_path": "single_n1_20260919T043422.038396+0000_7115f4c1",
+      "seed": "flowise-s1-completion-v2-seedA-20260919"
+    },
+    {
+      "agent_run_derived_gt_overlap": false,
+      "artifact": "runs/single_n1_20260919T043607.735505+0000_d2527e90/retrospective.json",
+      "condition": "S",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T043607.735505+0000_d2527e90/evaluation.json",
+        "score_artifact_sha256": "87ca0e568f888104d25483669b11838e8470572af3206e610a69fbd7602db995",
+        "true_positives": 0,
+        "unmatched": 0,
+        "verification_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T043607.735505+0000_d2527e90/evaluator_private/verification.json",
+        "verification_artifact_sha256": "b4147f077c139a01d508d115e4938264508dbb193f87f3bf6e6806765b3564c2"
+      },
+      "retrospective": {
+        "canonical_tp": 0,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 30,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "single_n1_20260919T043607.735505+0000_d2527e90",
+      "run_path": "single_n1_20260919T043607.735505+0000_d2527e90",
+      "seed": "flowise-s1-completion-v2-seedA-20260919"
+    },
+    {
+      "agent_run_derived_gt_overlap": false,
+      "artifact": "runs/single_n1_20260919T043752.931894+0000_ee9271bb/retrospective.json",
+      "condition": "S",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T043752.931894+0000_ee9271bb/evaluation.json",
+        "score_artifact_sha256": "87ca0e568f888104d25483669b11838e8470572af3206e610a69fbd7602db995",
+        "true_positives": 0,
+        "unmatched": 0,
+        "verification_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T043752.931894+0000_ee9271bb/evaluator_private/verification.json",
+        "verification_artifact_sha256": "b4147f077c139a01d508d115e4938264508dbb193f87f3bf6e6806765b3564c2"
+      },
+      "retrospective": {
+        "canonical_tp": 0,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 30,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "single_n1_20260919T043752.931894+0000_ee9271bb",
+      "run_path": "single_n1_20260919T043752.931894+0000_ee9271bb",
+      "seed": "flowise-s1-completion-v2-seedA-20260919"
+    },
+    {
+      "agent_run_derived_gt_overlap": false,
+      "artifact": "runs/single_n1_20260919T043947.149201+0000_a8afbe28/retrospective.json",
+      "condition": "S",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T043947.149201+0000_a8afbe28/evaluation.json",
+        "score_artifact_sha256": "87ca0e568f888104d25483669b11838e8470572af3206e610a69fbd7602db995",
+        "true_positives": 0,
+        "unmatched": 0,
+        "verification_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T043947.149201+0000_a8afbe28/evaluator_private/verification.json",
+        "verification_artifact_sha256": "b4147f077c139a01d508d115e4938264508dbb193f87f3bf6e6806765b3564c2"
+      },
+      "retrospective": {
+        "canonical_tp": 0,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 30,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "single_n1_20260919T043947.149201+0000_a8afbe28",
+      "run_path": "single_n1_20260919T043947.149201+0000_a8afbe28",
+      "seed": "flowise-s1-completion-v2-seedB-20260919"
+    },
+    {
+      "agent_run_derived_gt_overlap": false,
+      "artifact": "runs/single_n1_20260919T044128.426804+0000_ddaadeb0/retrospective.json",
+      "condition": "S",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T044128.426804+0000_ddaadeb0/evaluation.json",
+        "score_artifact_sha256": "87ca0e568f888104d25483669b11838e8470572af3206e610a69fbd7602db995",
+        "true_positives": 0,
+        "unmatched": 0,
+        "verification_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T044128.426804+0000_ddaadeb0/evaluator_private/verification.json",
+        "verification_artifact_sha256": "b4147f077c139a01d508d115e4938264508dbb193f87f3bf6e6806765b3564c2"
+      },
+      "retrospective": {
+        "canonical_tp": 0,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 30,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "single_n1_20260919T044128.426804+0000_ddaadeb0",
+      "run_path": "single_n1_20260919T044128.426804+0000_ddaadeb0",
+      "seed": "flowise-s1-completion-v2-seedB-20260919"
+    },
+    {
+      "agent_run_derived_gt_overlap": false,
+      "artifact": "runs/single_n1_20260919T044314.544537+0000_08633048/retrospective.json",
+      "condition": "S",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T044314.544537+0000_08633048/evaluation.json",
+        "score_artifact_sha256": "87ca0e568f888104d25483669b11838e8470572af3206e610a69fbd7602db995",
+        "true_positives": 0,
+        "unmatched": 0,
+        "verification_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T044314.544537+0000_08633048/evaluator_private/verification.json",
+        "verification_artifact_sha256": "b4147f077c139a01d508d115e4938264508dbb193f87f3bf6e6806765b3564c2"
+      },
+      "retrospective": {
+        "canonical_tp": 0,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 30,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "single_n1_20260919T044314.544537+0000_08633048",
+      "run_path": "single_n1_20260919T044314.544537+0000_08633048",
+      "seed": "flowise-s1-completion-v2-seedB-20260919"
+    },
+    {
+      "agent_run_derived_gt_overlap": false,
+      "artifact": "runs/single_n1_20260919T044647.138261+0000_bec52002/retrospective.json",
+      "condition": "S",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T044647.138261+0000_bec52002/evaluation.json",
+        "score_artifact_sha256": "87ca0e568f888104d25483669b11838e8470572af3206e610a69fbd7602db995",
+        "true_positives": 0,
+        "unmatched": 0,
+        "verification_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T044647.138261+0000_bec52002/evaluator_private/verification.json",
+        "verification_artifact_sha256": "b4147f077c139a01d508d115e4938264508dbb193f87f3bf6e6806765b3564c2"
+      },
+      "retrospective": {
+        "canonical_tp": 0,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 30,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "single_n1_20260919T044647.138261+0000_bec52002",
+      "run_path": "single_n1_20260919T044647.138261+0000_bec52002",
+      "seed": "flowise-s1-completion-v2-seedA-20260919"
+    },
+    {
+      "agent_run_derived_gt_overlap": true,
+      "artifact": "runs/single_n1_20260919T045055.779809+0000_77081634/retrospective.json",
+      "condition": "S",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T045055.779809+0000_77081634/evaluation.json",
+        "score_artifact_sha256": "23a77f6627a0592e9ccdba182c1a29cb55e3bb0f9f71c0310ab6fa839419cf42",
+        "true_positives": 0,
+        "unmatched": 3,
+        "verification_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T045055.779809+0000_77081634/evaluator_private/verification.json",
+        "verification_artifact_sha256": "456ecaa780b45311307aad7b22a6767408ed95a896dbdcec368412eb69c2bacc"
+      },
+      "retrospective": {
+        "canonical_tp": 1,
+        "duplicate_findings": 0,
+        "equivalent_tp": 1,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 28,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 1,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "single_n1_20260919T045055.779809+0000_77081634",
+      "run_path": "single_n1_20260919T045055.779809+0000_77081634",
+      "seed": "flowise-s1-completion-v2-seedA-20260919"
+    },
+    {
+      "agent_run_derived_gt_overlap": true,
+      "artifact": "runs/single_n1_20260919T045304.598787+0000_28d2d36e/retrospective.json",
+      "condition": "S",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T045304.598787+0000_28d2d36e/evaluation.json",
+        "score_artifact_sha256": "e77f38898e2e5ca0c6c37fd08f5867caa20030dd23da151bf6a2a0db12d0b18e",
+        "true_positives": 0,
+        "unmatched": 3,
+        "verification_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T045304.598787+0000_28d2d36e/evaluator_private/verification.json",
+        "verification_artifact_sha256": "456ecaa780b45311307aad7b22a6767408ed95a896dbdcec368412eb69c2bacc"
+      },
+      "retrospective": {
+        "canonical_tp": 0,
+        "duplicate_findings": 0,
+        "equivalent_tp": 1,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 29,
+        "false_positive": 2,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "single_n1_20260919T045304.598787+0000_28d2d36e",
+      "run_path": "single_n1_20260919T045304.598787+0000_28d2d36e",
+      "seed": "flowise-s1-completion-v2-seedA-20260919"
+    },
+    {
+      "agent_run_derived_gt_overlap": true,
+      "artifact": "runs/single_n1_20260919T045736.278175+0000_4455ede1/retrospective.json",
+      "condition": "S",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T045736.278175+0000_4455ede1/evaluation.json",
+        "score_artifact_sha256": "d11c8259a182e14175c8afb498a50d3e93d997cd5b4b41c3cc90f79adf95b224",
+        "true_positives": 0,
+        "unmatched": 2,
+        "verification_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T045736.278175+0000_4455ede1/evaluator_private/verification.json",
+        "verification_artifact_sha256": "1c6a0590469cab92dbd213badd63a376a484fc91db419ffb35416ce6c5f0c51f"
+      },
+      "retrospective": {
+        "canonical_tp": 1,
+        "duplicate_findings": 0,
+        "equivalent_tp": 1,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 28,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "single_n1_20260919T045736.278175+0000_4455ede1",
+      "run_path": "single_n1_20260919T045736.278175+0000_4455ede1",
+      "seed": "flowise-s1-completion-v2-seedA-20260919"
+    },
+    {
+      "agent_run_derived_gt_overlap": false,
+      "artifact": "runs/single_n1_20260919T050111.482674+0000_a6409f3c/retrospective.json",
+      "condition": "S",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T050111.482674+0000_a6409f3c/evaluation.json",
+        "score_artifact_sha256": "87ca0e568f888104d25483669b11838e8470572af3206e610a69fbd7602db995",
+        "true_positives": 0,
+        "unmatched": 0,
+        "verification_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T050111.482674+0000_a6409f3c/evaluator_private/verification.json",
+        "verification_artifact_sha256": "b4147f077c139a01d508d115e4938264508dbb193f87f3bf6e6806765b3564c2"
+      },
+      "retrospective": {
+        "canonical_tp": 0,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 30,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "single_n1_20260919T050111.482674+0000_a6409f3c",
+      "run_path": "single_n1_20260919T050111.482674+0000_a6409f3c",
+      "seed": "flowise-s1-completion-v2-seedB-20260919"
+    },
+    {
+      "agent_run_derived_gt_overlap": true,
+      "artifact": "runs/single_n1_20260919T050526.679955+0000_6793723c/retrospective.json",
+      "condition": "S",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T050526.679955+0000_6793723c/evaluation.json",
+        "score_artifact_sha256": "a175570899753d1e48aad0b3945e3c099a1e1931bbdba0017a87e074afd62787",
+        "true_positives": 0,
+        "unmatched": 1,
+        "verification_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T050526.679955+0000_6793723c/evaluator_private/verification.json",
+        "verification_artifact_sha256": "cfc4bcf04167806002e5fdcfa0b248a406f1793d714ba82ac53904537bd4169b"
+      },
+      "retrospective": {
+        "canonical_tp": 1,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 29,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "single_n1_20260919T050526.679955+0000_6793723c",
+      "run_path": "single_n1_20260919T050526.679955+0000_6793723c",
+      "seed": "flowise-s1-completion-v2-seedB-20260919"
+    },
+    {
+      "agent_run_derived_gt_overlap": false,
+      "artifact": "runs/single_n1_20260919T050926.137877+0000_c3a912ed/retrospective.json",
+      "condition": "S",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 19,
+        "score_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T050926.137877+0000_c3a912ed/evaluation.json",
+        "score_artifact_sha256": "a0056111eba63f14cf4a24dfe660dd74c39e5baa32810e61d78af1f3423a77b0",
+        "true_positives": 1,
+        "unmatched": 1,
+        "verification_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T050926.137877+0000_c3a912ed/evaluator_private/verification.json",
+        "verification_artifact_sha256": "6eff8531b5f4e991b73a992bd9a184819128023379974f0041a0c34379ee7976"
+      },
+      "retrospective": {
+        "canonical_tp": 1,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 29,
+        "false_positive": 1,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "single_n1_20260919T050926.137877+0000_c3a912ed",
+      "run_path": "single_n1_20260919T050926.137877+0000_c3a912ed",
+      "seed": "flowise-s1-completion-v2-seedB-20260919"
+    },
+    {
+      "agent_run_derived_gt_overlap": true,
+      "artifact": "runs/single_n1_20260919T051314.688086+0000_54b1add0/retrospective.json",
+      "condition": "S",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T051314.688086+0000_54b1add0/evaluation.json",
+        "score_artifact_sha256": "17728cd9bc56734245c476b43c70857f882d6061c18c9408c4fed60d2fbbe9d8",
+        "true_positives": 0,
+        "unmatched": 1,
+        "verification_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T051314.688086+0000_54b1add0/evaluator_private/verification.json",
+        "verification_artifact_sha256": "cfc4bcf04167806002e5fdcfa0b248a406f1793d714ba82ac53904537bd4169b"
+      },
+      "retrospective": {
+        "canonical_tp": 1,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 29,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "single_n1_20260919T051314.688086+0000_54b1add0",
+      "run_path": "single_n1_20260919T051314.688086+0000_54b1add0",
+      "seed": "flowise-s1-completion-v2-seedB-20260919"
+    },
+    {
+      "agent_run_derived_gt_overlap": false,
+      "artifact": "runs/single_n1_20260919T051634.656613+0000_3be2e511/retrospective.json",
+      "condition": "S",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T051634.656613+0000_3be2e511/evaluation.json",
+        "score_artifact_sha256": "c178a1479a2f578aa531ae2bba7aa14534d334534d404ece0517a0be033cb4f6",
+        "true_positives": 0,
+        "unmatched": 0,
+        "verification_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T051634.656613+0000_3be2e511/evaluator_private/verification.json",
+        "verification_artifact_sha256": "b4147f077c139a01d508d115e4938264508dbb193f87f3bf6e6806765b3564c2"
+      },
+      "retrospective": {
+        "canonical_tp": 0,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 30,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "single_n1_20260919T051634.656613+0000_3be2e511",
+      "run_path": "single_n1_20260919T051634.656613+0000_3be2e511",
+      "seed": "flowise-s1-completion-v2-seedC-20260919"
+    },
+    {
+      "agent_run_derived_gt_overlap": true,
+      "artifact": "runs/single_n1_20260919T052100.005951+0000_953dd098/retrospective.json",
+      "condition": "S",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T052100.005951+0000_953dd098/evaluation.json",
+        "score_artifact_sha256": "6d3fce1041871af9de989f42ac4485a1b8b91a3308f2865ae715d3c8d995e60e",
+        "true_positives": 0,
+        "unmatched": 3,
+        "verification_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T052100.005951+0000_953dd098/evaluator_private/verification.json",
+        "verification_artifact_sha256": "456ecaa780b45311307aad7b22a6767408ed95a896dbdcec368412eb69c2bacc"
+      },
+      "retrospective": {
+        "canonical_tp": 1,
+        "duplicate_findings": 0,
+        "equivalent_tp": 1,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 28,
+        "false_positive": 1,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "single_n1_20260919T052100.005951+0000_953dd098",
+      "run_path": "single_n1_20260919T052100.005951+0000_953dd098",
+      "seed": "flowise-s1-completion-v2-seedC-20260919"
+    },
+    {
+      "agent_run_derived_gt_overlap": true,
+      "artifact": "runs/single_n1_20260919T052352.707783+0000_8e78df51/retrospective.json",
+      "condition": "S",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T052352.707783+0000_8e78df51/evaluation.json",
+        "score_artifact_sha256": "2701fbbd1f7482ed0a70bfb8990d875830dfed4e4ac286cdf0d40764d7e63a8d",
+        "true_positives": 0,
+        "unmatched": 4,
+        "verification_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T052352.707783+0000_8e78df51/evaluator_private/verification.json",
+        "verification_artifact_sha256": "42cab59feb7b6397efbc13f446e7e402ad711b86cd02dd0742d413b679faa0e1"
+      },
+      "retrospective": {
+        "canonical_tp": 1,
+        "duplicate_findings": 1,
+        "equivalent_tp": 1,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 28,
+        "false_positive": 1,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "single_n1_20260919T052352.707783+0000_8e78df51",
+      "run_path": "single_n1_20260919T052352.707783+0000_8e78df51",
+      "seed": "flowise-s1-completion-v2-seedC-20260919"
+    },
+    {
+      "agent_run_derived_gt_overlap": true,
+      "artifact": "runs/single_n1_20260919T052703.310841+0000_fb71500f/retrospective.json",
+      "condition": "S",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T052703.310841+0000_fb71500f/evaluation.json",
+        "score_artifact_sha256": "d11c8259a182e14175c8afb498a50d3e93d997cd5b4b41c3cc90f79adf95b224",
+        "true_positives": 0,
+        "unmatched": 2,
+        "verification_artifact": "experiments/emergent_coordination/runs/single_n1_20260919T052703.310841+0000_fb71500f/evaluator_private/verification.json",
+        "verification_artifact_sha256": "1c6a0590469cab92dbd213badd63a376a484fc91db419ffb35416ce6c5f0c51f"
+      },
+      "retrospective": {
+        "canonical_tp": 1,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 29,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 1,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "single_n1_20260919T052703.310841+0000_fb71500f",
+      "run_path": "single_n1_20260919T052703.310841+0000_fb71500f",
+      "seed": "flowise-s1-completion-v2-seedC-20260919"
+    },
+    {
+      "agent_run_derived_gt_overlap": false,
+      "artifact": "runs/structured_team_n4_20260918T123223.960058+0000_f463a12f/retrospective.json",
+      "condition": "T",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/structured_team_n4_20260918T123223.960058+0000_f463a12f/evaluation.json",
+        "score_artifact_sha256": "87ca0e568f888104d25483669b11838e8470572af3206e610a69fbd7602db995",
+        "true_positives": 0,
+        "unmatched": 0,
+        "verification_artifact": "experiments/emergent_coordination/runs/structured_team_n4_20260918T123223.960058+0000_f463a12f/evaluator_private/verification.json",
+        "verification_artifact_sha256": "b4147f077c139a01d508d115e4938264508dbb193f87f3bf6e6806765b3564c2"
+      },
+      "retrospective": {
+        "canonical_tp": 0,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 30,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "structured_team_n4_20260918T123223.960058+0000_f463a12f",
+      "run_path": "structured_team_n4_20260918T123223.960058+0000_f463a12f",
+      "seed": "0"
+    },
+    {
+      "agent_run_derived_gt_overlap": true,
+      "artifact": "runs/t4-board-bootstrap-adoption-v1-192p/formal_t4-board-bootstrap-adoption-v1/retrospective.json",
+      "condition": "T",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 19,
+        "score_artifact": "experiments/emergent_coordination/runs/t4-board-bootstrap-adoption-v1-192p/formal_t4-board-bootstrap-adoption-v1/evaluation.json",
+        "score_artifact_sha256": "2a2776683966e8e40e5698791bc1f0d40607743794a0dc9540dc612715ce0305",
+        "true_positives": 1,
+        "unmatched": 6,
+        "verification_artifact": "experiments/emergent_coordination/runs/t4-board-bootstrap-adoption-v1-192p/formal_t4-board-bootstrap-adoption-v1/evaluator_private/verification.json",
+        "verification_artifact_sha256": "0cd81f69adb351060a495dd00c3c9b203af4c91b270fec4c7920ee9fa0925784"
+      },
+      "retrospective": {
+        "canonical_tp": 2,
+        "duplicate_findings": 3,
+        "equivalent_tp": 1,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 27,
+        "false_positive": 1,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "formal_t4-board-bootstrap-adoption-v1",
+      "run_path": "t4-board-bootstrap-adoption-v1-192p/formal_t4-board-bootstrap-adoption-v1",
+      "seed": "n4-flowise-completion-calibration-v2-96p"
+    },
+    {
+      "agent_run_derived_gt_overlap": true,
+      "artifact": "runs/t4-flowise-completion-budget-diagnostic-v1-192p/formal_t4_completion-budget-diagnostic-v1/retrospective.json",
+      "condition": "T",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/t4-flowise-completion-budget-diagnostic-v1-192p/formal_t4_completion-budget-diagnostic-v1/evaluation.json",
+        "score_artifact_sha256": "0645d74ff32e7f8761d00d7e3db4a2f5c4ddd4febb7c1042b2340fbce34dd68b",
+        "true_positives": 0,
+        "unmatched": 4,
+        "verification_artifact": "experiments/emergent_coordination/runs/t4-flowise-completion-budget-diagnostic-v1-192p/formal_t4_completion-budget-diagnostic-v1/evaluator_private/verification.json",
+        "verification_artifact_sha256": "42cab59feb7b6397efbc13f446e7e402ad711b86cd02dd0742d413b679faa0e1"
+      },
+      "retrospective": {
+        "canonical_tp": 1,
+        "duplicate_findings": 1,
+        "equivalent_tp": 1,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 28,
+        "false_positive": 1,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "formal_t4_completion-budget-diagnostic-v1",
+      "run_path": "t4-flowise-completion-budget-diagnostic-v1-192p/formal_t4_completion-budget-diagnostic-v1",
+      "seed": "n4-flowise-completion-calibration-v2-96p"
+    },
+    {
+      "agent_run_derived_gt_overlap": true,
+      "artifact": "runs/t4-nonoverlap-v1-192p/formal_t4-nonoverlap-v1/retrospective.json",
+      "condition": "T",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 19,
+        "score_artifact": "experiments/emergent_coordination/runs/t4-nonoverlap-v1-192p/formal_t4-nonoverlap-v1/evaluation.json",
+        "score_artifact_sha256": "edb16309c03b0cb10b7bed0877f313ae2ff4f38de45df949f1a662642fe41c0a",
+        "true_positives": 1,
+        "unmatched": 6,
+        "verification_artifact": "experiments/emergent_coordination/runs/t4-nonoverlap-v1-192p/formal_t4-nonoverlap-v1/evaluator_private/verification.json",
+        "verification_artifact_sha256": "2c418938127f90955af5a064e68837380ffb0d665c7e963568714936b1e1e15b"
+      },
+      "retrospective": {
+        "canonical_tp": 4,
+        "duplicate_findings": 1,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 26,
+        "false_positive": 3,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "formal_t4-nonoverlap-v1",
+      "run_path": "t4-nonoverlap-v1-192p/formal_t4-nonoverlap-v1",
+      "seed": "n4-flowise-completion-calibration-v2-96p"
+    },
+    {
+      "agent_run_derived_gt_overlap": false,
+      "artifact": "runs/t4-result-inspection-prompt-v1-192p/matched-seed-01/retrospective.json",
+      "condition": "T",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/t4-result-inspection-prompt-v1-192p/matched-seed-01/evaluation.json",
+        "score_artifact_sha256": "87ca0e568f888104d25483669b11838e8470572af3206e610a69fbd7602db995",
+        "true_positives": 0,
+        "unmatched": 0,
+        "verification_artifact": "experiments/emergent_coordination/runs/t4-result-inspection-prompt-v1-192p/matched-seed-01/evaluator_private/verification.json",
+        "verification_artifact_sha256": "b4147f077c139a01d508d115e4938264508dbb193f87f3bf6e6806765b3564c2"
+      },
+      "retrospective": {
+        "canonical_tp": 0,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 30,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "matched-seed-01",
+      "run_path": "t4-result-inspection-prompt-v1-192p/matched-seed-01",
+      "seed": "t4-result-sync-v1-matched-seed-01"
+    },
+    {
+      "agent_run_derived_gt_overlap": true,
+      "artifact": "runs/t4-result-inspection-prompt-v1-192p/matched-seed-01-replacement-01/retrospective.json",
+      "condition": "T",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/t4-result-inspection-prompt-v1-192p/matched-seed-01-replacement-01/evaluation.json",
+        "score_artifact_sha256": "17728cd9bc56734245c476b43c70857f882d6061c18c9408c4fed60d2fbbe9d8",
+        "true_positives": 0,
+        "unmatched": 1,
+        "verification_artifact": "experiments/emergent_coordination/runs/t4-result-inspection-prompt-v1-192p/matched-seed-01-replacement-01/evaluator_private/verification.json",
+        "verification_artifact_sha256": "cfc4bcf04167806002e5fdcfa0b248a406f1793d714ba82ac53904537bd4169b"
+      },
+      "retrospective": {
+        "canonical_tp": 1,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 29,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "matched-seed-01-replacement-01",
+      "run_path": "t4-result-inspection-prompt-v1-192p/matched-seed-01-replacement-01",
+      "seed": "t4-result-sync-v1-matched-seed-01"
+    },
+    {
+      "agent_run_derived_gt_overlap": true,
+      "artifact": "runs/t4-result-sync-v1-192p/matched-seed-01/retrospective.json",
+      "condition": "T",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/t4-result-sync-v1-192p/matched-seed-01/evaluation.json",
+        "score_artifact_sha256": "2754c84e2e1dfdf7af6d37c06ba6ef097d0ea3c2574cc0a614149fca3199ee79",
+        "true_positives": 0,
+        "unmatched": 7,
+        "verification_artifact": "experiments/emergent_coordination/runs/t4-result-sync-v1-192p/matched-seed-01/evaluator_private/verification.json",
+        "verification_artifact_sha256": "87c3a3c577ecb3df75d213ff1c79f204fc31b90c86d1a47a68126f2c10290356"
+      },
+      "retrospective": {
+        "canonical_tp": 1,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 29,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 6,
+        "validated_novel_tp": 0
+      },
+      "run_id": "matched-seed-01",
+      "run_path": "t4-result-sync-v1-192p/matched-seed-01",
+      "seed": "t4-result-sync-v1-matched-seed-01"
+    },
+    {
+      "agent_run_derived_gt_overlap": true,
+      "artifact": "runs/t4-sequenced-bootstrap-task-closure-v1-192p/formal_seed-01/retrospective.json",
+      "condition": "T",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 19,
+        "score_artifact": "experiments/emergent_coordination/runs/t4-sequenced-bootstrap-task-closure-v1-192p/formal_seed-01/evaluation.json",
+        "score_artifact_sha256": "9dec2d185004c6c8f363fadc4009f28fa3d392548d03930de83237e305a2fee4",
+        "true_positives": 1,
+        "unmatched": 9,
+        "verification_artifact": "experiments/emergent_coordination/runs/t4-sequenced-bootstrap-task-closure-v1-192p/formal_seed-01/evaluator_private/verification.json",
+        "verification_artifact_sha256": "1161dad17b6170219447021ac1407edd439deceab5f61bb064a55f2d9feb9fbf"
+      },
+      "retrospective": {
+        "canonical_tp": 2,
+        "duplicate_findings": 2,
+        "equivalent_tp": 1,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 27,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 5,
+        "validated_novel_tp": 0
+      },
+      "run_id": "formal_seed-01",
+      "run_path": "t4-sequenced-bootstrap-task-closure-v1-192p/formal_seed-01",
+      "seed": "matched-seed-01-from-t4-sequenced-bootstrap-v1-corrected-3seed-192p"
+    },
+    {
+      "agent_run_derived_gt_overlap": true,
+      "artifact": "runs/t4-sequenced-bootstrap-task-closure-v1-192p/formal_seed-01-replacement-01/retrospective.json",
+      "condition": "T",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/t4-sequenced-bootstrap-task-closure-v1-192p/formal_seed-01-replacement-01/evaluation.json",
+        "score_artifact_sha256": "aa9b603aaf9e27367bd643c50afb2337feed560876242e6bdf4e07ae0dae3e49",
+        "true_positives": 0,
+        "unmatched": 11,
+        "verification_artifact": "experiments/emergent_coordination/runs/t4-sequenced-bootstrap-task-closure-v1-192p/formal_seed-01-replacement-01/evaluator_private/verification.json",
+        "verification_artifact_sha256": "13ad8d420685d5ec9e3578b4bc2aab27c64261634d0a05972e154b414ace39f6"
+      },
+      "retrospective": {
+        "canonical_tp": 2,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 28,
+        "false_positive": 0,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 9,
+        "validated_novel_tp": 0
+      },
+      "run_id": "formal_seed-01-replacement-01",
+      "run_path": "t4-sequenced-bootstrap-task-closure-v1-192p/formal_seed-01-replacement-01",
+      "seed": "matched-seed-01-from-t4-sequenced-bootstrap-v1-corrected-3seed-192p"
+    },
+    {
+      "agent_run_derived_gt_overlap": true,
+      "artifact": "runs/t4-sequenced-bootstrap-v1-192p/formal_t4-sequenced-bootstrap-v1/retrospective.json",
+      "condition": "T",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 19,
+        "score_artifact": "experiments/emergent_coordination/runs/t4-sequenced-bootstrap-v1-192p/formal_t4-sequenced-bootstrap-v1/evaluation.json",
+        "score_artifact_sha256": "f26ffccacd28e26183ba50655d60f7675a2c1e7dc7b30f830874af5d129e5566",
+        "true_positives": 1,
+        "unmatched": 4,
+        "verification_artifact": "experiments/emergent_coordination/runs/t4-sequenced-bootstrap-v1-192p/formal_t4-sequenced-bootstrap-v1/evaluator_private/verification.json",
+        "verification_artifact_sha256": "80012887e0ae2e639cb8bd8678c6e5fedda04dd6f8e809f19eda1467205c96fa"
+      },
+      "retrospective": {
+        "canonical_tp": 2,
+        "duplicate_findings": 0,
+        "equivalent_tp": 1,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 27,
+        "false_positive": 2,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "formal_t4-sequenced-bootstrap-v1",
+      "run_path": "t4-sequenced-bootstrap-v1-192p/formal_t4-sequenced-bootstrap-v1",
+      "seed": "n4-flowise-completion-calibration-v2-96p"
+    },
+    {
+      "agent_run_derived_gt_overlap": true,
+      "artifact": "runs/t4-sequenced-bootstrap-v1-corrected-192p/formal_t4-sequenced-bootstrap-v1-corrected/retrospective.json",
+      "condition": "T",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/t4-sequenced-bootstrap-v1-corrected-192p/formal_t4-sequenced-bootstrap-v1-corrected/evaluation.json",
+        "score_artifact_sha256": "f950b54a9129fb36c90ae80dc3382dbc2d7ce3c97e6f60f85bb1f8cce84a9eaa",
+        "true_positives": 0,
+        "unmatched": 4,
+        "verification_artifact": "experiments/emergent_coordination/runs/t4-sequenced-bootstrap-v1-corrected-192p/formal_t4-sequenced-bootstrap-v1-corrected/evaluator_private/verification.json",
+        "verification_artifact_sha256": "42cab59feb7b6397efbc13f446e7e402ad711b86cd02dd0742d413b679faa0e1"
+      },
+      "retrospective": {
+        "canonical_tp": 0,
+        "duplicate_findings": 0,
+        "equivalent_tp": 2,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 28,
+        "false_positive": 2,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "formal_t4-sequenced-bootstrap-v1-corrected",
+      "run_path": "t4-sequenced-bootstrap-v1-corrected-192p/formal_t4-sequenced-bootstrap-v1-corrected",
+      "seed": "n4-flowise-completion-calibration-v2-96p"
+    },
+    {
+      "agent_run_derived_gt_overlap": true,
+      "artifact": "runs/t4-sequenced-bootstrap-v1-corrected-3seed-192p/formal_seed-02/retrospective.json",
+      "condition": "T",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/t4-sequenced-bootstrap-v1-corrected-3seed-192p/formal_seed-02/evaluation.json",
+        "score_artifact_sha256": "0aeea0cd878657764bbbc82ffae5baa0de35a642c8764e03351dfb14d0654a4e",
+        "true_positives": 0,
+        "unmatched": 5,
+        "verification_artifact": "experiments/emergent_coordination/runs/t4-sequenced-bootstrap-v1-corrected-3seed-192p/formal_seed-02/evaluator_private/verification.json",
+        "verification_artifact_sha256": "825b7a71fa7a7b39818aacb997a9716531191c0d9b23856718af10684d4bd592"
+      },
+      "retrospective": {
+        "canonical_tp": 1,
+        "duplicate_findings": 0,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 29,
+        "false_positive": 2,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 1,
+        "known_gt_overlap_uncredited": 1,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "formal_seed-02",
+      "run_path": "t4-sequenced-bootstrap-v1-corrected-3seed-192p/formal_seed-02",
+      "seed": "t4-sequenced-bootstrap-v1-corrected-192p-replicate-02"
+    },
+    {
+      "agent_run_derived_gt_overlap": true,
+      "artifact": "runs/t4-sequenced-bootstrap-v1-corrected-3seed-192p/formal_seed-03/retrospective.json",
+      "condition": "T",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 20,
+        "score_artifact": "experiments/emergent_coordination/runs/t4-sequenced-bootstrap-v1-corrected-3seed-192p/formal_seed-03/evaluation.json",
+        "score_artifact_sha256": "f816bb02cec258a022062c0e7c8d896797d90207d720aa6ccf2ec37f06f9cce2",
+        "true_positives": 0,
+        "unmatched": 9,
+        "verification_artifact": "experiments/emergent_coordination/runs/t4-sequenced-bootstrap-v1-corrected-3seed-192p/formal_seed-03/evaluator_private/verification.json",
+        "verification_artifact_sha256": "14d0d97b162dee99a005de0ab121c1d50879d99d9b612ba9c8f4b4873e2de977"
+      },
+      "retrospective": {
+        "canonical_tp": 2,
+        "duplicate_findings": 4,
+        "equivalent_tp": 1,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 27,
+        "false_positive": 1,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 1,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "formal_seed-03",
+      "run_path": "t4-sequenced-bootstrap-v1-corrected-3seed-192p/formal_seed-03",
+      "seed": "t4-sequenced-bootstrap-v1-corrected-192p-replicate-03"
+    },
+    {
+      "agent_run_derived_gt_overlap": true,
+      "artifact": "runs/t4-task-lifecycle-v2-192p/formal_t4-task-lifecycle-v2/retrospective.json",
+      "condition": "T",
+      "original": {
+        "evaluator_generation": "repository_v1",
+        "false_negatives": 19,
+        "score_artifact": "experiments/emergent_coordination/runs/t4-task-lifecycle-v2-192p/formal_t4-task-lifecycle-v2/evaluation.json",
+        "score_artifact_sha256": "96fe93cce124e8eccbdaa53e3a49328c6eed1e260102e0d57c1d98c03bd1be13",
+        "true_positives": 1,
+        "unmatched": 5,
+        "verification_artifact": "experiments/emergent_coordination/runs/t4-task-lifecycle-v2-192p/formal_t4-task-lifecycle-v2/evaluator_private/verification.json",
+        "verification_artifact_sha256": "190383da22c5dffd7698fa50006bb863ea331441aac353cd37b22cf836546e01"
+      },
+      "retrospective": {
+        "canonical_tp": 3,
+        "duplicate_findings": 2,
+        "equivalent_tp": 0,
+        "evaluator_generation": "repository_v1_1",
+        "false_negatives": 27,
+        "false_positive": 2,
+        "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+        "inconclusive": 0,
+        "known_gt_overlap_uncredited": 0,
+        "root_denominator": 30,
+        "unmatched_unreviewed": 0,
+        "validated_novel_tp": 0
+      },
+      "run_id": "formal_t4-task-lifecycle-v2",
+      "run_path": "t4-task-lifecycle-v2-192p/formal_t4-task-lifecycle-v2",
+      "seed": "n4-flowise-completion-calibration-v2-96p"
+    }
+  ],
+  "schema_version": "repository-v1.1-retrospective-v2"
+}

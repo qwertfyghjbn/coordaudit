@@ -1,0 +1,125 @@
+{
+  "agent_run_derived_gt_overlap": {
+    "discovery_cluster_ids": [
+      "UC01",
+      "UC23"
+    ],
+    "discovery_equivalent_anchor_ids": [],
+    "discovery_root_ids": [
+      "R21_oauth2_unauth_credential_mutation",
+      "R26_apikey_raw_secret_exposure"
+    ],
+    "discovery_source": true,
+    "independent_generalization_evidence": false,
+    "matched_agent_run_derived_root_ids": [
+      "R21_oauth2_unauth_credential_mutation"
+    ],
+    "present": true
+  },
+  "condition": "T",
+  "input_sha256": {
+    "evaluation.json": "0aeea0cd878657764bbbc82ffae5baa0de35a642c8764e03351dfb14d0654a4e",
+    "evaluator_private/verification.json": "825b7a71fa7a7b39818aacb997a9716531191c0d9b23856718af10684d4bd592",
+    "merged_findings.json": "99f11171a144db28b4c7ebff7844fae9e8ba09eb462d1874ea7baf52df763800",
+    "run_manifest.json": "e042412c0a09616efd13ded0411c7f0712f3ed8371d54d716293445fdad06080"
+  },
+  "original": {
+    "evaluator_generation": "repository_v1",
+    "false_negatives": 20,
+    "score_artifact": "experiments/emergent_coordination/runs/t4-sequenced-bootstrap-v1-corrected-3seed-192p/formal_seed-02/evaluation.json",
+    "score_artifact_sha256": "0aeea0cd878657764bbbc82ffae5baa0de35a642c8764e03351dfb14d0654a4e",
+    "true_positives": 0,
+    "unmatched": 5,
+    "verification_artifact": "experiments/emergent_coordination/runs/t4-sequenced-bootstrap-v1-corrected-3seed-192p/formal_seed-02/evaluator_private/verification.json",
+    "verification_artifact_sha256": "825b7a71fa7a7b39818aacb997a9716531191c0d9b23856718af10684d4bd592"
+  },
+  "per_finding_transition": [
+    {
+      "anchor_id": "primary:1",
+      "historical_cluster_id": "UC01",
+      "index": 0,
+      "original_disposition": "unmatched_review",
+      "retrospective_classification": "canonical_tp",
+      "root_id": "R21_oauth2_unauth_credential_mutation"
+    },
+    {
+      "historical_cluster_id": "UC23",
+      "index": 1,
+      "original_disposition": "unmatched_review",
+      "retrospective_classification": "gt_overlap_uncredited"
+    },
+    {
+      "historical_cluster_id": "UC06",
+      "index": 2,
+      "original_disposition": "unmatched_review",
+      "retrospective_classification": "false_positive"
+    },
+    {
+      "historical_cluster_id": "UC40",
+      "index": 3,
+      "original_disposition": "unmatched_review",
+      "retrospective_classification": "inconclusive"
+    },
+    {
+      "historical_cluster_id": "UC06",
+      "index": 4,
+      "original_disposition": "unmatched_review",
+      "retrospective_classification": "false_positive"
+    }
+  ],
+  "retrospective": {
+    "canonical_tp": 1,
+    "duplicate_findings": 0,
+    "equivalent_tp": 0,
+    "evaluator_generation": "repository_v1_1",
+    "false_negatives": 29,
+    "false_positive": 2,
+    "ground_truth_sha256": "4e41103ecbe6d96cb0bbe3cc54c0c4a574ac21d7825bc2adc36c723ee5978da8",
+    "inconclusive": 1,
+    "known_gt_overlap_uncredited": 1,
+    "matched_roots": {
+      "R21_oauth2_unauth_credential_mutation": {
+        "anchor_id": "primary:1",
+        "classification": "canonical_tp",
+        "index": 0
+      }
+    },
+    "missing_roots": [
+      "R01_enterprise_active_org_binding",
+      "R02_org_user_password_serialization",
+      "R03_chat_message_route_permission",
+      "R04_generic_credential_lookup_scope",
+      "R05_openai_assistant_credential_lookup_scope",
+      "R06_assistant_delete_credential_lookup_scope",
+      "R07_sso_invited_token_proof",
+      "R08_sso_email_only_identity",
+      "R09_bullmq_dashboard_rbac",
+      "R10_mcp_stdio_executable_policy",
+      "R11_mcp_cwd_policy",
+      "R12_realtime_chatflow_workspace_scope",
+      "R13_sqlite_chain_write_capability",
+      "R14_chat_model_baseurl_egress_policy",
+      "R15_upsert_history_route_scope",
+      "R16_memory_session_id_type",
+      "R17_document_loader_egress_policy",
+      "R18_export_variable_secret",
+      "R19_tts_abort_cross_operation",
+      "R20_tts_private_flow_credential_use",
+      "R22_feedback_unauth_cross_flow_access",
+      "R23_get_upload_file_unauth_cross_tenant_read",
+      "R24_dataset_rows_unscoped_delete",
+      "R25_user_create_zero_permission",
+      "R26_apikey_raw_secret_exposure",
+      "R27_documentstore_upsert_zero_permission",
+      "R28_documentstore_query_unscoped",
+      "R29_nvidia_nim_zero_permission_routes",
+      "R30_host_header_chatflow_tool_credential_egress"
+    ],
+    "root_denominator": 30,
+    "unmatched_unreviewed": 0,
+    "validated_novel_tp": 0
+  },
+  "run_id": "formal_seed-02",
+  "run_path": "t4-sequenced-bootstrap-v1-corrected-3seed-192p/formal_seed-02",
+  "seed": "t4-sequenced-bootstrap-v1-corrected-192p-replicate-02"
+}
