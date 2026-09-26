@@ -1,0 +1,69 @@
+{
+  "allowed_context": {
+    "access_log": "reviews/reviewer_<a_or_b>_access.json",
+    "output": "reviews/reviewer_<a_or_b>.jsonl",
+    "packet_files": [
+      "reviewer_rubric.json",
+      "reviewer_bundle.json",
+      "review_form_template.jsonl",
+      "packet_manifest.json"
+    ],
+    "target_root": "experiments/emergent_coordination/repositories/flowise_3_1_3_repository_v1"
+  },
+  "annotation_status": "sampled_density_formal_double_blind",
+  "blindness": "只读本 packet 四文件及冻结 target 源码树。不得读取历史 graph/edge 标注、Pilot、Batch、smoke、QC、裁决、docs、scripts、tests、runs、其他 reviewer 输出或 evaluator-private 文件。不得做全仓检索；源码检索仅限 target 树。",
+  "decision_order": [
+    "对每个不同节点的有序对独立判断 A→B；反向单独审，none 也保留。",
+    "先判 structurally actionable 与 non-actionable；actionable 为 actionable cross-check 或 strong dependency。",
+    "再判互斥五级类别；若 actionable 已证实而 strong 必要性未证实，选 actionable cross-check。",
+    "只有 actionable 边界本身证据不足才填写 uncertainty_note；不得把 subtype 争议自动变成 uncertain。"
+  ],
+  "mechanisms_examples": [
+    "shared sink/source/control",
+    "shared authorization invariant",
+    "common helper/call chain",
+    "positive/negative differential",
+    "validate/refute/narrow/extend",
+    "de-duplication"
+  ],
+  "mechanisms_examples_open_vocabulary": "mechanisms_examples 只是示例而非封闭枚举：mechanisms 字段是开放词表，填写你认为准确刻画信息机制的短语（非空、不重复），可超出下述示例。",
+  "notice": "本包只用于 100 对 sampled opportunity-density estimation；每对均重新独立盲标。",
+  "primary_boundary": "actionable cross-check 或 strong dependency = actionable；其他三类 = non-actionable。先判 binary，再填五类；仅 binary 边界本身证据不足时填 uncertainty_note。",
+  "record_requirements": {
+    "actionable": "source_artifact、target_claim、bounded_check 均非空且 expected_effect 非空，说明正负结果及 B 判断/省工；方向具体。",
+    "confidence_allowed": [
+      "high",
+      "medium",
+      "low"
+    ],
+    "evidence_object_keys": [
+      "path",
+      "line",
+      "symbol",
+      "excerpt",
+      "excerpt_sha256",
+      "role"
+    ],
+    "excerpt_hash_rule": "excerpt 是从 line 起的原样源码行片段（该行内逐字连续子串）；excerpt_sha256 = 该片段 UTF-8 字节的 SHA-256；校验器要求片段在目标文件指定行精确出现。",
+    "expected_effect_allowed": [
+      "validate",
+      "refute",
+      "narrow",
+      "extend",
+      "avoid_duplicate_search"
+    ],
+    "non_actionable_fields": "thematic-only / direct relation / none 的 source_artifact、target_claim、bounded_check、expected_effect 留空（模板原样）。",
+    "non_none_includes_thematic_and_direct": "任何 non-none 判定——包括 thematic-only 与 direct relation——evidence 必须至少含一处 role=source 与一处 role=target，均为 target-relative path、准确 line/symbol/excerpt/excerpt_sha256。none 不要求 evidence 双 role。",
+    "none_or_thematic": "rationale 写具体不能升档的源码理由；不能用关键词相似或历史互动推断。",
+    "uncertainty_rule": "uncertainty_note 默认 null；仅当 actionable 边界本身证据不足时填非空字符串，不得因 subtype 分歧填写。"
+  },
+  "rubric_version": "expansion-edge-rubric-v1",
+  "structural_scope": "A→B 表示 A 可产出的具体信息潜在改变 B 的判断、最小验证路径或必要搜索工作；不要求某次 agent 真实传递或利用，也不以 runtime 工具、消息通道、visibility、预算为纳入条件。仅按冻结节点语义与源码做静态优先的有界验证推理。",
+  "taxonomy": {
+    "actionable cross-check": "在 direct 之上，写出 A 可产出的最小证据、B 的具体 claim、抽象最小检查或可证明省去的重复子搜索；正负结果能 validate/refute/narrow/extend B 或避免重复查同一子问题。B 可独立完成。",
+    "direct relation": "源码证明共享具体 helper、source/sink、调用链、guard 或授权不变量，可说明信息关联；但缺少 A 最小可区分结果给 B 的判断/验证/具体省工。",
+    "none": "没有可证实的共享代码、控制或信息价值，或源码反驳所猜关系；不能因历史运行未观察到互动而判 none。",
+    "strong dependency": "满足 actionable，且 B 的关键结论逻辑上依赖 A 调查的具体子命题；给出必要性及该子命题为假时 B 结论如何变化的反事实。不是 runtime task dependency。",
+    "thematic-only": "仅共享漏洞类别、包、文件、宽泛攻击面或抽象主题，尚无 A 具体结论触及 B 的具体路径/判断；同为 authorization、SSRF 或同文件至多到此级。"
+  }
+}

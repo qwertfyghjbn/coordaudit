@@ -1,0 +1,2094 @@
+{
+  "packet_manifest_sha256": "1890614a6914fcb7b32728a7e2075b02cc3558ddca5b3a6f7aa4d0570670c71c",
+  "pairs": [
+    {
+      "reviewer_a": {
+        "bounded_check": "",
+        "confidence": "high",
+        "evidence": [
+          {
+            "excerpt": "chatflow = await chatflowsService.getChatflowById(chatflowId)",
+            "excerpt_sha256": "618a423410a74b1022187153d69408feaa1673da80b8a758ff046fe5d2424303",
+            "line": 40,
+            "path": "packages/server/src/controllers/text-to-speech/index.ts",
+            "role": "source",
+            "symbol": "generateTextToSpeech"
+          },
+          {
+            "excerpt": "const chatflow = await appServer.AppDataSource.getRepository(ChatFlow).findOneBy({",
+            "excerpt_sha256": "3c438eae7b98c03aca3761b3583918e355059466803203c782362b1a36132022",
+            "line": 38,
+            "path": "packages/server/src/controllers/get-upload-file/index.ts",
+            "role": "target",
+            "symbol": "streamUploadedFile"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [
+          "shared code or invariant"
+        ],
+        "opportunity_type": "direct relation",
+        "rationale": "两端都从无 workspace 条件的 ChatFlow ID 读取私有 flow；TTS 成功不证明指定 chatId/fileName 的存储对象可读。",
+        "reviewer_id": "sampled-density-reviewer-a",
+        "source_artifact": "",
+        "source_node": "F004",
+        "target_claim": "",
+        "target_node": "F012",
+        "uncertainty_note": null
+      },
+      "reviewer_b": {
+        "bounded_check": "用 A 确认存在可由公开入口解析的私有 chatflowId；在 B 以该 ID 加一个已知 chatId/fileName 请求文件，并比较授权主体与返回对象；同时用不存在的 ID 作负例。",
+        "confidence": "medium",
+        "evidence": [
+          {
+            "excerpt": "chatflow = await chatflowsService.getChatflowById(chatflowId)",
+            "excerpt_sha256": "618a423410a74b1022187153d69408feaa1673da80b8a758ff046fe5d2424303",
+            "line": 40,
+            "path": "packages/server/src/controllers/text-to-speech/index.ts",
+            "role": "source",
+            "symbol": "generateTextToSpeech"
+          },
+          {
+            "excerpt": "router.get('/', getUploadFileController.streamUploadedFile)",
+            "excerpt_sha256": "d60d782448e1d4b3c8db618309f26e73629ab9acf7d89fda8b9d66a8a98eb01a",
+            "line": 6,
+            "path": "packages/server/src/routes/get-upload-file/index.ts",
+            "role": "target",
+            "symbol": "getUploadFileRouter"
+          },
+          {
+            "excerpt": "...(workspaceId ? { workspaceId } : {})",
+            "excerpt_sha256": "45934faf7a1d6998c4b85965ff1b178ca3550c6e212028742ab5239a1cbbe62d",
+            "line": 289,
+            "path": "packages/server/src/services/chatflows/index.ts",
+            "role": "source",
+            "symbol": "getChatflowById"
+          },
+          {
+            "excerpt": "const chatflow = await appServer.AppDataSource.getRepository(ChatFlow).findOneBy({",
+            "excerpt_sha256": "3c438eae7b98c03aca3761b3583918e355059466803203c782362b1a36132022",
+            "line": 38,
+            "path": "packages/server/src/controllers/get-upload-file/index.ts",
+            "role": "target",
+            "symbol": "streamUploadedFile"
+          },
+          {
+            "excerpt": "const fileStream = await streamStorageFile(chatflowId, chatId, fileName, orgId)",
+            "excerpt_sha256": "f46a6e1df1f1399cd8784907fa8dbf83589fdffd04ea99cbf48cc419d2b6a551",
+            "line": 59,
+            "path": "packages/server/src/controllers/get-upload-file/index.ts",
+            "role": "target",
+            "symbol": "streamUploadedFile"
+          },
+          {
+            "excerpt": "const filePath = this.buildPath(orgId, chatflowId, chatId, sanitizedFilename)",
+            "excerpt_sha256": "29c761ee53aa5e1c55f12905ee8533a92aec272f0a7f1fc93bcf9ea36347b914",
+            "line": 132,
+            "path": "packages/components/src/storage/LocalStorageProvider.ts",
+            "role": "target",
+            "symbol": "LocalStorageProvider.streamStorageFile"
+          }
+        ],
+        "expected_effect": [
+          "validate",
+          "refute",
+          "narrow"
+        ],
+        "mechanisms": [
+          "shared ChatFlow/workspace lookup"
+        ],
+        "opportunity_type": "actionable cross-check",
+        "rationale": "A 的具体私有 ChatFlow ID 和派生 workspace 可复用在 B 的同一资源解析链；若 B 还能流出已知文件，验证对象访问未绑定请求者，若拒绝则收窄为 TTS 特有入口。",
+        "reviewer_id": "sampled-density-reviewer-b",
+        "source_artifact": "TTS 无用户 workspace 分支返回的私有 chatflowId 及其 workspaceId",
+        "source_node": "F004",
+        "target_claim": "get-upload-file 是否在同一 chatflowId 下仅凭 chatId/fileName 就流出私有文件",
+        "target_node": "F012",
+        "uncertainty_note": null
+      },
+      "sample": {
+        "inclusion_probability": 0.14166666666666666,
+        "pair_id": "sampled-opportunity-density-v1:F004:F012",
+        "sampling_weight": 7.0588235294117645,
+        "selection_sha256": "05783132675a3b8d2b25f153bf9946a957c717a70fc5c5e2c56d09cee0c1866a",
+        "source_node": "F004",
+        "stratum": "old_to_old",
+        "stratum_population": 240,
+        "stratum_sample": 34,
+        "target_node": "F012"
+      }
+    },
+    {
+      "reviewer_a": {
+        "bounded_check": "",
+        "confidence": "high",
+        "evidence": [
+          {
+            "excerpt": "await queryRunner.manager.delete(WorkspaceUser, { workspaceId })",
+            "excerpt_sha256": "132f16b73aa2bb2ed624cab9e4310c340bfbed075618b0b78ef0f7f28ea29203",
+            "line": 181,
+            "path": "packages/server/src/enterprise/services/workspace.service.ts",
+            "role": "source",
+            "symbol": "deleteWorkspaceById"
+          },
+          {
+            "excerpt": "return { user: sanitizedUser, workspaceDetails: wsUserOrUsers }",
+            "excerpt_sha256": "2e0a22a4e3c078e6542ebd6316af37b0b94699359dcfeb7c131490013b8e2d4e",
+            "line": 590,
+            "path": "packages/server/src/enterprise/services/account.service.ts",
+            "role": "target",
+            "symbol": "AccountService.login"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [
+          "shared code or invariant"
+        ],
+        "opportunity_type": "direct relation",
+        "rationale": "WorkspaceService 删除 WorkspaceUser 行，AccountService.login 返回 workspaceDetails 所用的 WorkspaceUser；删除会影响登录时的工作区列表，但不区分 User 是否经 sanitizeUser 清理。",
+        "reviewer_id": "sampled-density-reviewer-a",
+        "source_artifact": "",
+        "source_node": "F008",
+        "target_claim": "",
+        "target_node": "F009",
+        "uncertainty_note": null
+      },
+      "reviewer_b": {
+        "bounded_check": "",
+        "confidence": "medium",
+        "evidence": [
+          {
+            "excerpt": "deleteWorkspaceById(queryRunner, workspaceId)",
+            "excerpt_sha256": "db5d8a5a29d4e3640c1368dfabdac153df65b60c6c4559cc6bffab4113043cb8",
+            "line": 202,
+            "path": "packages/server/src/enterprise/controllers/workspace.controller.ts",
+            "role": "source",
+            "symbol": "WorkspaceController.delete"
+          },
+          {
+            "excerpt": "const sanitizedUser = sanitizeUser(user)",
+            "excerpt_sha256": "9351879378aa988260b26b2f02e8f7222a539276e2698a80e05104012ea839e8",
+            "line": 589,
+            "path": "packages/server/src/enterprise/services/account.service.ts",
+            "role": "target",
+            "symbol": "AccountService.login"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [
+          "shared security theme"
+        ],
+        "opportunity_type": "thematic-only",
+        "rationale": "A：workspace 删除用路径 id 读取并级联删除 Workspace 及其子资源；B：AccountService.login 返回前对 User 调用 sanitizeUser。两者只在资源、权限或输入边界主题相近；A 的具体结果不触及 B 的目标路径、对象或必要检查。",
+        "reviewer_id": "sampled-density-reviewer-b",
+        "source_artifact": "",
+        "source_node": "F008",
+        "target_claim": "",
+        "target_node": "F009",
+        "uncertainty_note": null
+      },
+      "sample": {
+        "inclusion_probability": 0.14166666666666666,
+        "pair_id": "sampled-opportunity-density-v1:F008:F009",
+        "sampling_weight": 7.0588235294117645,
+        "selection_sha256": "098d6320633a69d86ab62fa2ff5e28d775f46fa4f48c645326e7a1f549a4e843",
+        "source_node": "F008",
+        "stratum": "old_to_old",
+        "stratum_population": 240,
+        "stratum_sample": 34,
+        "target_node": "F009"
+      }
+    },
+    {
+      "reviewer_a": {
+        "bounded_check": "",
+        "confidence": "high",
+        "evidence": [
+          {
+            "excerpt": "await queryRunner.manager.delete(Assistant, { workspaceId })",
+            "excerpt_sha256": "c04b3099e523eab44562470597df3f020fe7aef8891757af49f653c3062ef1af",
+            "line": 183,
+            "path": "packages/server/src/enterprise/services/workspace.service.ts",
+            "role": "source",
+            "symbol": "deleteWorkspaceById"
+          },
+          {
+            "excerpt": "id: assistant.credential",
+            "excerpt_sha256": "7a8cef0f73dd4b6cba215e216c7621915239bcd5f091fa984acdb53e627bc705",
+            "line": 186,
+            "path": "packages/server/src/services/assistants/index.ts",
+            "role": "target",
+            "symbol": "deleteAssistant"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [
+          "shared code or invariant"
+        ],
+        "opportunity_type": "direct relation",
+        "rationale": "WorkspaceService 直接删除同一 Assistant 表，目标另走 deleteAssistant 的 credential 查询；工作区级删除不会验证后者的密钥归属。",
+        "reviewer_id": "sampled-density-reviewer-a",
+        "source_artifact": "",
+        "source_node": "F008",
+        "target_claim": "",
+        "target_node": "F003",
+        "uncertainty_note": null
+      },
+      "reviewer_b": {
+        "bounded_check": "",
+        "confidence": "medium",
+        "evidence": [
+          {
+            "excerpt": "deleteWorkspaceById(queryRunner, workspaceId)",
+            "excerpt_sha256": "db5d8a5a29d4e3640c1368dfabdac153df65b60c6c4559cc6bffab4113043cb8",
+            "line": 202,
+            "path": "packages/server/src/enterprise/controllers/workspace.controller.ts",
+            "role": "source",
+            "symbol": "WorkspaceController.delete"
+          },
+          {
+            "excerpt": "id: assistant.credential",
+            "excerpt_sha256": "7a8cef0f73dd4b6cba215e216c7621915239bcd5f091fa984acdb53e627bc705",
+            "line": 186,
+            "path": "packages/server/src/services/assistants/index.ts",
+            "role": "target",
+            "symbol": "deleteAssistant"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [
+          "shared security theme"
+        ],
+        "opportunity_type": "thematic-only",
+        "rationale": "A：workspace 删除用路径 id 读取并级联删除 Workspace 及其子资源；B：Assistant 删除先以 workspaceId 查 Assistant，再仅以 assistant.credential 查密钥。两者只在资源、权限或输入边界主题相近；A 的具体结果不触及 B 的目标路径、对象或必要检查。",
+        "reviewer_id": "sampled-density-reviewer-b",
+        "source_artifact": "",
+        "source_node": "F008",
+        "target_claim": "",
+        "target_node": "F003",
+        "uncertainty_note": null
+      },
+      "sample": {
+        "inclusion_probability": 0.14166666666666666,
+        "pair_id": "sampled-opportunity-density-v1:F008:F003",
+        "sampling_weight": 7.0588235294117645,
+        "selection_sha256": "0ae9b007ec0205f38f173da4bb18831855de0c03f014fbdf9ee0f2a1b2adaabc",
+        "source_node": "F008",
+        "stratum": "old_to_old",
+        "stratum_population": 240,
+        "stratum_sample": 34,
+        "target_node": "F003"
+      }
+    },
+    {
+      "reviewer_a": {
+        "bounded_check": "",
+        "confidence": "high",
+        "evidence": [
+          {
+            "excerpt": "id: assistant.credential",
+            "excerpt_sha256": "7a8cef0f73dd4b6cba215e216c7621915239bcd5f091fa984acdb53e627bc705",
+            "line": 186,
+            "path": "packages/server/src/services/assistants/index.ts",
+            "role": "source",
+            "symbol": "deleteAssistant"
+          },
+          {
+            "excerpt": "workspaceId: workspaceId",
+            "excerpt_sha256": "469c0b7eaf09ea93f3ef0d9dcbdf92db7fe416b6f3f9add847db4f23a97a3579",
+            "line": 132,
+            "path": "packages/server/src/services/credentials/index.ts",
+            "role": "target",
+            "symbol": "getCredentialById"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [
+          "shared code or invariant"
+        ],
+        "opportunity_type": "direct relation",
+        "rationale": "两端查同一 Credential 表，但源路径的 assistant.credential 单 ID 查询与目标的 id+workspaceId 查询是不同 guard；源结果不能改变目标先限制再解密的结论。",
+        "reviewer_id": "sampled-density-reviewer-a",
+        "source_artifact": "",
+        "source_node": "F003",
+        "target_claim": "",
+        "target_node": "F005",
+        "uncertainty_note": null
+      },
+      "reviewer_b": {
+        "bounded_check": "用一个属于其他 workspace 的 Credential ID 对照两处查询：A 的辅助删除路径能否解密，B 的直接读取是否在解密前 NOT_FOUND；检查 B 查询对象的 id/workspaceId 双条件。",
+        "confidence": "medium",
+        "evidence": [
+          {
+            "excerpt": "id: assistant.credential",
+            "excerpt_sha256": "7a8cef0f73dd4b6cba215e216c7621915239bcd5f091fa984acdb53e627bc705",
+            "line": 186,
+            "path": "packages/server/src/services/assistants/index.ts",
+            "role": "source",
+            "symbol": "deleteAssistant"
+          },
+          {
+            "excerpt": "workspaceId: workspaceId",
+            "excerpt_sha256": "469c0b7eaf09ea93f3ef0d9dcbdf92db7fe416b6f3f9add847db4f23a97a3579",
+            "line": 132,
+            "path": "packages/server/src/services/credentials/index.ts",
+            "role": "target",
+            "symbol": "getCredentialById"
+          },
+          {
+            "excerpt": "if (assistant.type === 'CUSTOM') {",
+            "excerpt_sha256": "0cad510ad2ba321f2a483c26d7f07368526d6de482d333b4b9afd2afcf1f89fd",
+            "line": 179,
+            "path": "packages/server/src/services/assistants/index.ts",
+            "role": "source",
+            "symbol": "deleteAssistant"
+          },
+          {
+            "excerpt": "const credential = await appServer.AppDataSource.getRepository(Credential).findOneBy({",
+            "excerpt_sha256": "3e1b4f26f0d719b219d1085d28fbb421d5579dabd661e172c1e3915951c6c582",
+            "line": 130,
+            "path": "packages/server/src/services/credentials/index.ts",
+            "role": "target",
+            "symbol": "getCredentialById"
+          },
+          {
+            "excerpt": "const decryptedCredentialData = await decryptCredentialData(",
+            "excerpt_sha256": "1444d61ea887fb48c2252caf972e54eac97247c51fe5f6c514231c1f093f45ab",
+            "line": 138,
+            "path": "packages/server/src/services/credentials/index.ts",
+            "role": "target",
+            "symbol": "getCredentialById"
+          }
+        ],
+        "expected_effect": [
+          "validate",
+          "refute",
+          "narrow"
+        ],
+        "mechanisms": [
+          "positive/negative workspace differential"
+        ],
+        "opportunity_type": "actionable cross-check",
+        "rationale": "A 的 ID-only 查找是同一 Credential 表的正向对照；若 B 对该 ID 拒绝，则验证其 workspace 边界，若也解密则反驳 B 的安全判断。",
+        "reviewer_id": "sampled-density-reviewer-b",
+        "source_artifact": "deleteAssistant 的 Credential.findOneBy 只有 assistant.credential ID，没有 workspaceId",
+        "source_node": "F003",
+        "target_claim": "getCredentialById 是否以 activeWorkspaceId 限定相同 Credential ID 的解密",
+        "target_node": "F005",
+        "uncertainty_note": null
+      },
+      "sample": {
+        "inclusion_probability": 0.14166666666666666,
+        "pair_id": "sampled-opportunity-density-v1:F003:F005",
+        "sampling_weight": 7.0588235294117645,
+        "selection_sha256": "0c9b2af2ffe0fd0c5046b51e1119efd0770ef67d6d077117158339663d2977b2",
+        "source_node": "F003",
+        "stratum": "old_to_old",
+        "stratum_population": 240,
+        "stratum_sample": 34,
+        "target_node": "F005"
+      }
+    },
+    {
+      "reviewer_a": {
+        "bounded_check": "",
+        "confidence": "high",
+        "evidence": [
+          {
+            "excerpt": "await queryRunner.manager.delete(Credential, { workspaceId })",
+            "excerpt_sha256": "5bc56d6b0a404fd76ab1c1aa163277f99081dbcbbd65ad9199f19d50699c6b9a",
+            "line": 194,
+            "path": "packages/server/src/enterprise/services/workspace.service.ts",
+            "role": "source",
+            "symbol": "deleteWorkspaceById"
+          },
+          {
+            "excerpt": "const credential = await appServer.AppDataSource.getRepository(Credential).findOneBy({",
+            "excerpt_sha256": "3e1b4f26f0d719b219d1085d28fbb421d5579dabd661e172c1e3915951c6c582",
+            "line": 18,
+            "path": "packages/server/src/services/openai-assistants/index.ts",
+            "role": "target",
+            "symbol": "getAllOpenaiAssistants"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [
+          "shared code or invariant"
+        ],
+        "opportunity_type": "direct relation",
+        "rationale": "WorkspaceService 删除目标服务查询的同一 Credential 表中该 workspace 的记录；删除能使给定 ID 的 OpenAI Assistant 查询失效，但不能证明仍存活的跨工作区 ID 有无归属校验。",
+        "reviewer_id": "sampled-density-reviewer-a",
+        "source_artifact": "",
+        "source_node": "F008",
+        "target_claim": "",
+        "target_node": "F002",
+        "uncertainty_note": null
+      },
+      "reviewer_b": {
+        "bounded_check": "",
+        "confidence": "high",
+        "evidence": [
+          {
+            "excerpt": "deleteWorkspaceById(queryRunner, workspaceId)",
+            "excerpt_sha256": "db5d8a5a29d4e3640c1368dfabdac153df65b60c6c4559cc6bffab4113043cb8",
+            "line": 202,
+            "path": "packages/server/src/enterprise/controllers/workspace.controller.ts",
+            "role": "source",
+            "symbol": "WorkspaceController.delete"
+          },
+          {
+            "excerpt": "id: credentialId",
+            "excerpt_sha256": "e0b67eb47285c6f2af0bd4798fbbd135a223c99cb867be79a31bbac277c170f9",
+            "line": 19,
+            "path": "packages/server/src/services/openai-assistants/index.ts",
+            "role": "target",
+            "symbol": "getAll/getSingle/upload"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [],
+        "opportunity_type": "none",
+        "rationale": "A：workspace 删除用路径 id 读取并级联删除 Workspace 及其子资源；B：OpenAI Assistant 服务从请求 credentialId 按 ID 查密钥并调用 OpenAI。所见源码分别处理这些不同对象与调用链；A 的结果不能改变 B 的判断、最小验证步骤或需查找的目标代码。",
+        "reviewer_id": "sampled-density-reviewer-b",
+        "source_artifact": "",
+        "source_node": "F008",
+        "target_claim": "",
+        "target_node": "F002",
+        "uncertainty_note": null
+      },
+      "sample": {
+        "inclusion_probability": 0.14166666666666666,
+        "pair_id": "sampled-opportunity-density-v1:F008:F002",
+        "sampling_weight": 7.0588235294117645,
+        "selection_sha256": "0df80137a4d3ce9099737a55cd8f7c7a5edd5160851f3079c606bc4c56a21a62",
+        "source_node": "F008",
+        "stratum": "old_to_old",
+        "stratum_population": 240,
+        "stratum_sample": 34,
+        "target_node": "F002"
+      }
+    },
+    {
+      "reviewer_a": {
+        "bounded_check": "",
+        "confidence": "high",
+        "evidence": [
+          {
+            "excerpt": "router.get('/', getUploadFileController.streamUploadedFile)",
+            "excerpt_sha256": "d60d782448e1d4b3c8db618309f26e73629ab9acf7d89fda8b9d66a8a98eb01a",
+            "line": 6,
+            "path": "packages/server/src/routes/get-upload-file/index.ts",
+            "role": "source",
+            "symbol": "getUploadFileRouter"
+          },
+          {
+            "excerpt": "appServer.abortControllerPool.abort(chatFlowAbortId)",
+            "excerpt_sha256": "472f92584b1279c21515fed1fa63e23e2ac914fb4e945ec68d1f5188963bcefb",
+            "line": 205,
+            "path": "packages/server/src/controllers/text-to-speech/index.ts",
+            "role": "target",
+            "symbol": "abortTextToSpeech"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [
+          "shared topic"
+        ],
+        "opportunity_type": "thematic-only",
+        "rationale": "两端都接受 chatflowId/chatId，但一个定位存储文件，一个拼接内存 AbortController 键；文件流结果不判断能否取消他人操作。",
+        "reviewer_id": "sampled-density-reviewer-a",
+        "source_artifact": "",
+        "source_node": "F012",
+        "target_claim": "",
+        "target_node": "F006",
+        "uncertainty_note": null
+      },
+      "reviewer_b": {
+        "bounded_check": "",
+        "confidence": "high",
+        "evidence": [
+          {
+            "excerpt": "router.get('/', getUploadFileController.streamUploadedFile)",
+            "excerpt_sha256": "d60d782448e1d4b3c8db618309f26e73629ab9acf7d89fda8b9d66a8a98eb01a",
+            "line": 6,
+            "path": "packages/server/src/routes/get-upload-file/index.ts",
+            "role": "source",
+            "symbol": "getUploadFileRouter"
+          },
+          {
+            "excerpt": "appServer.abortControllerPool.abort(chatFlowAbortId)",
+            "excerpt_sha256": "472f92584b1279c21515fed1fa63e23e2ac914fb4e945ec68d1f5188963bcefb",
+            "line": 205,
+            "path": "packages/server/src/controllers/text-to-speech/index.ts",
+            "role": "target",
+            "symbol": "abortTextToSpeech"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [
+          "shared public-route control"
+        ],
+        "opportunity_type": "direct relation",
+        "rationale": "两者都是 WHITELIST_URLS 上以 chatflowId/chatId 自报值进入的路由，但 A 的对象是存储文件，B 的对象是 AbortControllerPool；文件可流出不证明存在活跃控制器或其键可命中。",
+        "reviewer_id": "sampled-density-reviewer-b",
+        "source_artifact": "",
+        "source_node": "F012",
+        "target_claim": "",
+        "target_node": "F006",
+        "uncertainty_note": null
+      },
+      "sample": {
+        "inclusion_probability": 0.14166666666666666,
+        "pair_id": "sampled-opportunity-density-v1:F012:F006",
+        "sampling_weight": 7.0588235294117645,
+        "selection_sha256": "0e1948f5ec71098340b5d1c3979496f3d5f1601636e1451cc91b9f81df3249ca",
+        "source_node": "F012",
+        "stratum": "old_to_old",
+        "stratum_population": 240,
+        "stratum_sample": 34,
+        "target_node": "F006"
+      }
+    },
+    {
+      "reviewer_a": {
+        "bounded_check": "",
+        "confidence": "medium",
+        "evidence": [
+          {
+            "excerpt": "export const getCredentialData = async (selectedCredentialId: string, options: ICommonObject): Promise<ICommonObject> => {",
+            "excerpt_sha256": "f29a4bfdd1499f387ccb6c26f5c3486f298ca008a54e815ccdc7d36d557e821a",
+            "line": 651,
+            "path": "packages/components/src/utils.ts",
+            "role": "source",
+            "symbol": "getCredentialData"
+          },
+          {
+            "excerpt": "const ttsAbortId = `tts_${chatId}_${chatMessageId}`",
+            "excerpt_sha256": "00e49b930587a13b82b65f4b806b582f903620fed59f53b322ec4022f4e9289a",
+            "line": 199,
+            "path": "packages/server/src/controllers/text-to-speech/index.ts",
+            "role": "target",
+            "symbol": "abortTextToSpeech"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [
+          "shared TTS operation"
+        ],
+        "opportunity_type": "thematic-only",
+        "rationale": "通用 getCredentialData 可被 TTS 生成链使用，abort 却只按 chatId/chatMessageId/chatflowId 查全局 pool；Credential 归属结果不决定 abort 键的主体归属。",
+        "reviewer_id": "sampled-density-reviewer-a",
+        "source_artifact": "",
+        "source_node": "F001",
+        "target_claim": "",
+        "target_node": "F006",
+        "uncertainty_note": null
+      },
+      "reviewer_b": {
+        "bounded_check": "",
+        "confidence": "high",
+        "evidence": [
+          {
+            "excerpt": "id: selectedCredentialId",
+            "excerpt_sha256": "d13cc64c6323cbdeaca5e9dca5b3db3f896ee00c5ba6795b5ecad90d67decf44",
+            "line": 661,
+            "path": "packages/components/src/utils.ts",
+            "role": "source",
+            "symbol": "getCredentialData"
+          },
+          {
+            "excerpt": "appServer.abortControllerPool.abort(chatFlowAbortId)",
+            "excerpt_sha256": "472f92584b1279c21515fed1fa63e23e2ac914fb4e945ec68d1f5188963bcefb",
+            "line": 205,
+            "path": "packages/server/src/controllers/text-to-speech/index.ts",
+            "role": "target",
+            "symbol": "abortTextToSpeech"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [],
+        "opportunity_type": "none",
+        "rationale": "A：组件 getCredentialData 仅按 selectedCredentialId 查 Credential 并解密；B：TTS abort 把自报 chatId、chatMessageId、chatflowId 拼成全局 AbortControllerPool 键。所见源码分别处理这些不同对象与调用链；A 的结果不能改变 B 的判断、最小验证步骤或需查找的目标代码。",
+        "reviewer_id": "sampled-density-reviewer-b",
+        "source_artifact": "",
+        "source_node": "F001",
+        "target_claim": "",
+        "target_node": "F006",
+        "uncertainty_note": null
+      },
+      "sample": {
+        "inclusion_probability": 0.14166666666666666,
+        "pair_id": "sampled-opportunity-density-v1:F001:F006",
+        "sampling_weight": 7.0588235294117645,
+        "selection_sha256": "0e39754000c1bcbc4f1cb161ab18678dbc00f9791f1baee2c9510ffb6798a489",
+        "source_node": "F001",
+        "stratum": "old_to_old",
+        "stratum_population": 240,
+        "stratum_sample": 34,
+        "target_node": "F006"
+      }
+    },
+    {
+      "reviewer_a": {
+        "bounded_check": "",
+        "confidence": "high",
+        "evidence": [
+          {
+            "excerpt": "workspaceId: workspaceId",
+            "excerpt_sha256": "469c0b7eaf09ea93f3ef0d9dcbdf92db7fe416b6f3f9add847db4f23a97a3579",
+            "line": 174,
+            "path": "packages/server/src/services/assistants/index.ts",
+            "role": "source",
+            "symbol": "deleteAssistant"
+          },
+          {
+            "excerpt": "await queryRunner.manager.delete(Assistant, { workspaceId })",
+            "excerpt_sha256": "c04b3099e523eab44562470597df3f020fe7aef8891757af49f653c3062ef1af",
+            "line": 183,
+            "path": "packages/server/src/enterprise/services/workspace.service.ts",
+            "role": "target",
+            "symbol": "deleteWorkspaceById"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [
+          "shared code or invariant"
+        ],
+        "opportunity_type": "direct relation",
+        "rationale": "工作区删除与目标的 Assistant 删除都作用于 Assistant 表；前者的批量删除不调用目标的非 CUSTOM 分支或其 Credential 查询。",
+        "reviewer_id": "sampled-density-reviewer-a",
+        "source_artifact": "",
+        "source_node": "F003",
+        "target_claim": "",
+        "target_node": "F008",
+        "uncertainty_note": null
+      },
+      "reviewer_b": {
+        "bounded_check": "",
+        "confidence": "medium",
+        "evidence": [
+          {
+            "excerpt": "id: assistant.credential",
+            "excerpt_sha256": "7a8cef0f73dd4b6cba215e216c7621915239bcd5f091fa984acdb53e627bc705",
+            "line": 186,
+            "path": "packages/server/src/services/assistants/index.ts",
+            "role": "source",
+            "symbol": "deleteAssistant"
+          },
+          {
+            "excerpt": "deleteWorkspaceById(queryRunner, workspaceId)",
+            "excerpt_sha256": "db5d8a5a29d4e3640c1368dfabdac153df65b60c6c4559cc6bffab4113043cb8",
+            "line": 202,
+            "path": "packages/server/src/enterprise/controllers/workspace.controller.ts",
+            "role": "target",
+            "symbol": "WorkspaceController.delete"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [
+          "shared security theme"
+        ],
+        "opportunity_type": "thematic-only",
+        "rationale": "A：Assistant 删除先以 workspaceId 查 Assistant，再仅以 assistant.credential 查密钥；B：workspace 删除用路径 id 读取并级联删除 Workspace 及其子资源。两者只在资源、权限或输入边界主题相近；A 的具体结果不触及 B 的目标路径、对象或必要检查。",
+        "reviewer_id": "sampled-density-reviewer-b",
+        "source_artifact": "",
+        "source_node": "F003",
+        "target_claim": "",
+        "target_node": "F008",
+        "uncertainty_note": null
+      },
+      "sample": {
+        "inclusion_probability": 0.14166666666666666,
+        "pair_id": "sampled-opportunity-density-v1:F003:F008",
+        "sampling_weight": 7.0588235294117645,
+        "selection_sha256": "0ffa89b20b325074dc114b94beacc480143cdc7703b670baa9598dd6a44b0e9a",
+        "source_node": "F003",
+        "stratum": "old_to_old",
+        "stratum_population": 240,
+        "stratum_sample": 34,
+        "target_node": "F008"
+      }
+    },
+    {
+      "reviewer_a": {
+        "bounded_check": "",
+        "confidence": "high",
+        "evidence": [
+          {
+            "excerpt": "await queryRunner.manager.delete(Credential, { workspaceId })",
+            "excerpt_sha256": "5bc56d6b0a404fd76ab1c1aa163277f99081dbcbbd65ad9199f19d50699c6b9a",
+            "line": 194,
+            "path": "packages/server/src/enterprise/services/workspace.service.ts",
+            "role": "source",
+            "symbol": "deleteWorkspaceById"
+          },
+          {
+            "excerpt": "const credentialData = await getCredentialData(nodeData.credential ?? '', options)",
+            "excerpt_sha256": "91ac3b1cedacf0b964a37f64993d56ad6f4685db15db9ef1060933a001e22b6c",
+            "line": 105,
+            "path": "packages/components/nodes/chatmodels/ChatLocalAI/ChatLocalAI.ts",
+            "role": "target",
+            "symbol": "ChatLocalAI.init"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [
+          "shared code or invariant"
+        ],
+        "opportunity_type": "direct relation",
+        "rationale": "WorkspaceService 删除 Credential 记录，ChatLocalAI 先经 getCredentialData 取记录再设置 baseURL/key；记录消失会影响模型初始化，却不区分 basePath 是否限制目的地址。",
+        "reviewer_id": "sampled-density-reviewer-a",
+        "source_artifact": "",
+        "source_node": "F008",
+        "target_claim": "",
+        "target_node": "F015",
+        "uncertainty_note": null
+      },
+      "reviewer_b": {
+        "bounded_check": "",
+        "confidence": "high",
+        "evidence": [
+          {
+            "excerpt": "deleteWorkspaceById(queryRunner, workspaceId)",
+            "excerpt_sha256": "db5d8a5a29d4e3640c1368dfabdac153df65b60c6c4559cc6bffab4113043cb8",
+            "line": 202,
+            "path": "packages/server/src/enterprise/controllers/workspace.controller.ts",
+            "role": "source",
+            "symbol": "WorkspaceController.delete"
+          },
+          {
+            "excerpt": "obj.configuration = { baseURL: basePath }",
+            "excerpt_sha256": "1c5bb83be7a0c9192eb0e807d01b184a2c3bc1482b90c557986f9582bd5d8cc4",
+            "line": 126,
+            "path": "packages/components/nodes/chatmodels/ChatLocalAI/ChatLocalAI.ts",
+            "role": "target",
+            "symbol": "ChatLocalAI_ChatModels.init"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [],
+        "opportunity_type": "none",
+        "rationale": "A：workspace 删除用路径 id 读取并级联删除 Workspace 及其子资源；B：ChatLocalAI 将 basePath 设为带 API key 的 ChatOpenAI baseURL。所见源码分别处理这些不同对象与调用链；A 的结果不能改变 B 的判断、最小验证步骤或需查找的目标代码。",
+        "reviewer_id": "sampled-density-reviewer-b",
+        "source_artifact": "",
+        "source_node": "F008",
+        "target_claim": "",
+        "target_node": "F015",
+        "uncertainty_note": null
+      },
+      "sample": {
+        "inclusion_probability": 0.14166666666666666,
+        "pair_id": "sampled-opportunity-density-v1:F008:F015",
+        "sampling_weight": 7.0588235294117645,
+        "selection_sha256": "107692eb8e58c96732f2a96f1cd584a4e25bf884f64c9e1ffb33d033c524f20a",
+        "source_node": "F008",
+        "stratum": "old_to_old",
+        "stratum_population": 240,
+        "stratum_sample": 34,
+        "target_node": "F015"
+      }
+    },
+    {
+      "reviewer_a": {
+        "bounded_check": "",
+        "confidence": "high",
+        "evidence": [
+          {
+            "excerpt": "workspaceId: workspaceId",
+            "excerpt_sha256": "469c0b7eaf09ea93f3ef0d9dcbdf92db7fe416b6f3f9add847db4f23a97a3579",
+            "line": 132,
+            "path": "packages/server/src/services/credentials/index.ts",
+            "role": "source",
+            "symbol": "getCredentialById"
+          },
+          {
+            "excerpt": "const sanitizedUser = sanitizeUser(user)",
+            "excerpt_sha256": "9351879378aa988260b26b2f02e8f7222a539276e2698a80e05104012ea839e8",
+            "line": 589,
+            "path": "packages/server/src/enterprise/services/account.service.ts",
+            "role": "target",
+            "symbol": "AccountService.login"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [
+          "shared topic"
+        ],
+        "opportunity_type": "thematic-only",
+        "rationale": "两端关心秘密字段，但 Credential 解密的 workspace 条件不进入 AccountService.login 的 User 清理。",
+        "reviewer_id": "sampled-density-reviewer-a",
+        "source_artifact": "",
+        "source_node": "F005",
+        "target_claim": "",
+        "target_node": "F009",
+        "uncertainty_note": null
+      },
+      "reviewer_b": {
+        "bounded_check": "",
+        "confidence": "high",
+        "evidence": [
+          {
+            "excerpt": "workspaceId: workspaceId",
+            "excerpt_sha256": "469c0b7eaf09ea93f3ef0d9dcbdf92db7fe416b6f3f9add847db4f23a97a3579",
+            "line": 132,
+            "path": "packages/server/src/services/credentials/index.ts",
+            "role": "source",
+            "symbol": "getCredentialById"
+          },
+          {
+            "excerpt": "const sanitizedUser = sanitizeUser(user)",
+            "excerpt_sha256": "9351879378aa988260b26b2f02e8f7222a539276e2698a80e05104012ea839e8",
+            "line": 589,
+            "path": "packages/server/src/enterprise/services/account.service.ts",
+            "role": "target",
+            "symbol": "AccountService.login"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [],
+        "opportunity_type": "none",
+        "rationale": "A：getCredentialById 同时以 id 与 workspaceId 查询后才解密；B：AccountService.login 返回前对 User 调用 sanitizeUser。所见源码分别处理这些不同对象与调用链；A 的结果不能改变 B 的判断、最小验证步骤或需查找的目标代码。",
+        "reviewer_id": "sampled-density-reviewer-b",
+        "source_artifact": "",
+        "source_node": "F005",
+        "target_claim": "",
+        "target_node": "F009",
+        "uncertainty_note": null
+      },
+      "sample": {
+        "inclusion_probability": 0.14166666666666666,
+        "pair_id": "sampled-opportunity-density-v1:F005:F009",
+        "sampling_weight": 7.0588235294117645,
+        "selection_sha256": "123ab8e2254b4a32e4be57bb4ef96f7f53019b201844d5620cc3c2f5b1cffbf8",
+        "source_node": "F005",
+        "stratum": "old_to_old",
+        "stratum_population": 240,
+        "stratum_sample": 34,
+        "target_node": "F009"
+      }
+    },
+    {
+      "reviewer_a": {
+        "bounded_check": "",
+        "confidence": "high",
+        "evidence": [
+          {
+            "excerpt": "obj.configuration = { baseURL: basePath }",
+            "excerpt_sha256": "1c5bb83be7a0c9192eb0e807d01b184a2c3bc1482b90c557986f9582bd5d8cc4",
+            "line": 126,
+            "path": "packages/components/nodes/chatmodels/ChatLocalAI/ChatLocalAI.ts",
+            "role": "source",
+            "symbol": "ChatLocalAI_ChatModels.init"
+          },
+          {
+            "excerpt": "export const validateMCPServerConfig = (serverParams: any)",
+            "excerpt_sha256": "69e01fafc6509e4bca4919e93b9ac4ffc5f2e026899cfa6a7735483cbd433223",
+            "line": 374,
+            "path": "packages/components/nodes/tools/MCP/core.ts",
+            "role": "target",
+            "symbol": "validateMCPServerConfig"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [
+          "shared topic"
+        ],
+        "opportunity_type": "thematic-only",
+        "rationale": "两个配置都能影响外部执行目标，但 ChatLocalAI 的 baseURL 不传给 MCP stdio 的 cwd 校验。",
+        "reviewer_id": "sampled-density-reviewer-a",
+        "source_artifact": "",
+        "source_node": "F015",
+        "target_claim": "",
+        "target_node": "F014",
+        "uncertainty_note": null
+      },
+      "reviewer_b": {
+        "bounded_check": "",
+        "confidence": "high",
+        "evidence": [
+          {
+            "excerpt": "obj.configuration = { baseURL: basePath }",
+            "excerpt_sha256": "1c5bb83be7a0c9192eb0e807d01b184a2c3bc1482b90c557986f9582bd5d8cc4",
+            "line": 126,
+            "path": "packages/components/nodes/chatmodels/ChatLocalAI/ChatLocalAI.ts",
+            "role": "source",
+            "symbol": "ChatLocalAI_ChatModels.init"
+          },
+          {
+            "excerpt": "export const validateMCPServerConfig = (serverParams: any)",
+            "excerpt_sha256": "69e01fafc6509e4bca4919e93b9ac4ffc5f2e026899cfa6a7735483cbd433223",
+            "line": 374,
+            "path": "packages/components/nodes/tools/MCP/core.ts",
+            "role": "target",
+            "symbol": "validateMCPServerConfig"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [],
+        "opportunity_type": "none",
+        "rationale": "A：ChatLocalAI 将 basePath 设为带 API key 的 ChatOpenAI baseURL；B：MCP stdio 把 serverParams 中的 cwd 传入进程 transport。所见源码分别处理这些不同对象与调用链；A 的结果不能改变 B 的判断、最小验证步骤或需查找的目标代码。",
+        "reviewer_id": "sampled-density-reviewer-b",
+        "source_artifact": "",
+        "source_node": "F015",
+        "target_claim": "",
+        "target_node": "F014",
+        "uncertainty_note": null
+      },
+      "sample": {
+        "inclusion_probability": 0.14166666666666666,
+        "pair_id": "sampled-opportunity-density-v1:F015:F014",
+        "sampling_weight": 7.0588235294117645,
+        "selection_sha256": "1668fa1f6ba54c9abdc29d07d5c9651710761542d3c2233a0ce471baff64cfa5",
+        "source_node": "F015",
+        "stratum": "old_to_old",
+        "stratum_population": 240,
+        "stratum_sample": 34,
+        "target_node": "F014"
+      }
+    },
+    {
+      "reviewer_a": {
+        "bounded_check": "把同一个 Credential ID 作为非 CUSTOM Assistant 的 credential 指针导入当前 workspace，再以 isDeleteBoth 删除；核对导入拒绝、Credential 归属及远端 API 调用。",
+        "confidence": "medium",
+        "evidence": [
+          {
+            "excerpt": "const credentialData = await getCredentialData(credentialId ?? '', options)",
+            "excerpt_sha256": "a48096da22e27bf882c2abd869c743fc3ed7dd3786da4821ede54f81e566832b",
+            "line": 34,
+            "path": "packages/components/src/textToSpeech.ts",
+            "role": "source",
+            "symbol": "convertTextToSpeech"
+          },
+          {
+            "excerpt": "id: assistant.credential",
+            "excerpt_sha256": "7a8cef0f73dd4b6cba215e216c7621915239bcd5f091fa984acdb53e627bc705",
+            "line": 186,
+            "path": "packages/server/src/services/assistants/index.ts",
+            "role": "target",
+            "symbol": "deleteAssistant"
+          }
+        ],
+        "expected_effect": [
+          "validate",
+          "refute",
+          "narrow"
+        ],
+        "mechanisms": [
+          "shared credential identifier",
+          "positive/negative differential"
+        ],
+        "opportunity_type": "actionable cross-check",
+        "rationale": "公开 TTS 链把配置中的 credentialId 交给按 ID 解密的通用 helper；Assistant 删除亦按 assistant.credential 单独取 Credential。源可给出可用的跨工作区 Credential ID，直接缩小目标导入后删除的验证路径。",
+        "reviewer_id": "sampled-density-reviewer-a",
+        "source_artifact": "源 TTS 配置中一个属于其他 workspace、但在公开 generate 路径被 getCredentialData 按 ID 使用的 Credential ID 及其归属。",
+        "source_node": "F004",
+        "target_claim": "导入到当前 workspace 的非 CUSTOM Assistant 在删除时是否使用该外 workspace Credential。",
+        "target_node": "F003",
+        "uncertainty_note": null
+      },
+      "reviewer_b": {
+        "bounded_check": "",
+        "confidence": "medium",
+        "evidence": [
+          {
+            "excerpt": "chatflow = await chatflowsService.getChatflowById(chatflowId)",
+            "excerpt_sha256": "618a423410a74b1022187153d69408feaa1673da80b8a758ff046fe5d2424303",
+            "line": 40,
+            "path": "packages/server/src/controllers/text-to-speech/index.ts",
+            "role": "source",
+            "symbol": "generateTextToSpeech"
+          },
+          {
+            "excerpt": "id: assistant.credential",
+            "excerpt_sha256": "7a8cef0f73dd4b6cba215e216c7621915239bcd5f091fa984acdb53e627bc705",
+            "line": 186,
+            "path": "packages/server/src/services/assistants/index.ts",
+            "role": "target",
+            "symbol": "deleteAssistant"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [
+          "shared security theme"
+        ],
+        "opportunity_type": "thematic-only",
+        "rationale": "A：TTS generate 无用户 workspace 时以 chatflowId 全局读取 ChatFlow 和 TTS Credential；B：Assistant 删除先以 workspaceId 查 Assistant，再仅以 assistant.credential 查密钥。两者只在资源、权限或输入边界主题相近；A 的具体结果不触及 B 的目标路径、对象或必要检查。",
+        "reviewer_id": "sampled-density-reviewer-b",
+        "source_artifact": "",
+        "source_node": "F004",
+        "target_claim": "",
+        "target_node": "F003",
+        "uncertainty_note": null
+      },
+      "sample": {
+        "inclusion_probability": 0.14166666666666666,
+        "pair_id": "sampled-opportunity-density-v1:F004:F003",
+        "sampling_weight": 7.0588235294117645,
+        "selection_sha256": "169cd3387ca3d3cbcd8515b019466e1e40cae6c83da668df48cae182845d8222",
+        "source_node": "F004",
+        "stratum": "old_to_old",
+        "stratum_population": 240,
+        "stratum_sample": 34,
+        "target_node": "F003"
+      }
+    },
+    {
+      "reviewer_a": {
+        "bounded_check": "",
+        "confidence": "high",
+        "evidence": [
+          {
+            "excerpt": "oneRole.organizationId !== user.activeOrganizationId",
+            "excerpt_sha256": "fee28904b309c3b6fb8ffd245c196574acb98b58a152b8b44fc2bbd8607f0815",
+            "line": 40,
+            "path": "packages/server/src/enterprise/controllers/role.controller.ts",
+            "role": "source",
+            "symbol": "RoleController.read"
+          },
+          {
+            "excerpt": "id: chatflowid",
+            "excerpt_sha256": "b2276a116bd2b12f4ee1aec5ffb75558a3d602dd54358f4aaa1b2191452dcd1f",
+            "line": 32,
+            "path": "packages/server/src/services/openai-realtime/index.ts",
+            "role": "target",
+            "symbol": "buildAndInitTool"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [
+          "shared topic"
+        ],
+        "opportunity_type": "thematic-only",
+        "rationale": "都涉及工作区/组织边界，Role 的 read guard 不进入 realtime 的 ChatFlow.findOneBy。",
+        "reviewer_id": "sampled-density-reviewer-a",
+        "source_artifact": "",
+        "source_node": "F007",
+        "target_claim": "",
+        "target_node": "F024",
+        "uncertainty_note": null
+      },
+      "reviewer_b": {
+        "bounded_check": "",
+        "confidence": "high",
+        "evidence": [
+          {
+            "excerpt": "oneRole.organizationId !== user.activeOrganizationId",
+            "excerpt_sha256": "fee28904b309c3b6fb8ffd245c196574acb98b58a152b8b44fc2bbd8607f0815",
+            "line": 40,
+            "path": "packages/server/src/enterprise/controllers/role.controller.ts",
+            "role": "source",
+            "symbol": "RoleController.read"
+          },
+          {
+            "excerpt": "id: chatflowid",
+            "excerpt_sha256": "b2276a116bd2b12f4ee1aec5ffb75558a3d602dd54358f4aaa1b2191452dcd1f",
+            "line": 32,
+            "path": "packages/server/src/services/openai-realtime/index.ts",
+            "role": "target",
+            "symbol": "buildAndInitTool"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [],
+        "opportunity_type": "none",
+        "rationale": "A：Role.read 在返回单个 Role 前比较该对象的 organizationId 与 activeOrganizationId；B：openai-realtime 按全局 chatflowId 读取私有 flow 并初始化其 agent 工具。所见源码分别处理这些不同对象与调用链；A 的结果不能改变 B 的判断、最小验证步骤或需查找的目标代码。",
+        "reviewer_id": "sampled-density-reviewer-b",
+        "source_artifact": "",
+        "source_node": "F007",
+        "target_claim": "",
+        "target_node": "F024",
+        "uncertainty_note": null
+      },
+      "sample": {
+        "inclusion_probability": 0.14204545454545456,
+        "pair_id": "sampled-opportunity-density-v1:F007:F024",
+        "sampling_weight": 7.04,
+        "selection_sha256": "003c16ce0a71fd370d77a98ec5fa6e918a22f8b897ebffc2c755ce5016966f24",
+        "source_node": "F007",
+        "stratum": "old_to_new",
+        "stratum_population": 176,
+        "stratum_sample": 25,
+        "target_node": "F024"
+      }
+    },
+    {
+      "reviewer_a": {
+        "bounded_check": "",
+        "confidence": "high",
+        "evidence": [],
+        "expected_effect": [],
+        "mechanisms": [],
+        "opportunity_type": "none",
+        "rationale": "源节点中，Assistant 删除先限定 Assistant.workspaceId，随后按 assistant.credential 单独查密钥；目标节点中，openai-realtime 按 chatflowId 全局加载私有 flow 并执行 agent tool。两条源码路径没有共用的对象查找、调用链或可传递的验证子命题，源结果不能改变目标的具体判断或省去目标的必要检查。",
+        "reviewer_id": "sampled-density-reviewer-a",
+        "source_artifact": "",
+        "source_node": "F003",
+        "target_claim": "",
+        "target_node": "F024",
+        "uncertainty_note": null
+      },
+      "reviewer_b": {
+        "bounded_check": "",
+        "confidence": "medium",
+        "evidence": [
+          {
+            "excerpt": "id: assistant.credential",
+            "excerpt_sha256": "7a8cef0f73dd4b6cba215e216c7621915239bcd5f091fa984acdb53e627bc705",
+            "line": 186,
+            "path": "packages/server/src/services/assistants/index.ts",
+            "role": "source",
+            "symbol": "deleteAssistant"
+          },
+          {
+            "excerpt": "id: chatflowid",
+            "excerpt_sha256": "b2276a116bd2b12f4ee1aec5ffb75558a3d602dd54358f4aaa1b2191452dcd1f",
+            "line": 32,
+            "path": "packages/server/src/services/openai-realtime/index.ts",
+            "role": "target",
+            "symbol": "buildAndInitTool"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [
+          "shared security theme"
+        ],
+        "opportunity_type": "thematic-only",
+        "rationale": "A：Assistant 删除先以 workspaceId 查 Assistant，再仅以 assistant.credential 查密钥；B：openai-realtime 按全局 chatflowId 读取私有 flow 并初始化其 agent 工具。两者只在资源、权限或输入边界主题相近；A 的具体结果不触及 B 的目标路径、对象或必要检查。",
+        "reviewer_id": "sampled-density-reviewer-b",
+        "source_artifact": "",
+        "source_node": "F003",
+        "target_claim": "",
+        "target_node": "F024",
+        "uncertainty_note": null
+      },
+      "sample": {
+        "inclusion_probability": 0.14204545454545456,
+        "pair_id": "sampled-opportunity-density-v1:F003:F024",
+        "sampling_weight": 7.04,
+        "selection_sha256": "0e24d8f88782fdeda40a2c8f58dab4d3bdd945bc4e5b065a4486e9876dde87d0",
+        "source_node": "F003",
+        "stratum": "old_to_new",
+        "stratum_population": 176,
+        "stratum_sample": 25,
+        "target_node": "F024"
+      }
+    },
+    {
+      "reviewer_a": {
+        "bounded_check": "",
+        "confidence": "high",
+        "evidence": [],
+        "expected_effect": [],
+        "mechanisms": [],
+        "opportunity_type": "none",
+        "rationale": "源节点中，OpenAI Assistant 服务按请求的 credentialId 查询并使用 API key；目标节点中，getChatflowByIdForWorkspace 拒绝缺失 workspaceId，再做受限 ChatFlow 查询。两条源码路径没有共用的对象查找、调用链或可传递的验证子命题，源结果不能改变目标的具体判断或省去目标的必要检查。",
+        "reviewer_id": "sampled-density-reviewer-a",
+        "source_artifact": "",
+        "source_node": "F002",
+        "target_claim": "",
+        "target_node": "F019",
+        "uncertainty_note": null
+      },
+      "reviewer_b": {
+        "bounded_check": "",
+        "confidence": "medium",
+        "evidence": [
+          {
+            "excerpt": "id: credentialId",
+            "excerpt_sha256": "e0b67eb47285c6f2af0bd4798fbbd135a223c99cb867be79a31bbac277c170f9",
+            "line": 19,
+            "path": "packages/server/src/services/openai-assistants/index.ts",
+            "role": "source",
+            "symbol": "getAll/getSingle/upload"
+          },
+          {
+            "excerpt": "return getChatflowById(chatflowId, workspaceId)",
+            "excerpt_sha256": "c707d9429a8da8020def438e6dc1e6ca8a7c17f69baffe63081898af5903411d",
+            "line": 312,
+            "path": "packages/server/src/services/chatflows/index.ts",
+            "role": "target",
+            "symbol": "getChatflowByIdForWorkspace"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [
+          "shared security theme"
+        ],
+        "opportunity_type": "thematic-only",
+        "rationale": "A：OpenAI Assistant 服务从请求 credentialId 按 ID 查密钥并调用 OpenAI；B：getChatflowByIdForWorkspace 拒绝空 workspaceId，随后按该 workspace 查询 ChatFlow。两者只在资源、权限或输入边界主题相近；A 的具体结果不触及 B 的目标路径、对象或必要检查。",
+        "reviewer_id": "sampled-density-reviewer-b",
+        "source_artifact": "",
+        "source_node": "F002",
+        "target_claim": "",
+        "target_node": "F019",
+        "uncertainty_note": null
+      },
+      "sample": {
+        "inclusion_probability": 0.14204545454545456,
+        "pair_id": "sampled-opportunity-density-v1:F002:F019",
+        "sampling_weight": 7.04,
+        "selection_sha256": "10ba5d0d2333d80e01d4ef3e191f5d98bde6dc3bceb5059bfea0198be083618e",
+        "source_node": "F002",
+        "stratum": "old_to_new",
+        "stratum_population": 176,
+        "stratum_sample": 25,
+        "target_node": "F019"
+      }
+    },
+    {
+      "reviewer_a": {
+        "bounded_check": "",
+        "confidence": "high",
+        "evidence": [],
+        "expected_effect": [],
+        "mechanisms": [],
+        "opportunity_type": "none",
+        "rationale": "源节点中，SqlDatabaseChain 生成并执行 SQL；目标节点中，openai-realtime 按 chatflowId 全局加载私有 flow 并执行 agent tool。两条源码路径没有共用的对象查找、调用链或可传递的验证子命题，源结果不能改变目标的具体判断或省去目标的必要检查。",
+        "reviewer_id": "sampled-density-reviewer-a",
+        "source_artifact": "",
+        "source_node": "F013",
+        "target_claim": "",
+        "target_node": "F024",
+        "uncertainty_note": null
+      },
+      "reviewer_b": {
+        "bounded_check": "",
+        "confidence": "medium",
+        "evidence": [
+          {
+            "excerpt": "SqlDatabase.fromDataSourceParams",
+            "excerpt_sha256": "82139f9998affa75f12af01dc2c982e2baa378b645b2dfb092ab6f531f1186b2",
+            "line": 235,
+            "path": "packages/components/nodes/chains/SqlDatabaseChain/SqlDatabaseChain.ts",
+            "role": "source",
+            "symbol": "getSQLDBChain"
+          },
+          {
+            "excerpt": "id: chatflowid",
+            "excerpt_sha256": "b2276a116bd2b12f4ee1aec5ffb75558a3d602dd54358f4aaa1b2191452dcd1f",
+            "line": 32,
+            "path": "packages/server/src/services/openai-realtime/index.ts",
+            "role": "target",
+            "symbol": "buildAndInitTool"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [
+          "shared security theme"
+        ],
+        "opportunity_type": "thematic-only",
+        "rationale": "A：SqlDatabaseChain 把 LLM 生成的 SQL 交给数据库链运行；B：openai-realtime 按全局 chatflowId 读取私有 flow 并初始化其 agent 工具。两者只在资源、权限或输入边界主题相近；A 的具体结果不触及 B 的目标路径、对象或必要检查。",
+        "reviewer_id": "sampled-density-reviewer-b",
+        "source_artifact": "",
+        "source_node": "F013",
+        "target_claim": "",
+        "target_node": "F024",
+        "uncertainty_note": null
+      },
+      "sample": {
+        "inclusion_probability": 0.14204545454545456,
+        "pair_id": "sampled-opportunity-density-v1:F013:F024",
+        "sampling_weight": 7.04,
+        "selection_sha256": "122d863959bdfc8691857c95ca62fc23c8b265b414f9ddfaa2a30245c1cb18e6",
+        "source_node": "F013",
+        "stratum": "old_to_new",
+        "stratum_population": 176,
+        "stratum_sample": 25,
+        "target_node": "F024"
+      }
+    },
+    {
+      "reviewer_a": {
+        "bounded_check": "",
+        "confidence": "medium",
+        "evidence": [
+          {
+            "excerpt": "const res = await chain.run(input, [loggerHandler, handler, ...callbacks])",
+            "excerpt_sha256": "acdea3af82c6968e25dcf9ad73db4b0db1715373d914f29ffa455f537744c8f3",
+            "line": 204,
+            "path": "packages/components/nodes/chains/SqlDatabaseChain/SqlDatabaseChain.ts",
+            "role": "source",
+            "symbol": "SqlDatabaseChain.run"
+          },
+          {
+            "excerpt": "const chatflow = await chatflowService.getChatflowByIdForWorkspace(req.params.id, workspaceId)",
+            "excerpt_sha256": "9b3e2f588e12b895f0b65ab9e3e7717aef14a0a53f403ff13d66a8d0e79699c2",
+            "line": 15,
+            "path": "packages/server/src/controllers/internal-predictions/index.ts",
+            "role": "target",
+            "symbol": "createInternalPrediction"
+          },
+          {
+            "excerpt": "const apiResponse = await utilBuildChatflow(req, true)",
+            "excerpt_sha256": "97900b1e0eb976ca5afe53a8695ddc0e0d743b9494f5057dc3894aa6d29b84b8",
+            "line": 24,
+            "path": "packages/server/src/controllers/internal-predictions/index.ts",
+            "role": "target",
+            "symbol": "createInternalPrediction"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [
+          "shared code or invariant"
+        ],
+        "opportunity_type": "direct relation",
+        "rationale": "internal-predictions 的受限 ChatFlow helper 成功后调用 utilBuildChatflow，可执行该 flow 中的 SqlDatabaseChain；SQL 是否只读不区分前置 workspace guard 是否有效。",
+        "reviewer_id": "sampled-density-reviewer-a",
+        "source_artifact": "",
+        "source_node": "F013",
+        "target_claim": "",
+        "target_node": "F019",
+        "uncertainty_note": null
+      },
+      "reviewer_b": {
+        "bounded_check": "",
+        "confidence": "high",
+        "evidence": [
+          {
+            "excerpt": "SqlDatabase.fromDataSourceParams",
+            "excerpt_sha256": "82139f9998affa75f12af01dc2c982e2baa378b645b2dfb092ab6f531f1186b2",
+            "line": 235,
+            "path": "packages/components/nodes/chains/SqlDatabaseChain/SqlDatabaseChain.ts",
+            "role": "source",
+            "symbol": "getSQLDBChain"
+          },
+          {
+            "excerpt": "return getChatflowById(chatflowId, workspaceId)",
+            "excerpt_sha256": "c707d9429a8da8020def438e6dc1e6ca8a7c17f69baffe63081898af5903411d",
+            "line": 312,
+            "path": "packages/server/src/services/chatflows/index.ts",
+            "role": "target",
+            "symbol": "getChatflowByIdForWorkspace"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [],
+        "opportunity_type": "none",
+        "rationale": "A：SqlDatabaseChain 把 LLM 生成的 SQL 交给数据库链运行；B：getChatflowByIdForWorkspace 拒绝空 workspaceId，随后按该 workspace 查询 ChatFlow。所见源码分别处理这些不同对象与调用链；A 的结果不能改变 B 的判断、最小验证步骤或需查找的目标代码。",
+        "reviewer_id": "sampled-density-reviewer-b",
+        "source_artifact": "",
+        "source_node": "F013",
+        "target_claim": "",
+        "target_node": "F019",
+        "uncertainty_note": null
+      },
+      "sample": {
+        "inclusion_probability": 0.14204545454545456,
+        "pair_id": "sampled-opportunity-density-v1:F013:F019",
+        "sampling_weight": 7.04,
+        "selection_sha256": "129122cd1f2b6497162d3087d9b850ca7b898e341c4ef87b3cd9cdc09fb8f977",
+        "source_node": "F013",
+        "stratum": "old_to_new",
+        "stratum_population": 176,
+        "stratum_sample": 25,
+        "target_node": "F019"
+      }
+    },
+    {
+      "reviewer_a": {
+        "bounded_check": "",
+        "confidence": "high",
+        "evidence": [
+          {
+            "excerpt": "oneRole.organizationId !== user.activeOrganizationId",
+            "excerpt_sha256": "fee28904b309c3b6fb8ffd245c196574acb98b58a152b8b44fc2bbd8607f0815",
+            "line": 40,
+            "path": "packages/server/src/enterprise/controllers/role.controller.ts",
+            "role": "source",
+            "symbol": "RoleController.read"
+          },
+          {
+            "excerpt": "const role = await roleService.readRoleById(workspaceUser.roleId, queryRunner)",
+            "excerpt_sha256": "b6ff92b5978640bb20c1b943b4b28f3d0d63f3f5ada724a152e0dbd1612b78e8",
+            "line": 102,
+            "path": "packages/server/src/enterprise/sso/SSOBase.ts",
+            "role": "target",
+            "symbol": "verifyAndLogin"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [
+          "shared code or invariant"
+        ],
+        "opportunity_type": "direct relation",
+        "rationale": "SSOBase 在构造登录身份时调用 RoleService.readRoleById，源控制器也读取该 helper；源的响应前组织比较不验证 SSO 邮箱归属。",
+        "reviewer_id": "sampled-density-reviewer-a",
+        "source_artifact": "",
+        "source_node": "F007",
+        "target_claim": "",
+        "target_node": "F022",
+        "uncertainty_note": null
+      },
+      "reviewer_b": {
+        "bounded_check": "",
+        "confidence": "medium",
+        "evidence": [
+          {
+            "excerpt": "oneRole.organizationId !== user.activeOrganizationId",
+            "excerpt_sha256": "fee28904b309c3b6fb8ffd245c196574acb98b58a152b8b44fc2bbd8607f0815",
+            "line": 40,
+            "path": "packages/server/src/enterprise/controllers/role.controller.ts",
+            "role": "source",
+            "symbol": "RoleController.read"
+          },
+          {
+            "excerpt": "userService.readUserByEmail(email, queryRunner)",
+            "excerpt_sha256": "de13b701abdc5bb52aaba782258f464366acc7d7fb05beedafdc37514137aeeb",
+            "line": 56,
+            "path": "packages/server/src/enterprise/sso/SSOBase.ts",
+            "role": "target",
+            "symbol": "SSOBase.getUser"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [
+          "shared security theme"
+        ],
+        "opportunity_type": "thematic-only",
+        "rationale": "A：Role.read 在返回单个 Role 前比较该对象的 organizationId 与 activeOrganizationId；B：SSO 以提供者邮箱全局匹配本地 User 并组装其工作区身份。两者只在资源、权限或输入边界主题相近；A 的具体结果不触及 B 的目标路径、对象或必要检查。",
+        "reviewer_id": "sampled-density-reviewer-b",
+        "source_artifact": "",
+        "source_node": "F007",
+        "target_claim": "",
+        "target_node": "F022",
+        "uncertainty_note": null
+      },
+      "sample": {
+        "inclusion_probability": 0.14204545454545456,
+        "pair_id": "sampled-opportunity-density-v1:F007:F022",
+        "sampling_weight": 7.04,
+        "selection_sha256": "15e4649078877a77f08e98125743a1b636182ca91394396b22da193b51bf21a8",
+        "source_node": "F007",
+        "stratum": "old_to_new",
+        "stratum_population": 176,
+        "stratum_sample": 25,
+        "target_node": "F022"
+      }
+    },
+    {
+      "reviewer_a": {
+        "bounded_check": "",
+        "confidence": "medium",
+        "evidence": [
+          {
+            "excerpt": "new PlaywrightWebBaseLoader(url, config)",
+            "excerpt_sha256": "59ef3f530275d880b5453522603d389ac2390ffcc7b39ab72dadcd2814d5658b",
+            "line": 226,
+            "path": "packages/components/nodes/documentloaders/Playwright/Playwright.ts",
+            "role": "source",
+            "symbol": "playwrightLoader"
+          },
+          {
+            "excerpt": "const allowedCommands = ['node', 'npx', 'python', 'python3', 'docker']",
+            "excerpt_sha256": "f043beef9975e36f0542cbf4ab07a684c6d881e6939b3882dbf034e774ff3302",
+            "line": 381,
+            "path": "packages/components/nodes/tools/MCP/core.ts",
+            "role": "target",
+            "symbol": "validateMCPServerConfig"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [
+          "shared topic"
+        ],
+        "opportunity_type": "thematic-only",
+        "rationale": "Playwright 浏览器导航与 MCP 子进程都可能触及宿主环境，但前者 URL 检查不进入后者命令参数校验。",
+        "reviewer_id": "sampled-density-reviewer-a",
+        "source_artifact": "",
+        "source_node": "F016",
+        "target_claim": "",
+        "target_node": "F026",
+        "uncertainty_note": null
+      },
+      "reviewer_b": {
+        "bounded_check": "",
+        "confidence": "high",
+        "evidence": [
+          {
+            "excerpt": "new PlaywrightWebBaseLoader(url, config)",
+            "excerpt_sha256": "59ef3f530275d880b5453522603d389ac2390ffcc7b39ab72dadcd2814d5658b",
+            "line": 226,
+            "path": "packages/components/nodes/documentloaders/Playwright/Playwright.ts",
+            "role": "source",
+            "symbol": "playwrightLoader"
+          },
+          {
+            "excerpt": "const allowedCommands = ['node', 'npx', 'python', 'python3', 'docker']",
+            "excerpt_sha256": "f043beef9975e36f0542cbf4ab07a684c6d881e6939b3882dbf034e774ff3302",
+            "line": 381,
+            "path": "packages/components/nodes/tools/MCP/core.ts",
+            "role": "target",
+            "symbol": "validateMCPServerConfig"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [],
+        "opportunity_type": "none",
+        "rationale": "A：Playwright loader 用输入 URL 建立浏览器加载器并导航；B：CustomMCP 参数验证允许 node/npx/python/docker，之后启动 MCP transport。所见源码分别处理这些不同对象与调用链；A 的结果不能改变 B 的判断、最小验证步骤或需查找的目标代码。",
+        "reviewer_id": "sampled-density-reviewer-b",
+        "source_artifact": "",
+        "source_node": "F016",
+        "target_claim": "",
+        "target_node": "F026",
+        "uncertainty_note": null
+      },
+      "sample": {
+        "inclusion_probability": 0.14204545454545456,
+        "pair_id": "sampled-opportunity-density-v1:F016:F026",
+        "sampling_weight": 7.04,
+        "selection_sha256": "2585d531b7483188870432d982f797af485aa3a610aa75fef4587c545fb553ad",
+        "source_node": "F016",
+        "stratum": "old_to_new",
+        "stratum_population": 176,
+        "stratum_sample": 25,
+        "target_node": "F026"
+      }
+    },
+    {
+      "reviewer_a": {
+        "bounded_check": "",
+        "confidence": "high",
+        "evidence": [
+          {
+            "excerpt": "userService.readUserByEmail(email, queryRunner)",
+            "excerpt_sha256": "de13b701abdc5bb52aaba782258f464366acc7d7fb05beedafdc37514137aeeb",
+            "line": 56,
+            "path": "packages/server/src/enterprise/sso/SSOBase.ts",
+            "role": "source",
+            "symbol": "SSOBase.getUser"
+          },
+          {
+            "excerpt": "user.user = userDetails",
+            "excerpt_sha256": "a1511ee5eb2a769bb9ce4b5b0d58bdfbd63329e5593a5fb070d9e4ef7b135abe",
+            "line": 181,
+            "path": "packages/server/src/enterprise/services/organization-user.service.ts",
+            "role": "target",
+            "symbol": "OrganizationUserService.readOrganizationUserByUserId"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [
+          "shared code or invariant"
+        ],
+        "opportunity_type": "direct relation",
+        "rationale": "两端使用 UserService 的 User 记录，源按邮箱读取，目标按 id 读取并嵌入组织用户；邮箱匹配结果不区分目标响应是否净化字段。",
+        "reviewer_id": "sampled-density-reviewer-a",
+        "source_artifact": "",
+        "source_node": "F022",
+        "target_claim": "",
+        "target_node": "F010",
+        "uncertainty_note": null
+      },
+      "reviewer_b": {
+        "bounded_check": "",
+        "confidence": "medium",
+        "evidence": [
+          {
+            "excerpt": "userService.readUserByEmail(email, queryRunner)",
+            "excerpt_sha256": "de13b701abdc5bb52aaba782258f464366acc7d7fb05beedafdc37514137aeeb",
+            "line": 56,
+            "path": "packages/server/src/enterprise/sso/SSOBase.ts",
+            "role": "source",
+            "symbol": "SSOBase.getUser"
+          },
+          {
+            "excerpt": "user.user = userDetails",
+            "excerpt_sha256": "a1511ee5eb2a769bb9ce4b5b0d58bdfbd63329e5593a5fb070d9e4ef7b135abe",
+            "line": 181,
+            "path": "packages/server/src/enterprise/services/organization-user.service.ts",
+            "role": "target",
+            "symbol": "OrganizationUserService.readOrganizationUserByUserId"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [
+          "shared security theme"
+        ],
+        "opportunity_type": "thematic-only",
+        "rationale": "A：SSO 以提供者邮箱全局匹配本地 User 并组装其工作区身份；B：organization-user 按 userId 读取组织成员并嵌入 owner 的 User 详情。两者只在资源、权限或输入边界主题相近；A 的具体结果不触及 B 的目标路径、对象或必要检查。",
+        "reviewer_id": "sampled-density-reviewer-b",
+        "source_artifact": "",
+        "source_node": "F022",
+        "target_claim": "",
+        "target_node": "F010",
+        "uncertainty_note": null
+      },
+      "sample": {
+        "inclusion_probability": 0.14204545454545456,
+        "pair_id": "sampled-opportunity-density-v1:F022:F010",
+        "sampling_weight": 7.04,
+        "selection_sha256": "09a15aaa95f6f68d5c537200101d4d6a447a13234aacc38800de65a6bc85fed5",
+        "source_node": "F022",
+        "stratum": "new_to_old",
+        "stratum_population": 176,
+        "stratum_sample": 25,
+        "target_node": "F010"
+      }
+    },
+    {
+      "reviewer_a": {
+        "bounded_check": "",
+        "confidence": "high",
+        "evidence": [
+          {
+            "excerpt": "const role = await roleService.readRoleById(workspaceUser.roleId, queryRunner)",
+            "excerpt_sha256": "b6ff92b5978640bb20c1b943b4b28f3d0d63f3f5ada724a152e0dbd1612b78e8",
+            "line": 102,
+            "path": "packages/server/src/enterprise/sso/SSOBase.ts",
+            "role": "source",
+            "symbol": "verifyAndLogin"
+          },
+          {
+            "excerpt": "oneRole.organizationId !== user.activeOrganizationId",
+            "excerpt_sha256": "fee28904b309c3b6fb8ffd245c196574acb98b58a152b8b44fc2bbd8607f0815",
+            "line": 40,
+            "path": "packages/server/src/enterprise/controllers/role.controller.ts",
+            "role": "target",
+            "symbol": "RoleController.read"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [
+          "shared code or invariant"
+        ],
+        "opportunity_type": "direct relation",
+        "rationale": "SSOBase 通过 RoleService.readRoleById 取得用户角色，目标 Role 控制器也读取该 helper；邮箱登录缺口不改变目标的 organizationId 比较。",
+        "reviewer_id": "sampled-density-reviewer-a",
+        "source_artifact": "",
+        "source_node": "F022",
+        "target_claim": "",
+        "target_node": "F007",
+        "uncertainty_note": null
+      },
+      "reviewer_b": {
+        "bounded_check": "",
+        "confidence": "medium",
+        "evidence": [
+          {
+            "excerpt": "userService.readUserByEmail(email, queryRunner)",
+            "excerpt_sha256": "de13b701abdc5bb52aaba782258f464366acc7d7fb05beedafdc37514137aeeb",
+            "line": 56,
+            "path": "packages/server/src/enterprise/sso/SSOBase.ts",
+            "role": "source",
+            "symbol": "SSOBase.getUser"
+          },
+          {
+            "excerpt": "oneRole.organizationId !== user.activeOrganizationId",
+            "excerpt_sha256": "fee28904b309c3b6fb8ffd245c196574acb98b58a152b8b44fc2bbd8607f0815",
+            "line": 40,
+            "path": "packages/server/src/enterprise/controllers/role.controller.ts",
+            "role": "target",
+            "symbol": "RoleController.read"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [
+          "shared security theme"
+        ],
+        "opportunity_type": "thematic-only",
+        "rationale": "A：SSO 以提供者邮箱全局匹配本地 User 并组装其工作区身份；B：Role.read 在返回单个 Role 前比较该对象的 organizationId 与 activeOrganizationId。两者只在资源、权限或输入边界主题相近；A 的具体结果不触及 B 的目标路径、对象或必要检查。",
+        "reviewer_id": "sampled-density-reviewer-b",
+        "source_artifact": "",
+        "source_node": "F022",
+        "target_claim": "",
+        "target_node": "F007",
+        "uncertainty_note": null
+      },
+      "sample": {
+        "inclusion_probability": 0.14204545454545456,
+        "pair_id": "sampled-opportunity-density-v1:F022:F007",
+        "sampling_weight": 7.04,
+        "selection_sha256": "127d586988f72a49796754a580ecca1b07b29ec116428b29b03f6cdb4964a371",
+        "source_node": "F022",
+        "stratum": "new_to_old",
+        "stratum_population": 176,
+        "stratum_sample": 25,
+        "target_node": "F007"
+      }
+    },
+    {
+      "reviewer_a": {
+        "bounded_check": "",
+        "confidence": "high",
+        "evidence": [],
+        "expected_effect": [],
+        "mechanisms": [],
+        "opportunity_type": "none",
+        "rationale": "源节点中，GET assistants/:id 有 assistants:view 检查且按 workspaceId 查 Assistant；目标节点中，organization-user 的 userId 查询把 readUserById 的 User 嵌入响应。两条源码路径没有共用的对象查找、调用链或可传递的验证子命题，源结果不能改变目标的具体判断或省去目标的必要检查。",
+        "reviewer_id": "sampled-density-reviewer-a",
+        "source_artifact": "",
+        "source_node": "F018",
+        "target_claim": "",
+        "target_node": "F010",
+        "uncertainty_note": null
+      },
+      "reviewer_b": {
+        "bounded_check": "",
+        "confidence": "medium",
+        "evidence": [
+          {
+            "excerpt": "checkPermission('assistants:view')",
+            "excerpt_sha256": "0147ca5e5e44a8be7755979f27b46659b554ead9c6254b2a996c1c6fae54ca9a",
+            "line": 12,
+            "path": "packages/server/src/routes/assistants/index.ts",
+            "role": "source",
+            "symbol": "router.get assistant detail"
+          },
+          {
+            "excerpt": "user.user = userDetails",
+            "excerpt_sha256": "a1511ee5eb2a769bb9ce4b5b0d58bdfbd63329e5593a5fb070d9e4ef7b135abe",
+            "line": 181,
+            "path": "packages/server/src/enterprise/services/organization-user.service.ts",
+            "role": "target",
+            "symbol": "OrganizationUserService.readOrganizationUserByUserId"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [
+          "shared security theme"
+        ],
+        "opportunity_type": "thematic-only",
+        "rationale": "A：Assistant 详情路由有 assistants:view 权限并按 activeWorkspaceId 查对象；B：organization-user 按 userId 读取组织成员并嵌入 owner 的 User 详情。两者只在资源、权限或输入边界主题相近；A 的具体结果不触及 B 的目标路径、对象或必要检查。",
+        "reviewer_id": "sampled-density-reviewer-b",
+        "source_artifact": "",
+        "source_node": "F018",
+        "target_claim": "",
+        "target_node": "F010",
+        "uncertainty_note": null
+      },
+      "sample": {
+        "inclusion_probability": 0.14204545454545456,
+        "pair_id": "sampled-opportunity-density-v1:F018:F010",
+        "sampling_weight": 7.04,
+        "selection_sha256": "267ddd8e647165022ad2c59683c23797d84766d49ca7e34190bae207242fb3f0",
+        "source_node": "F018",
+        "stratum": "new_to_old",
+        "stratum_population": 176,
+        "stratum_sample": 25,
+        "target_node": "F010"
+      }
+    },
+    {
+      "reviewer_a": {
+        "bounded_check": "",
+        "confidence": "high",
+        "evidence": [
+          {
+            "excerpt": "exportInput.assistantOpenAI === true ? await assistantsService.getAllAssistants(activeWorkspaceId, 'OPENAI') : []",
+            "excerpt_sha256": "52858f388cd3db9f89bf6244b326641f0ddb45a014fca02baf709f7d40267ab6",
+            "line": 112,
+            "path": "packages/server/src/services/export-import/index.ts",
+            "role": "source",
+            "symbol": "exportData"
+          },
+          {
+            "excerpt": "checkPermission('assistants:view')",
+            "excerpt_sha256": "0147ca5e5e44a8be7755979f27b46659b554ead9c6254b2a996c1c6fae54ca9a",
+            "line": 12,
+            "path": "packages/server/src/routes/assistants/index.ts",
+            "role": "target",
+            "symbol": "router.get assistant detail"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [
+          "shared code or invariant"
+        ],
+        "opportunity_type": "direct relation",
+        "rationale": "exportData 可按工作区导出 AssistantOpenAI，目标 GET 也读取 Assistant；变量明文导出结果不区分目标 GET 的 assistants:view 与 workspaceId guard。",
+        "reviewer_id": "sampled-density-reviewer-a",
+        "source_artifact": "",
+        "source_node": "F017",
+        "target_claim": "",
+        "target_node": "F018",
+        "uncertainty_note": null
+      },
+      "reviewer_b": {
+        "bounded_check": "",
+        "confidence": "medium",
+        "evidence": [
+          {
+            "excerpt": "Variable = 'data' in Variable ? Variable.data : Variable",
+            "excerpt_sha256": "53e2386cb1279b4f2e3f893504eeb7efd6ff1b85eb91b83115efb3bf755818f8",
+            "line": 158,
+            "path": "packages/server/src/services/export-import/index.ts",
+            "role": "source",
+            "symbol": "exportData"
+          },
+          {
+            "excerpt": "checkPermission('assistants:view')",
+            "excerpt_sha256": "0147ca5e5e44a8be7755979f27b46659b554ead9c6254b2a996c1c6fae54ca9a",
+            "line": 12,
+            "path": "packages/server/src/routes/assistants/index.ts",
+            "role": "target",
+            "symbol": "router.get assistant detail"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [
+          "shared security theme"
+        ],
+        "opportunity_type": "thematic-only",
+        "rationale": "A：workspace:export 路由把本 workspace 的 Variable 记录纳入导出响应；B：Assistant 详情路由有 assistants:view 权限并按 activeWorkspaceId 查对象。两者只在资源、权限或输入边界主题相近；A 的具体结果不触及 B 的目标路径、对象或必要检查。",
+        "reviewer_id": "sampled-density-reviewer-b",
+        "source_artifact": "",
+        "source_node": "F017",
+        "target_claim": "",
+        "target_node": "F018",
+        "uncertainty_note": null
+      },
+      "sample": {
+        "inclusion_probability": 0.14545454545454545,
+        "pair_id": "sampled-opportunity-density-v1:F017:F018",
+        "sampling_weight": 6.875,
+        "selection_sha256": "0edfc9278ee88c1444f3df8da0c3e452809d8afa800e1de2e20256c41bf36039",
+        "source_node": "F017",
+        "stratum": "new_to_new",
+        "stratum_population": 110,
+        "stratum_sample": 16,
+        "target_node": "F018"
+      }
+    },
+    {
+      "reviewer_a": {
+        "bounded_check": "",
+        "confidence": "high",
+        "evidence": [
+          {
+            "excerpt": "id: chatflowid",
+            "excerpt_sha256": "b2276a116bd2b12f4ee1aec5ffb75558a3d602dd54358f4aaa1b2191452dcd1f",
+            "line": 32,
+            "path": "packages/server/src/services/openai-realtime/index.ts",
+            "role": "source",
+            "symbol": "buildAndInitTool"
+          },
+          {
+            "excerpt": "userService.readUserByEmail(email, queryRunner)",
+            "excerpt_sha256": "de13b701abdc5bb52aaba782258f464366acc7d7fb05beedafdc37514137aeeb",
+            "line": 56,
+            "path": "packages/server/src/enterprise/sso/SSOBase.ts",
+            "role": "target",
+            "symbol": "SSOBase.getUser"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [
+          "shared topic"
+        ],
+        "opportunity_type": "thematic-only",
+        "rationale": "两端可能造成跨租户身份效果，但 API Key 的 ChatFlow 读取与 SSO 邮箱匹配是独立认证链。",
+        "reviewer_id": "sampled-density-reviewer-a",
+        "source_artifact": "",
+        "source_node": "F024",
+        "target_claim": "",
+        "target_node": "F022",
+        "uncertainty_note": null
+      },
+      "reviewer_b": {
+        "bounded_check": "",
+        "confidence": "high",
+        "evidence": [
+          {
+            "excerpt": "id: chatflowid",
+            "excerpt_sha256": "b2276a116bd2b12f4ee1aec5ffb75558a3d602dd54358f4aaa1b2191452dcd1f",
+            "line": 32,
+            "path": "packages/server/src/services/openai-realtime/index.ts",
+            "role": "source",
+            "symbol": "buildAndInitTool"
+          },
+          {
+            "excerpt": "userService.readUserByEmail(email, queryRunner)",
+            "excerpt_sha256": "de13b701abdc5bb52aaba782258f464366acc7d7fb05beedafdc37514137aeeb",
+            "line": 56,
+            "path": "packages/server/src/enterprise/sso/SSOBase.ts",
+            "role": "target",
+            "symbol": "SSOBase.getUser"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [],
+        "opportunity_type": "none",
+        "rationale": "A：openai-realtime 按全局 chatflowId 读取私有 flow 并初始化其 agent 工具；B：SSO 以提供者邮箱全局匹配本地 User 并组装其工作区身份。所见源码分别处理这些不同对象与调用链；A 的结果不能改变 B 的判断、最小验证步骤或需查找的目标代码。",
+        "reviewer_id": "sampled-density-reviewer-b",
+        "source_artifact": "",
+        "source_node": "F024",
+        "target_claim": "",
+        "target_node": "F022",
+        "uncertainty_note": null
+      },
+      "sample": {
+        "inclusion_probability": 0.14545454545454545,
+        "pair_id": "sampled-opportunity-density-v1:F024:F022",
+        "sampling_weight": 6.875,
+        "selection_sha256": "12db394f0ca6e871d9af2d57c59312d8bafe87c82df08cc74cff7cbde1d2df2b",
+        "source_node": "F024",
+        "stratum": "new_to_new",
+        "stratum_population": 110,
+        "stratum_sample": 16,
+        "target_node": "F022"
+      }
+    },
+    {
+      "reviewer_a": {
+        "bounded_check": "",
+        "confidence": "high",
+        "evidence": [
+          {
+            "excerpt": "Variable = 'data' in Variable ? Variable.data : Variable",
+            "excerpt_sha256": "53e2386cb1279b4f2e3f893504eeb7efd6ff1b85eb91b83115efb3bf755818f8",
+            "line": 158,
+            "path": "packages/server/src/services/export-import/index.ts",
+            "role": "source",
+            "symbol": "exportData"
+          },
+          {
+            "excerpt": "const variables = await getVars(appDataSource, databaseEntities, nodeData, optionsWithWorkspaceId)",
+            "excerpt_sha256": "569af2f7a538140c032e19d2ad75f58de8371b65217be4fc492fc8ebed419f3e",
+            "line": 146,
+            "path": "packages/components/nodes/tools/MCP/CustomMCP/CustomMCP.ts",
+            "role": "target",
+            "symbol": "CustomMCP.getTools"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [
+          "shared code or invariant"
+        ],
+        "opportunity_type": "direct relation",
+        "rationale": "导出的 Variable.value 与 CustomMCP 的 getVars/$vars 配置来自工作区变量；导出能见原值不区分 MCP 参数 validator 是否阻止执行。",
+        "reviewer_id": "sampled-density-reviewer-a",
+        "source_artifact": "",
+        "source_node": "F017",
+        "target_claim": "",
+        "target_node": "F026",
+        "uncertainty_note": null
+      },
+      "reviewer_b": {
+        "bounded_check": "",
+        "confidence": "medium",
+        "evidence": [
+          {
+            "excerpt": "Variable = 'data' in Variable ? Variable.data : Variable",
+            "excerpt_sha256": "53e2386cb1279b4f2e3f893504eeb7efd6ff1b85eb91b83115efb3bf755818f8",
+            "line": 158,
+            "path": "packages/server/src/services/export-import/index.ts",
+            "role": "source",
+            "symbol": "exportData"
+          },
+          {
+            "excerpt": "const allowedCommands = ['node', 'npx', 'python', 'python3', 'docker']",
+            "excerpt_sha256": "f043beef9975e36f0542cbf4ab07a684c6d881e6939b3882dbf034e774ff3302",
+            "line": 381,
+            "path": "packages/components/nodes/tools/MCP/core.ts",
+            "role": "target",
+            "symbol": "validateMCPServerConfig"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [
+          "shared security theme"
+        ],
+        "opportunity_type": "thematic-only",
+        "rationale": "A：workspace:export 路由把本 workspace 的 Variable 记录纳入导出响应；B：CustomMCP 参数验证允许 node/npx/python/docker，之后启动 MCP transport。两者只在资源、权限或输入边界主题相近；A 的具体结果不触及 B 的目标路径、对象或必要检查。",
+        "reviewer_id": "sampled-density-reviewer-b",
+        "source_artifact": "",
+        "source_node": "F017",
+        "target_claim": "",
+        "target_node": "F026",
+        "uncertainty_note": null
+      },
+      "sample": {
+        "inclusion_probability": 0.14545454545454545,
+        "pair_id": "sampled-opportunity-density-v1:F017:F026",
+        "sampling_weight": 6.875,
+        "selection_sha256": "1c9e402645e1aa26da273efed76dc0f946d196736a639c81a80bee71515b7c35",
+        "source_node": "F017",
+        "stratum": "new_to_new",
+        "stratum_population": 110,
+        "stratum_sample": 16,
+        "target_node": "F026"
+      }
+    },
+    {
+      "reviewer_a": {
+        "bounded_check": "",
+        "confidence": "high",
+        "evidence": [
+          {
+            "excerpt": "upsertHistoryController.getAllUpsertHistory",
+            "excerpt_sha256": "2fcde2e11e1e4513f9441544098ef9a6d8ed55ce8aa2ac3f94b495b1c789f893",
+            "line": 8,
+            "path": "packages/server/src/routes/upsert-history/index.ts",
+            "role": "source",
+            "symbol": "router.get/router.patch"
+          },
+          {
+            "excerpt": "userService.readUserByEmail(email, queryRunner)",
+            "excerpt_sha256": "de13b701abdc5bb52aaba782258f464366acc7d7fb05beedafdc37514137aeeb",
+            "line": 56,
+            "path": "packages/server/src/enterprise/sso/SSOBase.ts",
+            "role": "target",
+            "symbol": "SSOBase.getUser"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [
+          "shared topic"
+        ],
+        "opportunity_type": "thematic-only",
+        "rationale": "UpsertHistory 的工作区 guard 与 SSO 邮箱匹配各自独立；前者不能验证提供者邮箱是否属于本地用户。",
+        "reviewer_id": "sampled-density-reviewer-a",
+        "source_artifact": "",
+        "source_node": "F025",
+        "target_claim": "",
+        "target_node": "F022",
+        "uncertainty_note": null
+      },
+      "reviewer_b": {
+        "bounded_check": "",
+        "confidence": "high",
+        "evidence": [
+          {
+            "excerpt": "upsertHistoryController.getAllUpsertHistory",
+            "excerpt_sha256": "2fcde2e11e1e4513f9441544098ef9a6d8ed55ce8aa2ac3f94b495b1c789f893",
+            "line": 8,
+            "path": "packages/server/src/routes/upsert-history/index.ts",
+            "role": "source",
+            "symbol": "router.get/router.patch"
+          },
+          {
+            "excerpt": "userService.readUserByEmail(email, queryRunner)",
+            "excerpt_sha256": "de13b701abdc5bb52aaba782258f464366acc7d7fb05beedafdc37514137aeeb",
+            "line": 56,
+            "path": "packages/server/src/enterprise/sso/SSOBase.ts",
+            "role": "target",
+            "symbol": "SSOBase.getUser"
+          }
+        ],
+        "expected_effect": [],
+        "mechanisms": [],
+        "opportunity_type": "none",
+        "rationale": "A：upsert-history GET/PATCH 先校验 ChatFlow 工作区再读删记录；B：SSO 以提供者邮箱全局匹配本地 User 并组装其工作区身份。所见源码分别处理这些不同对象与调用链；A 的结果不能改变 B 的判断、最小验证步骤或需查找的目标代码。",
+        "reviewer_id": "sampled-density-reviewer-b",
+        "source_artifact": "",
+        "source_node": "F025",
+        "target_claim": "",
+        "target_node": "F022",
+        "uncertainty_note": null
+      },
+      "sample": {
+        "inclusion_probability": 0.14545454545454545,
+        "pair_id": "sampled-opportunity-density-v1:F025:F022",
+        "sampling_weight": 6.875,
+        "selection_sha256": "2be3da029dddec9df2e8717cfc7cd742db1e37fe45b2b66ad903122aa7e3d197",
+        "source_node": "F025",
+        "stratum": "new_to_new",
+        "stratum_population": 110,
+        "stratum_sample": 16,
+        "target_node": "F022"
+      }
+    }
+  ],
+  "qc_report_sha256": "4b00ba95a7b2ac4e5b8f1d475143a26fc88489f6047187e6419dfe3e5db2e78a",
+  "status": "disagreement_only_input"
+}

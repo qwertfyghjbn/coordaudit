@@ -1,0 +1,98 @@
+{
+  "conservative_simultaneous_hypergeometric_95_count_interval": [
+    9,
+    183
+  ],
+  "conservative_simultaneous_hypergeometric_95_density_interval": [
+    0.01282051282051282,
+    0.2606837606837607
+  ],
+  "design_based_normal_95_interval": [
+    0.016930775354433145,
+    0.10315553267305136
+  ],
+  "design_based_standard_error": 0.021996111560871993,
+  "estimated_benchmark_actionable_pair_count": 42.150294117647064,
+  "estimated_count_95_interval": [
+    11.885404298812068,
+    72.41518393648205
+  ],
+  "exact_interval_method": "Invert each stratum's finite-population hypergeometric tails at 0.05/(2*4), then sum integer success-count bounds; Bonferroni gives at least 95% simultaneous coverage, often wide.",
+  "final_sample_labels_sha256": "9e82c5bd85155511d85607f38abbc2cdaaeab6db08492c1ec28707110bfaeee8",
+  "interval_caveat": "Finite-population stratified normal approximation; sparse positives can make coverage imperfect.",
+  "not_exact_full_graph_density": true,
+  "qc_report_sha256": "4b00ba95a7b2ac4e5b8f1d475143a26fc88489f6047187e6419dfe3e5db2e78a",
+  "raw_denominator": 100,
+  "raw_numerator": 6,
+  "raw_unweighted_fraction_descriptive_only": 0.06,
+  "sampled_actionable_count": 6,
+  "status": "sampled_density_estimate",
+  "strata": {
+    "new_to_new": {
+      "actionable_count": 1,
+      "density": 0.0625,
+      "estimated_actionable_count": 6.875,
+      "exact_finite_population_98_75_count_interval": [
+        1,
+        38
+      ],
+      "population": 110,
+      "population_weight": 0.15669515669515668,
+      "sample": 16,
+      "sampling_weight": 6.875,
+      "uncertain_count": 0
+    },
+    "new_to_old": {
+      "actionable_count": 1,
+      "density": 0.04,
+      "estimated_actionable_count": 7.04,
+      "exact_finite_population_98_75_count_interval": [
+        1,
+        42
+      ],
+      "population": 176,
+      "population_weight": 0.25071225071225073,
+      "sample": 25,
+      "sampling_weight": 7.04,
+      "uncertain_count": 0
+    },
+    "old_to_new": {
+      "actionable_count": 0,
+      "density": 0.0,
+      "estimated_actionable_count": 0.0,
+      "exact_finite_population_98_75_count_interval": [
+        0,
+        30
+      ],
+      "population": 176,
+      "population_weight": 0.25071225071225073,
+      "sample": 25,
+      "sampling_weight": 7.04,
+      "uncertain_count": 0
+    },
+    "old_to_old": {
+      "actionable_count": 4,
+      "density": 0.11764705882352941,
+      "estimated_actionable_count": 28.235294117647058,
+      "exact_finite_population_98_75_count_interval": [
+        7,
+        73
+      ],
+      "population": 240,
+      "population_weight": 0.3418803418803419,
+      "sample": 34,
+      "sampling_weight": 7.0588235294117645,
+      "uncertain_count": 0
+    }
+  },
+  "uncertain_pair_count": 0,
+  "uncertainty_sensitivity_count_bounds": [
+    42.150294117647064,
+    42.150294117647064
+  ],
+  "uncertainty_sensitivity_density_bounds": [
+    0.06004315401374225,
+    0.06004315401374225
+  ],
+  "weighted_actionable_density": 0.06004315401374225
+}

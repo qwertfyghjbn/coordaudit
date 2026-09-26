@@ -1,0 +1,2583 @@
+{
+  "case_id": "flowise_3_1_3_repository_v1",
+  "directed_pairs": [
+    {
+      "source_node": "F016",
+      "target_node": "F002"
+    },
+    {
+      "source_node": "F003",
+      "target_node": "F010"
+    },
+    {
+      "source_node": "F007",
+      "target_node": "F010"
+    },
+    {
+      "source_node": "F011",
+      "target_node": "F010"
+    },
+    {
+      "source_node": "F016",
+      "target_node": "F013"
+    },
+    {
+      "source_node": "F004",
+      "target_node": "F012"
+    },
+    {
+      "source_node": "F011",
+      "target_node": "F012"
+    },
+    {
+      "source_node": "F008",
+      "target_node": "F009"
+    },
+    {
+      "source_node": "F009",
+      "target_node": "F003"
+    },
+    {
+      "source_node": "F008",
+      "target_node": "F003"
+    },
+    {
+      "source_node": "F004",
+      "target_node": "F014"
+    },
+    {
+      "source_node": "F003",
+      "target_node": "F005"
+    },
+    {
+      "source_node": "F008",
+      "target_node": "F002"
+    },
+    {
+      "source_node": "F012",
+      "target_node": "F006"
+    },
+    {
+      "source_node": "F001",
+      "target_node": "F006"
+    },
+    {
+      "source_node": "F003",
+      "target_node": "F008"
+    },
+    {
+      "source_node": "F010",
+      "target_node": "F012"
+    },
+    {
+      "source_node": "F002",
+      "target_node": "F015"
+    },
+    {
+      "source_node": "F008",
+      "target_node": "F015"
+    },
+    {
+      "source_node": "F003",
+      "target_node": "F013"
+    },
+    {
+      "source_node": "F005",
+      "target_node": "F009"
+    },
+    {
+      "source_node": "F003",
+      "target_node": "F009"
+    },
+    {
+      "source_node": "F015",
+      "target_node": "F014"
+    },
+    {
+      "source_node": "F004",
+      "target_node": "F003"
+    },
+    {
+      "source_node": "F016",
+      "target_node": "F012"
+    },
+    {
+      "source_node": "F002",
+      "target_node": "F009"
+    },
+    {
+      "source_node": "F005",
+      "target_node": "F013"
+    },
+    {
+      "source_node": "F005",
+      "target_node": "F014"
+    },
+    {
+      "source_node": "F001",
+      "target_node": "F009"
+    },
+    {
+      "source_node": "F008",
+      "target_node": "F013"
+    },
+    {
+      "source_node": "F006",
+      "target_node": "F004"
+    },
+    {
+      "source_node": "F002",
+      "target_node": "F006"
+    },
+    {
+      "source_node": "F010",
+      "target_node": "F015"
+    },
+    {
+      "source_node": "F014",
+      "target_node": "F003"
+    },
+    {
+      "source_node": "F007",
+      "target_node": "F024"
+    },
+    {
+      "source_node": "F010",
+      "target_node": "F019"
+    },
+    {
+      "source_node": "F009",
+      "target_node": "F022"
+    },
+    {
+      "source_node": "F014",
+      "target_node": "F019"
+    },
+    {
+      "source_node": "F005",
+      "target_node": "F020"
+    },
+    {
+      "source_node": "F014",
+      "target_node": "F027"
+    },
+    {
+      "source_node": "F005",
+      "target_node": "F025"
+    },
+    {
+      "source_node": "F007",
+      "target_node": "F026"
+    },
+    {
+      "source_node": "F007",
+      "target_node": "F018"
+    },
+    {
+      "source_node": "F016",
+      "target_node": "F023"
+    },
+    {
+      "source_node": "F003",
+      "target_node": "F024"
+    },
+    {
+      "source_node": "F012",
+      "target_node": "F021"
+    },
+    {
+      "source_node": "F002",
+      "target_node": "F022"
+    },
+    {
+      "source_node": "F002",
+      "target_node": "F019"
+    },
+    {
+      "source_node": "F013",
+      "target_node": "F024"
+    },
+    {
+      "source_node": "F013",
+      "target_node": "F019"
+    },
+    {
+      "source_node": "F007",
+      "target_node": "F022"
+    },
+    {
+      "source_node": "F002",
+      "target_node": "F025"
+    },
+    {
+      "source_node": "F015",
+      "target_node": "F027"
+    },
+    {
+      "source_node": "F007",
+      "target_node": "F021"
+    },
+    {
+      "source_node": "F013",
+      "target_node": "F025"
+    },
+    {
+      "source_node": "F003",
+      "target_node": "F021"
+    },
+    {
+      "source_node": "F016",
+      "target_node": "F026"
+    },
+    {
+      "source_node": "F008",
+      "target_node": "F023"
+    },
+    {
+      "source_node": "F015",
+      "target_node": "F018"
+    },
+    {
+      "source_node": "F023",
+      "target_node": "F004"
+    },
+    {
+      "source_node": "F021",
+      "target_node": "F008"
+    },
+    {
+      "source_node": "F027",
+      "target_node": "F006"
+    },
+    {
+      "source_node": "F027",
+      "target_node": "F001"
+    },
+    {
+      "source_node": "F023",
+      "target_node": "F003"
+    },
+    {
+      "source_node": "F022",
+      "target_node": "F010"
+    },
+    {
+      "source_node": "F024",
+      "target_node": "F011"
+    },
+    {
+      "source_node": "F022",
+      "target_node": "F009"
+    },
+    {
+      "source_node": "F022",
+      "target_node": "F016"
+    },
+    {
+      "source_node": "F025",
+      "target_node": "F009"
+    },
+    {
+      "source_node": "F022",
+      "target_node": "F007"
+    },
+    {
+      "source_node": "F025",
+      "target_node": "F016"
+    },
+    {
+      "source_node": "F021",
+      "target_node": "F007"
+    },
+    {
+      "source_node": "F023",
+      "target_node": "F015"
+    },
+    {
+      "source_node": "F027",
+      "target_node": "F012"
+    },
+    {
+      "source_node": "F020",
+      "target_node": "F011"
+    },
+    {
+      "source_node": "F026",
+      "target_node": "F008"
+    },
+    {
+      "source_node": "F022",
+      "target_node": "F015"
+    },
+    {
+      "source_node": "F026",
+      "target_node": "F007"
+    },
+    {
+      "source_node": "F021",
+      "target_node": "F013"
+    },
+    {
+      "source_node": "F027",
+      "target_node": "F010"
+    },
+    {
+      "source_node": "F026",
+      "target_node": "F002"
+    },
+    {
+      "source_node": "F019",
+      "target_node": "F008"
+    },
+    {
+      "source_node": "F027",
+      "target_node": "F011"
+    },
+    {
+      "source_node": "F018",
+      "target_node": "F010"
+    },
+    {
+      "source_node": "F027",
+      "target_node": "F023"
+    },
+    {
+      "source_node": "F026",
+      "target_node": "F020"
+    },
+    {
+      "source_node": "F023",
+      "target_node": "F021"
+    },
+    {
+      "source_node": "F017",
+      "target_node": "F018"
+    },
+    {
+      "source_node": "F026",
+      "target_node": "F024"
+    },
+    {
+      "source_node": "F024",
+      "target_node": "F022"
+    },
+    {
+      "source_node": "F018",
+      "target_node": "F025"
+    },
+    {
+      "source_node": "F019",
+      "target_node": "F017"
+    },
+    {
+      "source_node": "F017",
+      "target_node": "F019"
+    },
+    {
+      "source_node": "F021",
+      "target_node": "F019"
+    },
+    {
+      "source_node": "F026",
+      "target_node": "F023"
+    },
+    {
+      "source_node": "F017",
+      "target_node": "F026"
+    },
+    {
+      "source_node": "F021",
+      "target_node": "F025"
+    },
+    {
+      "source_node": "F027",
+      "target_node": "F025"
+    },
+    {
+      "source_node": "F025",
+      "target_node": "F022"
+    },
+    {
+      "source_node": "F019",
+      "target_node": "F021"
+    }
+  ],
+  "node_set_version": "expansion-node-set-v2",
+  "nodes": [
+    {
+      "code_scope": [
+        "packages/components/src/utils.ts",
+        "packages/components/nodes/llms/OpenAI/OpenAI.ts"
+      ],
+      "evidence_refs": [
+        {
+          "excerpt": "id: selectedCredentialId",
+          "excerpt_sha256": "d13cc64c6323cbdeaca5e9dca5b3db3f896ee00c5ba6795b5ecad90d67decf44",
+          "line": 661,
+          "path": "packages/components/src/utils.ts",
+          "role": "gt_anchor",
+          "symbol": "getCredentialData"
+        },
+        {
+          "excerpt": "const credentialData = await getCredentialData(nodeData.credential ?? '', options)",
+          "excerpt_sha256": "91ac3b1cedacf0b964a37f64993d56ad6f4685db15db9ef1060933a001e22b6c",
+          "line": 157,
+          "path": "packages/components/nodes/llms/OpenAI/OpenAI.ts",
+          "role": "source",
+          "symbol": "OpenAI_LLMs.init"
+        },
+        {
+          "excerpt": "export const getCredentialData = async (selectedCredentialId: string, options: ICommonObject): Promise<ICommonObject> => {",
+          "excerpt_sha256": "f29a4bfdd1499f387ccb6c26f5c3486f298ca008a54e815ccdc7d36d557e821a",
+          "line": 651,
+          "path": "packages/components/src/utils.ts",
+          "role": "work_front",
+          "symbol": "getCredentialData"
+        },
+        {
+          "excerpt": "const credential = await appDataSource.getRepository(databaseEntities['Credential']).findOneBy({",
+          "excerpt_sha256": "540caffbaa996fa5f7ca71885343296ce56f6e87f258adc71c6fa02b6706966b",
+          "line": 660,
+          "path": "packages/components/src/utils.ts",
+          "role": "lookup",
+          "symbol": "getCredentialData"
+        },
+        {
+          "excerpt": "id: selectedCredentialId",
+          "excerpt_sha256": "d13cc64c6323cbdeaca5e9dca5b3db3f896ee00c5ba6795b5ecad90d67decf44",
+          "line": 661,
+          "path": "packages/components/src/utils.ts",
+          "role": "guard_question",
+          "symbol": "getCredentialData"
+        },
+        {
+          "excerpt": "const decryptedCredentialData = await decryptCredentialData(credential.encryptedData)",
+          "excerpt_sha256": "35900892b53b2adb68e506860435f0f69673e8c8ac7e851a3be8c5ee9e3d9043",
+          "line": 667,
+          "path": "packages/components/src/utils.ts",
+          "role": "sink",
+          "symbol": "getCredentialData"
+        },
+        {
+          "excerpt": "return decryptedCredentialData",
+          "excerpt_sha256": "30a74dc5aa1dc0d33350ceb5b2827af139caa0930f45cc9030193b94ab776e4b",
+          "line": 669,
+          "path": "packages/components/src/utils.ts",
+          "role": "result",
+          "symbol": "getCredentialData"
+        },
+        {
+          "excerpt": "workspaceId: workspaceId",
+          "excerpt_sha256": "469c0b7eaf09ea93f3ef0d9dcbdf92db7fe416b6f3f9add847db4f23a97a3579",
+          "line": 132,
+          "path": "packages/server/src/services/credentials/index.ts",
+          "role": "narrow_safe_contrast",
+          "symbol": "getCredentialById"
+        }
+      ],
+      "invariant": "从组件调用点取出的 Credential 必须与允许该调用的 workspace/共享关系匹配。",
+      "node_id": "F001",
+      "potential_artifact": "getCredentialData 仅按 ID 查 Credential 并解密；记录调用点是否已经验证 ID 归属。",
+      "security_question": "组件执行以 nodeData.credential 选择 Credential 时，通用 getCredentialData 是否把查询限制在调用者的 workspace？"
+    },
+    {
+      "code_scope": [
+        "packages/server/src/services/openai-assistants/index.ts",
+        "packages/server/src/routes/openai-assistants/index.ts",
+        "packages/server/src/controllers/openai-assistants/index.ts",
+        "packages/server/src/routes/openai-assistants-files/index.ts"
+      ],
+      "evidence_refs": [
+        {
+          "excerpt": "id: credentialId",
+          "excerpt_sha256": "e0b67eb47285c6f2af0bd4798fbbd135a223c99cb867be79a31bbac277c170f9",
+          "line": 19,
+          "path": "packages/server/src/services/openai-assistants/index.ts",
+          "role": "gt_anchor",
+          "symbol": "getAll/getSingle/upload"
+        },
+        {
+          "excerpt": "router.get('/', checkPermission('assistants:view'), openaiAssistantsController.getAllOpenaiAssistants)",
+          "excerpt_sha256": "c02a1b836a21191eddf69af52a37a651f8da319f86d5186a383c7c1a9b5484b4",
+          "line": 10,
+          "path": "packages/server/src/routes/openai-assistants/index.ts",
+          "role": "entry",
+          "symbol": "router.get /openai-assistants"
+        },
+        {
+          "excerpt": "const apiResponse = await openaiAssistantsService.getAllOpenaiAssistants(req.query.credential as string)",
+          "excerpt_sha256": "b9018c192319b41092507065ceef38a2ea5303d509d3886be546af0e2ba885a7",
+          "line": 22,
+          "path": "packages/server/src/controllers/openai-assistants/index.ts",
+          "role": "source",
+          "symbol": "getAllOpenaiAssistants"
+        },
+        {
+          "excerpt": "const credential = await appServer.AppDataSource.getRepository(Credential).findOneBy({",
+          "excerpt_sha256": "3e1b4f26f0d719b219d1085d28fbb421d5579dabd661e172c1e3915951c6c582",
+          "line": 18,
+          "path": "packages/server/src/services/openai-assistants/index.ts",
+          "role": "lookup",
+          "symbol": "getAllOpenaiAssistants"
+        },
+        {
+          "excerpt": "id: credentialId",
+          "excerpt_sha256": "e0b67eb47285c6f2af0bd4798fbbd135a223c99cb867be79a31bbac277c170f9",
+          "line": 19,
+          "path": "packages/server/src/services/openai-assistants/index.ts",
+          "role": "guard_question",
+          "symbol": "getAllOpenaiAssistants"
+        },
+        {
+          "excerpt": "const decryptedCredentialData = await decryptCredentialData(credential.encryptedData)",
+          "excerpt_sha256": "35900892b53b2adb68e506860435f0f69673e8c8ac7e851a3be8c5ee9e3d9043",
+          "line": 25,
+          "path": "packages/server/src/services/openai-assistants/index.ts",
+          "role": "secret_use",
+          "symbol": "getAllOpenaiAssistants"
+        },
+        {
+          "excerpt": "const retrievedAssistants = await openai.beta.assistants.list()",
+          "excerpt_sha256": "768c4ed62c41d04da21e662f163e603cdaf6b38ae168d1bb62c82eda6539fe02",
+          "line": 31,
+          "path": "packages/server/src/services/openai-assistants/index.ts",
+          "role": "sink",
+          "symbol": "getAllOpenaiAssistants"
+        },
+        {
+          "excerpt": "id: credentialId",
+          "excerpt_sha256": "e0b67eb47285c6f2af0bd4798fbbd135a223c99cb867be79a31bbac277c170f9",
+          "line": 47,
+          "path": "packages/server/src/services/openai-assistants/index.ts",
+          "role": "variant",
+          "symbol": "getSingleOpenaiAssistant"
+        },
+        {
+          "excerpt": "router.post('/upload/', getMulterStorage().array('files'), openaiAssistantsController.uploadAssistantFiles)",
+          "excerpt_sha256": "e69121cb87ce97b5e7e6d9f206d46f49bf781b95d3fea9bf2d1c3f8fca370c45",
+          "line": 8,
+          "path": "packages/server/src/routes/openai-assistants-files/index.ts",
+          "role": "variant_entry",
+          "symbol": "router.post /upload"
+        },
+        {
+          "excerpt": "id: credentialId",
+          "excerpt_sha256": "e0b67eb47285c6f2af0bd4798fbbd135a223c99cb867be79a31bbac277c170f9",
+          "line": 88,
+          "path": "packages/server/src/services/openai-assistants/index.ts",
+          "role": "variant",
+          "symbol": "uploadFilesToAssistant"
+        },
+        {
+          "excerpt": "const createdFile = await openai.files.create({",
+          "excerpt_sha256": "9ae8be85844b2da3a736df62eceb8a80cde837baeda0758db2d7f584b09fa83c",
+          "line": 106,
+          "path": "packages/server/src/services/openai-assistants/index.ts",
+          "role": "variant_sink",
+          "symbol": "uploadFilesToAssistant"
+        },
+        {
+          "excerpt": "workspaceId: workspaceId",
+          "excerpt_sha256": "469c0b7eaf09ea93f3ef0d9dcbdf92db7fe416b6f3f9add847db4f23a97a3579",
+          "line": 132,
+          "path": "packages/server/src/services/credentials/index.ts",
+          "role": "narrow_safe_contrast",
+          "symbol": "getCredentialById"
+        }
+      ],
+      "invariant": "具有 assistants 权限的请求只能使用其 workspace 获授权的 Credential。",
+      "node_id": "F002",
+      "potential_artifact": "三个服务路径均按 credential ID 单独查询、解密并以 openAIApiKey 构造 OpenAI 客户端；记录每个入口的权限和 workspace 传播。",
+      "security_question": "OpenAI Assistant 列表、单项读取或文件上传服务是否以请求中的 credential ID 使用非当前 workspace 的 OpenAI API key？"
+    },
+    {
+      "code_scope": [
+        "packages/server/src/services/assistants/index.ts",
+        "packages/server/src/routes/assistants/index.ts",
+        "packages/server/src/controllers/assistants/index.ts",
+        "packages/server/src/routes/export-import/index.ts",
+        "packages/server/src/controllers/export-import/index.ts",
+        "packages/server/src/services/export-import/index.ts"
+      ],
+      "evidence_refs": [
+        {
+          "excerpt": "id: assistant.credential",
+          "excerpt_sha256": "7a8cef0f73dd4b6cba215e216c7621915239bcd5f091fa984acdb53e627bc705",
+          "line": 186,
+          "path": "packages/server/src/services/assistants/index.ts",
+          "role": "gt_anchor",
+          "symbol": "deleteAssistant"
+        },
+        {
+          "excerpt": "router.delete(['/', '/:id'], checkPermission('assistants:delete'), assistantsController.deleteAssistant)",
+          "excerpt_sha256": "d0c3db64a443069384d3ddf1e912dfbe37543e676f5fae9966c7f5f3da8c60e5",
+          "line": 18,
+          "path": "packages/server/src/routes/assistants/index.ts",
+          "role": "entry",
+          "symbol": "router.delete /assistants"
+        },
+        {
+          "excerpt": "const apiResponse = await assistantsService.deleteAssistant(req.params.id, req.query.isDeleteBoth, workspaceId)",
+          "excerpt_sha256": "2bbeee0f9ff18f9b6d8e27059ee53ce11e5d3b826af3e8504b914076d05c6109",
+          "line": 61,
+          "path": "packages/server/src/controllers/assistants/index.ts",
+          "role": "source",
+          "symbol": "deleteAssistant"
+        },
+        {
+          "excerpt": "workspaceId: workspaceId",
+          "excerpt_sha256": "469c0b7eaf09ea93f3ef0d9dcbdf92db7fe416b6f3f9add847db4f23a97a3579",
+          "line": 174,
+          "path": "packages/server/src/services/assistants/index.ts",
+          "role": "guard",
+          "symbol": "deleteAssistant"
+        },
+        {
+          "excerpt": "if (assistant.type === 'CUSTOM') {",
+          "excerpt_sha256": "0cad510ad2ba321f2a483c26d7f07368526d6de482d333b4b9afd2afcf1f89fd",
+          "line": 179,
+          "path": "packages/server/src/services/assistants/index.ts",
+          "role": "branch_limit",
+          "symbol": "deleteAssistant"
+        },
+        {
+          "excerpt": "id: assistant.credential",
+          "excerpt_sha256": "7a8cef0f73dd4b6cba215e216c7621915239bcd5f091fa984acdb53e627bc705",
+          "line": 186,
+          "path": "packages/server/src/services/assistants/index.ts",
+          "role": "guard_question",
+          "symbol": "deleteAssistant"
+        },
+        {
+          "excerpt": "const decryptedCredentialData = await decryptCredentialData(credential.encryptedData)",
+          "excerpt_sha256": "35900892b53b2adb68e506860435f0f69673e8c8ac7e851a3be8c5ee9e3d9043",
+          "line": 194,
+          "path": "packages/server/src/services/assistants/index.ts",
+          "role": "secret_use",
+          "symbol": "deleteAssistant"
+        },
+        {
+          "excerpt": "if (isDeleteBoth) await openai.beta.assistants.delete(assistantDetails.id)",
+          "excerpt_sha256": "7cd97eac5092b6b2a84e43092771a01dbc63223815a5cccbb418726e9625899c",
+          "line": 202,
+          "path": "packages/server/src/services/assistants/index.ts",
+          "role": "sink",
+          "symbol": "deleteAssistant"
+        },
+        {
+          "excerpt": "workspaceId: workspaceId",
+          "excerpt_sha256": "469c0b7eaf09ea93f3ef0d9dcbdf92db7fe416b6f3f9add847db4f23a97a3579",
+          "line": 59,
+          "path": "packages/server/src/services/assistants/index.ts",
+          "role": "counterevidence",
+          "symbol": "createAssistant"
+        },
+        {
+          "excerpt": "workspaceId: workspaceId",
+          "excerpt_sha256": "469c0b7eaf09ea93f3ef0d9dcbdf92db7fe416b6f3f9add847db4f23a97a3579",
+          "line": 334,
+          "path": "packages/server/src/services/assistants/index.ts",
+          "role": "counterevidence",
+          "symbol": "updateAssistant"
+        },
+        {
+          "excerpt": "router.post('/import', checkPermission('workspace:import'), exportImportController.importData)",
+          "excerpt_sha256": "be8fc2275fc6470cae83e2a7a1050a9dd73de13705035295c9571d4a3f132a0b",
+          "line": 10,
+          "path": "packages/server/src/routes/export-import/index.ts",
+          "role": "alternate_entry",
+          "symbol": "router.post /import"
+        },
+        {
+          "excerpt": "const importData = req.body",
+          "excerpt_sha256": "9c6905ff9d191b9f9ccd2c2caae02f14a33ff42b586b7bec7e975fd7bc20bb77",
+          "line": 40,
+          "path": "packages/server/src/controllers/export-import/index.ts",
+          "role": "alternate_source",
+          "symbol": "importData"
+        },
+        {
+          "excerpt": "item.workspaceId = activeWorkspaceId",
+          "excerpt_sha256": "ea4d843247a31abe4f4240d97e8fd1f4abe3c6a33fcec979544121a747a9b72b",
+          "line": 609,
+          "path": "packages/server/src/services/export-import/index.ts",
+          "role": "workspace_rewrite",
+          "symbol": "insertWorkspaceId"
+        },
+        {
+          "excerpt": "if (importData.AssistantOpenAI.length > 0) {",
+          "excerpt_sha256": "a18d1e5892d770d967f626c93b356e49de939146d05f03bea7ed3cf85a2c48dd",
+          "line": 696,
+          "path": "packages/server/src/services/export-import/index.ts",
+          "role": "alternate_branch",
+          "symbol": "importData"
+        },
+        {
+          "excerpt": "importData.AssistantOpenAI = insertWorkspaceId(importData.AssistantOpenAI, activeWorkspaceId)",
+          "excerpt_sha256": "d3b3b7eafff7e57d3a5202618c67450ab3c44b8119fc93b1a043a207295c5c27",
+          "line": 697,
+          "path": "packages/server/src/services/export-import/index.ts",
+          "role": "alternate_guard_question",
+          "symbol": "importData"
+        },
+        {
+          "excerpt": "if (importData.AssistantOpenAI.length > 0) await queryRunner.manager.save(Assistant, importData.AssistantOpenAI)",
+          "excerpt_sha256": "1f8749a069064ce57f8c653c7d817dd3600f0e4b2b446070e180097bd7e6111c",
+          "line": 775,
+          "path": "packages/server/src/services/export-import/index.ts",
+          "role": "alternate_persistence",
+          "symbol": "importData"
+        },
+        {
+          "excerpt": "workspaceId: workspaceId",
+          "excerpt_sha256": "469c0b7eaf09ea93f3ef0d9dcbdf92db7fe416b6f3f9add847db4f23a97a3579",
+          "line": 132,
+          "path": "packages/server/src/services/credentials/index.ts",
+          "role": "narrow_safe_contrast",
+          "symbol": "getCredentialById"
+        }
+      ],
+      "invariant": "删除一个 workspace 的 Assistant 不能使用不属于该 workspace 的 Credential。",
+      "node_id": "F003",
+      "potential_artifact": "Assistant 删除查询含 workspaceId，后续 Credential 查询仅用 assistant.credential；常规创建/更新校验 Credential workspace，但导入分支从请求体接收非 CUSTOM Assistant，改写 Assistant.workspaceId 后保存，所见路径没有核对 credential 指针归属。",
+      "security_question": "删除本 workspace 的非 CUSTOM Assistant 时，对其存储的 credential ID 的再次查询是否可能使用外 workspace 的密钥？"
+    },
+    {
+      "code_scope": [
+        "packages/server/src/controllers/text-to-speech/index.ts",
+        "packages/server/src/utils/constants.ts",
+        "packages/server/src/routes/text-to-speech/index.ts",
+        "packages/server/src/services/chatflows/index.ts",
+        "packages/components/src/textToSpeech.ts",
+        "packages/server/src/utils/XSS.ts"
+      ],
+      "evidence_refs": [
+        {
+          "excerpt": "chatflow = await chatflowsService.getChatflowById(chatflowId)",
+          "excerpt_sha256": "618a423410a74b1022187153d69408feaa1673da80b8a758ff046fe5d2424303",
+          "line": 40,
+          "path": "packages/server/src/controllers/text-to-speech/index.ts",
+          "role": "gt_anchor",
+          "symbol": "generateTextToSpeech"
+        },
+        {
+          "excerpt": "'/api/v1/text-to-speech/generate',",
+          "excerpt_sha256": "0fcbda29c2f56c08ad9bda72509f965f5afe11f2455c8cbdff259e460528929d",
+          "line": 44,
+          "path": "packages/server/src/utils/constants.ts",
+          "role": "entry_policy",
+          "symbol": "WHITELIST_URLS"
+        },
+        {
+          "excerpt": "router.post('/generate', textToSpeechController.generateTextToSpeech)",
+          "excerpt_sha256": "ac4a5bf5d2e2f82672258d090fa8d889aa7f5902cc650656ad3186a72aae194f",
+          "line": 6,
+          "path": "packages/server/src/routes/text-to-speech/index.ts",
+          "role": "entry",
+          "symbol": "router.post /generate"
+        },
+        {
+          "excerpt": "chatflow = await chatflowsService.getChatflowById(chatflowId)",
+          "excerpt_sha256": "618a423410a74b1022187153d69408feaa1673da80b8a758ff046fe5d2424303",
+          "line": 40,
+          "path": "packages/server/src/controllers/text-to-speech/index.ts",
+          "role": "lookup",
+          "symbol": "generateTextToSpeech"
+        },
+        {
+          "excerpt": "...(workspaceId ? { workspaceId } : {})",
+          "excerpt_sha256": "45934faf7a1d6998c4b85965ff1b178ca3550c6e212028742ab5239a1cbbe62d",
+          "line": 289,
+          "path": "packages/server/src/services/chatflows/index.ts",
+          "role": "guard_question",
+          "symbol": "getChatflowById"
+        },
+        {
+          "excerpt": "const ttsConfig = JSON.parse(chatflow.textToSpeech)",
+          "excerpt_sha256": "4a64f1098072e4c9fdbbe2e3037d5cec3b06ee27297b575d9912641af6a2a24b",
+          "line": 51,
+          "path": "packages/server/src/controllers/text-to-speech/index.ts",
+          "role": "config_read",
+          "symbol": "generateTextToSpeech"
+        },
+        {
+          "excerpt": "credentialId = providerConfig.credentialId",
+          "excerpt_sha256": "2e31ff0460e8b6d1590cdc0c27de3571fbc88f6c633d113828ae7fbbcc589102",
+          "line": 64,
+          "path": "packages/server/src/controllers/text-to-speech/index.ts",
+          "role": "source_secret_id",
+          "symbol": "generateTextToSpeech"
+        },
+        {
+          "excerpt": "await convertTextToSpeechStream(",
+          "excerpt_sha256": "c5b1fcbbdc536935ffba1c7fbecbb03f2cb902b6f28386d01ce0f12d4a38270d",
+          "line": 115,
+          "path": "packages/server/src/controllers/text-to-speech/index.ts",
+          "role": "handoff",
+          "symbol": "generateTextToSpeech"
+        },
+        {
+          "excerpt": "const credentialData = await getCredentialData(credentialId ?? '', options)",
+          "excerpt_sha256": "a48096da22e27bf882c2abd869c743fc3ed7dd3786da4821ede54f81e566832b",
+          "line": 34,
+          "path": "packages/components/src/textToSpeech.ts",
+          "role": "secret_use",
+          "symbol": "convertTextToSpeechStream"
+        },
+        {
+          "excerpt": "const response = await openai.audio.speech.create(",
+          "excerpt_sha256": "1a7ad9487cd697d605fd7a1ca1ddb1de4746556b17318306d2dbf9250797971e",
+          "line": 44,
+          "path": "packages/components/src/textToSpeech.ts",
+          "role": "sink",
+          "symbol": "convertTextToSpeechStream"
+        },
+        {
+          "excerpt": "if (!originLc) return originCallback(null, true)",
+          "excerpt_sha256": "ea31ef4df4a250a2b7d520d9de0968c1388b3514de264b5e73573941d9118c60",
+          "line": 98,
+          "path": "packages/server/src/utils/XSS.ts",
+          "role": "scope_limit",
+          "symbol": "getCorsOptions"
+        },
+        {
+          "excerpt": "return getChatflowById(chatflowId, workspaceId)",
+          "excerpt_sha256": "c707d9429a8da8020def438e6dc1e6ca8a7c17f69baffe63081898af5903411d",
+          "line": 312,
+          "path": "packages/server/src/services/chatflows/index.ts",
+          "role": "narrow_safe_contrast",
+          "symbol": "getChatflowByIdForWorkspace"
+        }
+      ],
+      "invariant": "未获授权的请求不能通过 TTS 入口使用私有 chatflow 的配置或凭据。",
+      "node_id": "F004",
+      "potential_artifact": "白名单 generate 入口在无用户 workspace 时按 chatflowId 非限定查询，再取 textToSpeech.credentialId 交给组件 TTS。",
+      "security_question": "无用户 workspace 的 TTS generate 请求能否凭私有 chatflowId 读取其 TTS 配置并使用所存 Credential？"
+    },
+    {
+      "code_scope": [
+        "packages/server/src/services/credentials/index.ts",
+        "packages/server/src/routes/credentials/index.ts",
+        "packages/server/src/controllers/credentials/index.ts"
+      ],
+      "evidence_refs": [
+        {
+          "excerpt": "workspaceId: workspaceId",
+          "excerpt_sha256": "469c0b7eaf09ea93f3ef0d9dcbdf92db7fe416b6f3f9add847db4f23a97a3579",
+          "line": 132,
+          "path": "packages/server/src/services/credentials/index.ts",
+          "role": "gt_anchor",
+          "symbol": "getCredentialById"
+        },
+        {
+          "excerpt": "router.get(['/', '/:id'], checkAnyPermission('credentials:create,credentials:update'), credentialsController.getCredentialById)",
+          "excerpt_sha256": "dc75b6014462db8b60e20bc5aae42f93e2e5102a487fc98b9b4f81b37e3e908d",
+          "line": 11,
+          "path": "packages/server/src/routes/credentials/index.ts",
+          "role": "entry",
+          "symbol": "router.get /credentials/:id"
+        },
+        {
+          "excerpt": "const workspaceId = req.user?.activeWorkspaceId",
+          "excerpt_sha256": "0a2faa349d2e362317d5283fe8203207bad452c035735826510be820794f230a",
+          "line": 69,
+          "path": "packages/server/src/controllers/credentials/index.ts",
+          "role": "ownership_source",
+          "symbol": "getCredentialById"
+        },
+        {
+          "excerpt": "const apiResponse = await credentialsService.getCredentialById(req.params.id, workspaceId)",
+          "excerpt_sha256": "3a838f4058dc0e68f32881fe4df7941c85495fa7cc74326e92fa3baa54109ddd",
+          "line": 76,
+          "path": "packages/server/src/controllers/credentials/index.ts",
+          "role": "handoff",
+          "symbol": "getCredentialById"
+        },
+        {
+          "excerpt": "const credential = await appServer.AppDataSource.getRepository(Credential).findOneBy({",
+          "excerpt_sha256": "3e1b4f26f0d719b219d1085d28fbb421d5579dabd661e172c1e3915951c6c582",
+          "line": 130,
+          "path": "packages/server/src/services/credentials/index.ts",
+          "role": "lookup",
+          "symbol": "getCredentialById"
+        },
+        {
+          "excerpt": "workspaceId: workspaceId",
+          "excerpt_sha256": "469c0b7eaf09ea93f3ef0d9dcbdf92db7fe416b6f3f9add847db4f23a97a3579",
+          "line": 132,
+          "path": "packages/server/src/services/credentials/index.ts",
+          "role": "guard",
+          "symbol": "getCredentialById"
+        },
+        {
+          "excerpt": "const decryptedCredentialData = await decryptCredentialData(",
+          "excerpt_sha256": "1444d61ea887fb48c2252caf972e54eac97247c51fe5f6c514231c1f093f45ab",
+          "line": 138,
+          "path": "packages/server/src/services/credentials/index.ts",
+          "role": "secret_use",
+          "symbol": "getCredentialById"
+        },
+        {
+          "excerpt": "plainDataObj: decryptedCredentialData",
+          "excerpt_sha256": "9acecaaacc4ae3a720281437ba3c9dc6b67019d8570f9df66c25c44d30af3dba",
+          "line": 145,
+          "path": "packages/server/src/services/credentials/index.ts",
+          "role": "result",
+          "symbol": "getCredentialById"
+        },
+        {
+          "excerpt": "workspaceId: workspaceId",
+          "excerpt_sha256": "469c0b7eaf09ea93f3ef0d9dcbdf92db7fe416b6f3f9add847db4f23a97a3579",
+          "line": 132,
+          "path": "packages/server/src/services/credentials/index.ts",
+          "role": "narrow_safe_contrast",
+          "symbol": "getCredentialById"
+        }
+      ],
+      "invariant": "直接读取接口不得将其他 workspace 的 Credential 解密后返回。",
+      "node_id": "F005",
+      "potential_artifact": "getCredentialById 的 findOneBy 同时包含 id 和 workspaceId，缺失记录先报错，然后才解密。",
+      "security_question": "直接读取 Credential 的已拥有记录路径，是否在解密前以调用者 activeWorkspaceId 限制 ID 查询？"
+    },
+    {
+      "code_scope": [
+        "packages/server/src/controllers/text-to-speech/index.ts",
+        "packages/server/src/utils/constants.ts",
+        "packages/server/src/routes/text-to-speech/index.ts",
+        "packages/server/src/utils/buildChatflow.ts",
+        "packages/server/src/AbortControllerPool.ts"
+      ],
+      "evidence_refs": [
+        {
+          "excerpt": "appServer.abortControllerPool.abort(chatFlowAbortId)",
+          "excerpt_sha256": "472f92584b1279c21515fed1fa63e23e2ac914fb4e945ec68d1f5188963bcefb",
+          "line": 205,
+          "path": "packages/server/src/controllers/text-to-speech/index.ts",
+          "role": "gt_anchor",
+          "symbol": "abortTextToSpeech"
+        },
+        {
+          "excerpt": "'/api/v1/text-to-speech/abort',",
+          "excerpt_sha256": "c3aa33f8882212cb7e6f6d5acc3f5c8d5f786611a27eb35825b313531adffb06",
+          "line": 45,
+          "path": "packages/server/src/utils/constants.ts",
+          "role": "entry_policy",
+          "symbol": "WHITELIST_URLS"
+        },
+        {
+          "excerpt": "router.post('/abort', textToSpeechController.abortTextToSpeech)",
+          "excerpt_sha256": "8be9f40e47d7f81005e616b733474c4c132205d7e8194cd708f5217b166cc0b0",
+          "line": 8,
+          "path": "packages/server/src/routes/text-to-speech/index.ts",
+          "role": "entry",
+          "symbol": "router.post /abort"
+        },
+        {
+          "excerpt": "const { chatId, chatMessageId, chatflowId } = req.body",
+          "excerpt_sha256": "fd71876042274a7ad1c60b7de618d78a9b74bb46b4de4d0e06fdf225e548775f",
+          "line": 173,
+          "path": "packages/server/src/controllers/text-to-speech/index.ts",
+          "role": "source",
+          "symbol": "abortTextToSpeech"
+        },
+        {
+          "excerpt": "const ttsAbortId = `tts_${chatId}_${chatMessageId}`",
+          "excerpt_sha256": "00e49b930587a13b82b65f4b806b582f903620fed59f53b322ec4022f4e9289a",
+          "line": 199,
+          "path": "packages/server/src/controllers/text-to-speech/index.ts",
+          "role": "tts_key",
+          "symbol": "abortTextToSpeech"
+        },
+        {
+          "excerpt": "const chatFlowAbortId = `${chatflowId}_${chatId}`",
+          "excerpt_sha256": "8cf9221c3ce8f665356b0fa7714f4ae945db0c3dcdaf28f757d4612ac6a66d6c",
+          "line": 203,
+          "path": "packages/server/src/controllers/text-to-speech/index.ts",
+          "role": "prediction_key",
+          "symbol": "abortTextToSpeech"
+        },
+        {
+          "excerpt": "appServer.abortControllerPool.abort(chatFlowAbortId)",
+          "excerpt_sha256": "472f92584b1279c21515fed1fa63e23e2ac914fb4e945ec68d1f5188963bcefb",
+          "line": 205,
+          "path": "packages/server/src/controllers/text-to-speech/index.ts",
+          "role": "sink",
+          "symbol": "abortTextToSpeech"
+        },
+        {
+          "excerpt": "appServer.abortControllerPool.add(ttsAbortId, abortController)",
+          "excerpt_sha256": "0ef953aea04d3d37cfd0e12021e1143f8feb8f6ab82d3f8397717d440e22fc45",
+          "line": 112,
+          "path": "packages/server/src/controllers/text-to-speech/index.ts",
+          "role": "key_counterpart",
+          "symbol": "generateTextToSpeech"
+        },
+        {
+          "excerpt": "const abortControllerId = `${chatflow.id}_${chatId}`",
+          "excerpt_sha256": "b0a3ad961916a0cd4b03bcd02dc31971b0f7ad89606306925037b7f7987f5f96",
+          "line": 1009,
+          "path": "packages/server/src/utils/buildChatflow.ts",
+          "role": "key_counterpart",
+          "symbol": "utilBuildChatflow"
+        },
+        {
+          "excerpt": "appServer.abortControllerPool.add(abortControllerId, signal)",
+          "excerpt_sha256": "1b754df91bff95bd2d00299b7d382aead32223f01722aed88d12eb5c5ef9ca87",
+          "line": 1101,
+          "path": "packages/server/src/utils/buildChatflow.ts",
+          "role": "key_counterpart",
+          "symbol": "utilBuildChatflow"
+        },
+        {
+          "excerpt": "const abortController = this.abortControllers[id]",
+          "excerpt_sha256": "2b31ef7ec31b55e5ec025803830ff4187ddcaab4f42d3dc4499d8e010c13103d",
+          "line": 39,
+          "path": "packages/server/src/AbortControllerPool.ts",
+          "role": "pool_lookup",
+          "symbol": "AbortControllerPool.abort"
+        },
+        {
+          "excerpt": "abortController.abort()",
+          "excerpt_sha256": "30d3ef09aa56465a4d732458492d90bf9d57a1ede39e7e08232143f43b1bb5be",
+          "line": 41,
+          "path": "packages/server/src/AbortControllerPool.ts",
+          "role": "pool_sink",
+          "symbol": "AbortControllerPool.abort"
+        }
+      ],
+      "invariant": "取消操作必须绑定发起者/操作所有者，而不能仅凭猜到或获知共享 pool key。",
+      "node_id": "F006",
+      "potential_artifact": "白名单 abort 入口直接拼接请求体 ID，从全局 AbortControllerPool 取 controller 并 abort，未在这条链核对主体所有权。",
+      "security_question": "TTS abort 请求是否可用自报 chatId/chatMessageId/chatflowId 命中其他主体的 TTS 或主预测 AbortController 并取消操作？"
+    },
+    {
+      "code_scope": [
+        "packages/server/src/enterprise/controllers/role.controller.ts"
+      ],
+      "evidence_refs": [
+        {
+          "excerpt": "oneRole.organizationId !== user.activeOrganizationId",
+          "excerpt_sha256": "fee28904b309c3b6fb8ffd245c196574acb98b58a152b8b44fc2bbd8607f0815",
+          "line": 40,
+          "path": "packages/server/src/enterprise/controllers/role.controller.ts",
+          "role": "candidate_anchor",
+          "symbol": "RoleController.read"
+        },
+        {
+          "excerpt": "const user = getLoggedInUser(req)",
+          "excerpt_sha256": "ed477350e7e1d092760db9fa72a08210040e2658b5e465b6f3882842cc99932c",
+          "line": 27,
+          "path": "packages/server/src/enterprise/controllers/role.controller.ts",
+          "role": "source_chain",
+          "symbol": "RoleController.read"
+        },
+        {
+          "excerpt": "const oneRole = await roleService.readRoleById(query.id, queryRunner)",
+          "excerpt_sha256": "2f9325535747c02b6ac36db2840355dbb84a9fbb05f934bf4c1d71609623f2d4",
+          "line": 35,
+          "path": "packages/server/src/enterprise/controllers/role.controller.ts",
+          "role": "source_chain",
+          "symbol": "RoleController.read"
+        },
+        {
+          "excerpt": "return res.status(StatusCodes.OK).json(role)",
+          "excerpt_sha256": "38412acecebb81aeaa169de351a487c79cb7518bc91e797458a927ff2e8d2061",
+          "line": 54,
+          "path": "packages/server/src/enterprise/controllers/role.controller.ts",
+          "role": "source_chain",
+          "symbol": "RoleController.read"
+        }
+      ],
+      "invariant": "非通用 Role 详情只能返回给当前组织。",
+      "node_id": "F007",
+      "potential_artifact": "Role 对象的加载、组织归属比较与返回前的拒绝路径。",
+      "security_question": "按 id 读 Role 是否在返回前校验已加载对象的 organizationId？"
+    },
+    {
+      "code_scope": [
+        "packages/server/src/enterprise/controllers/workspace.controller.ts",
+        "packages/server/src/enterprise/routes/workspace.route.ts",
+        "packages/server/src/enterprise/services/workspace.service.ts"
+      ],
+      "evidence_refs": [
+        {
+          "excerpt": "deleteWorkspaceById(queryRunner, workspaceId)",
+          "excerpt_sha256": "db5d8a5a29d4e3640c1368dfabdac153df65b60c6c4559cc6bffab4113043cb8",
+          "line": 202,
+          "path": "packages/server/src/enterprise/controllers/workspace.controller.ts",
+          "role": "candidate_anchor",
+          "symbol": "WorkspaceController.delete"
+        },
+        {
+          "excerpt": "router.delete(",
+          "excerpt_sha256": "265bb1545398c37262e0c8f006681e5b8a3e435c2f334d7bd1ebf0d78bc0aed8",
+          "line": 18,
+          "path": "packages/server/src/enterprise/routes/workspace.route.ts",
+          "role": "source_chain",
+          "symbol": "router.delete"
+        },
+        {
+          "excerpt": "const workspaceId = req.params.id",
+          "excerpt_sha256": "cd6058c80cee2f4de95439fec4df9aad0cb8a40dc05e91aebfc36992f64090d9",
+          "line": 195,
+          "path": "packages/server/src/enterprise/controllers/workspace.controller.ts",
+          "role": "source_chain",
+          "symbol": "WorkspaceController.delete"
+        },
+        {
+          "excerpt": "public async deleteWorkspaceById(queryRunner: QueryRunner, workspaceId: string) {",
+          "excerpt_sha256": "142e87ec88352f023174d27a1813bedb3a31c1b723335740652c4df0f9f4c46a",
+          "line": 164,
+          "path": "packages/server/src/enterprise/services/workspace.service.ts",
+          "role": "source_chain",
+          "symbol": "WorkspaceService.deleteWorkspaceById"
+        },
+        {
+          "excerpt": "await queryRunner.manager.delete(WorkspaceUser, { workspaceId })",
+          "excerpt_sha256": "132f16b73aa2bb2ed624cab9e4310c340bfbed075618b0b78ef0f7f28ea29203",
+          "line": 181,
+          "path": "packages/server/src/enterprise/services/workspace.service.ts",
+          "role": "source_chain",
+          "symbol": "WorkspaceService.deleteWorkspaceById"
+        }
+      ],
+      "invariant": "目标 Workspace 必须属于调用者可管理的组织或工作区。",
+      "node_id": "F008",
+      "potential_artifact": "删除路由到 Workspace 归属查找及 deleteWorkspaceById 的有界证据链。",
+      "security_question": "workspace:delete 用户能否按任意 id 删除别的组织的工作区？"
+    },
+    {
+      "code_scope": [
+        "packages/server/src/enterprise/services/account.service.ts",
+        "packages/server/src/utils/sanitize.util.ts"
+      ],
+      "evidence_refs": [
+        {
+          "excerpt": "const sanitizedUser = sanitizeUser(user)",
+          "excerpt_sha256": "9351879378aa988260b26b2f02e8f7222a539276e2698a80e05104012ea839e8",
+          "line": 589,
+          "path": "packages/server/src/enterprise/services/account.service.ts",
+          "role": "candidate_anchor",
+          "symbol": "AccountService.login"
+        },
+        {
+          "excerpt": "return { user: sanitizedUser, workspaceDetails: wsUserOrUsers }",
+          "excerpt_sha256": "2e0a22a4e3c078e6542ebd6316af37b0b94699359dcfeb7c131490013b8e2d4e",
+          "line": 590,
+          "path": "packages/server/src/enterprise/services/account.service.ts",
+          "role": "source_chain",
+          "symbol": "AccountService.login"
+        },
+        {
+          "excerpt": "export function sanitizeUser(user: Partial<User>) {",
+          "excerpt_sha256": "09db2c02fdefcaec5f5b65681647094aab385ed440ed2cc0388f68bc92ccf86b",
+          "line": 37,
+          "path": "packages/server/src/utils/sanitize.util.ts",
+          "role": "source_chain",
+          "symbol": "sanitizeUser"
+        },
+        {
+          "excerpt": "return user",
+          "excerpt_sha256": "0351591ab36b492bc40e101c6e1f2c03554a6dab832f8ef6c5732d088d178df6",
+          "line": 42,
+          "path": "packages/server/src/utils/sanitize.util.ts",
+          "role": "source_chain",
+          "symbol": "sanitizeUser"
+        }
+      ],
+      "invariant": "登录响应的 user 字段不得含凭据与邀请 token。",
+      "node_id": "F009",
+      "potential_artifact": "AccountService.login 返回前移除 credential/tempToken/tokenExpiry 的调用与字段证据。",
+      "security_question": "AccountService.login 返回的 User 是否移除 credential/tempToken/tokenExpiry？"
+    },
+    {
+      "code_scope": [
+        "packages/server/src/enterprise/services/organization-user.service.ts",
+        "packages/server/src/enterprise/controllers/organization-user.controller.ts",
+        "packages/server/src/enterprise/database/entities/user.entity.ts"
+      ],
+      "evidence_refs": [
+        {
+          "excerpt": "user.user = userDetails",
+          "excerpt_sha256": "a1511ee5eb2a769bb9ce4b5b0d58bdfbd63329e5593a5fb070d9e4ef7b135abe",
+          "line": 181,
+          "path": "packages/server/src/enterprise/services/organization-user.service.ts",
+          "role": "candidate_anchor",
+          "symbol": "OrganizationUserService.readOrganizationUserByUserId"
+        },
+        {
+          "excerpt": "organizationUser = await organizationUserservice.readOrganizationUserByUserId(query.userId, queryRunner)",
+          "excerpt_sha256": "44e8f77a327a4844cb71366e4d432dc42d9b856d5d37b059334199f2bf55d4f4",
+          "line": 83,
+          "path": "packages/server/src/enterprise/controllers/organization-user.controller.ts",
+          "role": "source_chain",
+          "symbol": "OrganizationUserController.read"
+        },
+        {
+          "excerpt": "return res.status(StatusCodes.OK).json(organizationUser)",
+          "excerpt_sha256": "beb04d222b2982005a09b38fb1af79dad2b4760df3e855e9b29a3e6823194d12",
+          "line": 95,
+          "path": "packages/server/src/enterprise/controllers/organization-user.controller.ts",
+          "role": "source_chain",
+          "symbol": "OrganizationUserController.read"
+        },
+        {
+          "excerpt": "public async readOrganizationUserByUserId(userId: string | undefined, queryRunner: QueryRunner) {",
+          "excerpt_sha256": "5a53b57d0fba26d3a7edb73a6045479f1937909f7dfaa4bd77e25975988818ea",
+          "line": 158,
+          "path": "packages/server/src/enterprise/services/organization-user.service.ts",
+          "role": "source_chain",
+          "symbol": "OrganizationUserService.readOrganizationUserByUserId"
+        },
+        {
+          "excerpt": "credential?: string | null",
+          "excerpt_sha256": "fadb543bed8179dd3df150db45d8ac272916d3ac150fdd6151a57757a05dbd2e",
+          "line": 28,
+          "path": "packages/server/src/enterprise/database/entities/user.entity.ts",
+          "role": "source_chain",
+          "symbol": "User.credential"
+        }
+      ],
+      "invariant": "组织成员响应不得序列化用户凭据或邀请 token。",
+      "node_id": "F010",
+      "potential_artifact": "readOrganizationUserByUserId 查询、响应对象及敏感字段的源码证据。",
+      "security_question": "按 userId 查询组织成员时，嵌入的 User 是否在响应前移除 credential/tempToken？"
+    },
+    {
+      "code_scope": [
+        "packages/server/src/routes/attachments/index.ts",
+        "packages/components/src/storage/LocalStorageProvider.ts",
+        "packages/server/src/utils/createAttachment.ts",
+        "packages/components/src/validator.ts"
+      ],
+      "evidence_refs": [
+        {
+          "excerpt": "router.post('/:chatflowId/:chatId', getMulterStorage().array('files'), attachmentsController.createAttachment)",
+          "excerpt_sha256": "eb8740aa50341d157831fd4b4bcfdee89f29d479a44d9c4df1861de9da78d541",
+          "line": 8,
+          "path": "packages/server/src/routes/attachments/index.ts",
+          "role": "candidate_anchor",
+          "symbol": "attachmentsRouter"
+        },
+        {
+          "excerpt": "return multer({ dest: uploadPath })",
+          "excerpt_sha256": "f4f56642cbf9b9ed4940e647edc078f59c0eee4764da7fbdb6f08e70790bd7a5",
+          "line": 340,
+          "path": "packages/components/src/storage/LocalStorageProvider.ts",
+          "role": "source_chain",
+          "symbol": "LocalStorageProvider.getMulterStorage"
+        },
+        {
+          "excerpt": "if (!fileUploadEnabled) {",
+          "excerpt_sha256": "0f0386100051679eedcb240ddeba2cd3977b5d0d5fe3038a3fde4040072b770f",
+          "line": 111,
+          "path": "packages/server/src/utils/createAttachment.ts",
+          "role": "source_chain",
+          "symbol": "createFileAttachment"
+        },
+        {
+          "excerpt": "if (!allowedFileTypes.length) {",
+          "excerpt_sha256": "2930dacac1fb0aeea47037c2733a6a85ecd83fa5ba24ccbc63f253710ee6ad95",
+          "line": 132,
+          "path": "packages/server/src/utils/createAttachment.ts",
+          "role": "source_chain",
+          "symbol": "createFileAttachment"
+        },
+        {
+          "excerpt": "if (allowedFileTypes.length > 0 && !allowedFileTypes.includes(file.mimetype)) {",
+          "excerpt_sha256": "aba079631e8f72536fc3ce571c1bfaaf699345d66ad6c851840fe930993a719c",
+          "line": 140,
+          "path": "packages/server/src/utils/createAttachment.ts",
+          "role": "chain_hint",
+          "symbol": "createFileAttachment"
+        },
+        {
+          "excerpt": "validateFileMimeTypeAndExtensionMatch(file.originalname, file.mimetype)",
+          "excerpt_sha256": "17d284838ae03a82b43c0ee438f25965fc663157c38f76168775785ce173d4d6",
+          "line": 150,
+          "path": "packages/server/src/utils/createAttachment.ts",
+          "role": "chain_hint",
+          "symbol": "createFileAttachment"
+        },
+        {
+          "excerpt": "export const validateMimeTypeAndExtensionMatch = (filename: string, mimetype: string): void => {",
+          "excerpt_sha256": "97579450f146929a21ede5734af2fa9f1bb41b3355e573d2089b87051aafa948",
+          "line": 142,
+          "path": "packages/components/src/validator.ts",
+          "role": "source_chain",
+          "symbol": "validateMimeTypeAndExtensionMatch"
+        },
+        {
+          "excerpt": "file.originalname = Buffer.from(file.originalname, 'latin1').toString('utf8')",
+          "excerpt_sha256": "19dd1a763f406a8500c94d2d445509a3f1fd696f408770701fd2d4461c06867a",
+          "line": 157,
+          "path": "packages/server/src/utils/createAttachment.ts",
+          "role": "source_chain",
+          "symbol": "createFileAttachment"
+        },
+        {
+          "excerpt": "const { path: storagePath, totalSize } = await addArrayFilesToStorage(",
+          "excerpt_sha256": "df3b58cb588f13b4759c8b5d82458d16ddc8043d5363f3641c5ee94ad35a6e3f",
+          "line": 158,
+          "path": "packages/server/src/utils/createAttachment.ts",
+          "role": "chain_hint",
+          "symbol": "createFileAttachment"
+        },
+        {
+          "excerpt": "fs.writeFileSync(filePath, bf)",
+          "excerpt_sha256": "68d9a7613ece4761ca8e53eba74734b730b4d552c65f35635214c53621fd9063",
+          "line": 60,
+          "path": "packages/components/src/storage/LocalStorageProvider.ts",
+          "role": "source_chain",
+          "symbol": "LocalStorageProvider.addArrayFilesToStorage"
+        }
+      ],
+      "invariant": "该入口创建的业务持久附件应满足 chatflow 的启用与允许类型配置，并在业务存储写入前通过声明 MIME 与扩展名/文件名校验。",
+      "node_id": "F011",
+      "potential_artifact": "attachmentsRouter 到 createFileAttachment、类型验证、addArrayFilesToStorage 的检查顺序。",
+      "security_question": "POST /attachments/:chatflowId/:chatId 在建立业务附件对象前，是否按该 chatflow 配置检查声明 MIME、扩展名和文件名？"
+    },
+    {
+      "code_scope": [
+        "packages/server/src/routes/get-upload-file/index.ts",
+        "packages/server/src/utils/constants.ts",
+        "packages/server/src/controllers/get-upload-file/index.ts",
+        "packages/components/src/storage/LocalStorageProvider.ts"
+      ],
+      "evidence_refs": [
+        {
+          "excerpt": "router.get('/', getUploadFileController.streamUploadedFile)",
+          "excerpt_sha256": "d60d782448e1d4b3c8db618309f26e73629ab9acf7d89fda8b9d66a8a98eb01a",
+          "line": 6,
+          "path": "packages/server/src/routes/get-upload-file/index.ts",
+          "role": "candidate_anchor",
+          "symbol": "getUploadFileRouter"
+        },
+        {
+          "excerpt": "'/api/v1/get-upload-file',",
+          "excerpt_sha256": "f999556573493eec4db394e73e541d3ab3c04a7c909aa6674a9f916380df480f",
+          "line": 22,
+          "path": "packages/server/src/utils/constants.ts",
+          "role": "source_chain",
+          "symbol": "WHITELIST_URLS"
+        },
+        {
+          "excerpt": "const chatflow = await appServer.AppDataSource.getRepository(ChatFlow).findOneBy({",
+          "excerpt_sha256": "3c438eae7b98c03aca3761b3583918e355059466803203c782362b1a36132022",
+          "line": 38,
+          "path": "packages/server/src/controllers/get-upload-file/index.ts",
+          "role": "chain_hint",
+          "symbol": "streamUploadedFile"
+        },
+        {
+          "excerpt": "const fileStream = await streamStorageFile(chatflowId, chatId, fileName, orgId)",
+          "excerpt_sha256": "f46a6e1df1f1399cd8784907fa8dbf83589fdffd04ea99cbf48cc419d2b6a551",
+          "line": 59,
+          "path": "packages/server/src/controllers/get-upload-file/index.ts",
+          "role": "chain_hint",
+          "symbol": "streamUploadedFile"
+        },
+        {
+          "excerpt": "const filePath = this.buildPath(orgId, chatflowId, chatId, sanitizedFilename)",
+          "excerpt_sha256": "29c761ee53aa5e1c55f12905ee8533a92aec272f0a7f1fc93bcf9ea36347b914",
+          "line": 132,
+          "path": "packages/components/src/storage/LocalStorageProvider.ts",
+          "role": "chain_hint",
+          "symbol": "LocalStorageProvider.streamStorageFile"
+        },
+        {
+          "excerpt": "return fs.createReadStream(filePath)",
+          "excerpt_sha256": "da1d4dd0a2ddcc8dfa93e5b20eb7fc5feae07ff6330a4a48b780f5a1ec930668",
+          "line": 142,
+          "path": "packages/components/src/storage/LocalStorageProvider.ts",
+          "role": "source_chain",
+          "symbol": "LocalStorageProvider.streamStorageFile"
+        }
+      ],
+      "invariant": "公开读取入口在流出业务文件对象前，须有与被读取 chatflow、chatId 和文件相符的访问/归属依据；合法路径格式和存储目录限制不能替代对象范围检查。",
+      "node_id": "F012",
+      "potential_artifact": "get-upload-file 请求参数、ChatFlow/Workspace 查找与 streamStorageFile 的对象归属链。",
+      "security_question": "GET /get-upload-file 是否把请求者对特定 chatflow、chatId 与文件对象的访问范围，绑定到实际流出的存储对象？"
+    },
+    {
+      "code_scope": [
+        "packages/components/nodes/chains/SqlDatabaseChain/SqlDatabaseChain.ts"
+      ],
+      "evidence_refs": [
+        {
+          "excerpt": "SqlDatabase.fromDataSourceParams",
+          "excerpt_sha256": "82139f9998affa75f12af01dc2c982e2baa378b645b2dfb092ab6f531f1186b2",
+          "line": 235,
+          "path": "packages/components/nodes/chains/SqlDatabaseChain/SqlDatabaseChain.ts",
+          "role": "candidate_anchor",
+          "symbol": "getSQLDBChain"
+        },
+        {
+          "excerpt": "async run(nodeData: INodeData, input: string, options: ICommonObject): Promise<string | object> {",
+          "excerpt_sha256": "ed156df25d421379131f0baaf367b05f3710efb6cae450db13ade3f5a4fcabcb",
+          "line": 158,
+          "path": "packages/components/nodes/chains/SqlDatabaseChain/SqlDatabaseChain.ts",
+          "role": "source_chain",
+          "symbol": "SqlDatabaseChain_Chains.run"
+        },
+        {
+          "excerpt": "const res = await chain.run(input, [loggerHandler, handler, ...callbacks])",
+          "excerpt_sha256": "acdea3af82c6968e25dcf9ad73db4b0db1715373d914f29ffa455f537744c8f3",
+          "line": 204,
+          "path": "packages/components/nodes/chains/SqlDatabaseChain/SqlDatabaseChain.ts",
+          "role": "source_chain",
+          "symbol": "SqlDatabaseChain_Chains.run"
+        },
+        {
+          "excerpt": "database: validateSQLitePath(url)",
+          "excerpt_sha256": "f78b264f05384a3a250717fef907250c785cee44b3e4a198004da889400eaa64",
+          "line": 227,
+          "path": "packages/components/nodes/chains/SqlDatabaseChain/SqlDatabaseChain.ts",
+          "role": "source_chain",
+          "symbol": "getSQLDBChain"
+        }
+      ],
+      "invariant": "查询链不应允许低信任输入写入 SQLite。",
+      "node_id": "F013",
+      "potential_artifact": "SqlDatabaseChain 的生成 SQL、数据库执行接口与只读限制位置。",
+      "security_question": "SqlDatabaseChain 执行 LLM 生成 SQL 时是否强制只读？"
+    },
+    {
+      "code_scope": [
+        "packages/components/nodes/tools/MCP/core.ts",
+        "packages/components/nodes/tools/MCP/CustomMCP/CustomMCP.ts"
+      ],
+      "evidence_refs": [
+        {
+          "excerpt": "export const validateMCPServerConfig = (serverParams: any)",
+          "excerpt_sha256": "69e01fafc6509e4bca4919e93b9ac4ffc5f2e026899cfa6a7735483cbd433223",
+          "line": 374,
+          "path": "packages/components/nodes/tools/MCP/core.ts",
+          "role": "candidate_anchor",
+          "symbol": "validateMCPServerConfig"
+        },
+        {
+          "excerpt": "if (typeof mcpServerConfig === 'object') {",
+          "excerpt_sha256": "8de4c7b32e0b7a7a139a331593a08c56c2cebca7fade9f546a075a758a2ce91f",
+          "line": 168,
+          "path": "packages/components/nodes/tools/MCP/CustomMCP/CustomMCP.ts",
+          "role": "source_chain",
+          "symbol": "CustomMCP.getTools"
+        },
+        {
+          "excerpt": "// Validate environment variables",
+          "excerpt_sha256": "001301b3bb9a45719054ded7e71badd7da81112e9ad3897fd0658b29417faf53",
+          "line": 398,
+          "path": "packages/components/nodes/tools/MCP/core.ts",
+          "role": "source_chain",
+          "symbol": "validateMCPServerConfig"
+        },
+        {
+          "excerpt": "...this.serverParams,",
+          "excerpt_sha256": "7929d7960c2f0ef45c4567e00c316672c18816bf458de07960005f9fca271e6f",
+          "line": 45,
+          "path": "packages/components/nodes/tools/MCP/core.ts",
+          "role": "source_chain",
+          "symbol": "MCPToolkit.createClient"
+        },
+        {
+          "excerpt": "transport = new StdioClientTransport(params as StdioServerParameters)",
+          "excerpt_sha256": "108d8df4e063661fc39ae08ee0d6b1a3a04efe6cc51aff3444b5a2933b05745d",
+          "line": 52,
+          "path": "packages/components/nodes/tools/MCP/core.ts",
+          "role": "source_chain",
+          "symbol": "MCPToolkit.createClient"
+        }
+      ],
+      "invariant": "低信任配置不得任意指定进程工作目录。",
+      "node_id": "F014",
+      "potential_artifact": "validateMCPServerConfig 对 cwd 的判断以及创建子进程时传入的工作目录。",
+      "security_question": "MCP stdio 的 cwd 是否在进程启动前限制到允许目录？"
+    },
+    {
+      "code_scope": [
+        "packages/components/nodes/chatmodels/ChatLocalAI/ChatLocalAI.ts"
+      ],
+      "evidence_refs": [
+        {
+          "excerpt": "obj.configuration = { baseURL: basePath }",
+          "excerpt_sha256": "1c5bb83be7a0c9192eb0e807d01b184a2c3bc1482b90c557986f9582bd5d8cc4",
+          "line": 126,
+          "path": "packages/components/nodes/chatmodels/ChatLocalAI/ChatLocalAI.ts",
+          "role": "candidate_anchor",
+          "symbol": "ChatLocalAI_ChatModels.init"
+        },
+        {
+          "excerpt": "obj.openAIApiKey = localAIApiKey",
+          "excerpt_sha256": "3c24e9bb379248d9d3547cdf2a2aae2c8e948ee98213a7a5da4d5d54eeb7ccdc",
+          "line": 123,
+          "path": "packages/components/nodes/chatmodels/ChatLocalAI/ChatLocalAI.ts",
+          "role": "source_chain",
+          "symbol": "ChatLocalAI_ChatModels.init"
+        },
+        {
+          "excerpt": "const model = new ChatOpenAI(obj)",
+          "excerpt_sha256": "1af2b442f5dc63a76e4c32dda43edd1b5bb2160e0d910b3667461592394e5338",
+          "line": 128,
+          "path": "packages/components/nodes/chatmodels/ChatLocalAI/ChatLocalAI.ts",
+          "role": "source_chain",
+          "symbol": "ChatLocalAI_ChatModels.init"
+        }
+      ],
+      "invariant": "模型请求不得把凭据和内容发到禁止的网络目的地。",
+      "node_id": "F015",
+      "potential_artifact": "ChatLocalAI 初始化到模型请求目标与凭据传递的证据。",
+      "security_question": "ChatLocalAI basePath 传入带 key 的模型客户端前是否有目的地址限制？"
+    },
+    {
+      "code_scope": [
+        "packages/components/nodes/documentloaders/Playwright/Playwright.ts"
+      ],
+      "evidence_refs": [
+        {
+          "excerpt": "new PlaywrightWebBaseLoader(url, config)",
+          "excerpt_sha256": "59ef3f530275d880b5453522603d389ac2390ffcc7b39ab72dadcd2814d5658b",
+          "line": 226,
+          "path": "packages/components/nodes/documentloaders/Playwright/Playwright.ts",
+          "role": "candidate_anchor",
+          "symbol": "playwrightLoader"
+        },
+        {
+          "excerpt": "let url = nodeData.inputs?.url as string",
+          "excerpt_sha256": "12cbd2affd158b8559d677e4941d5f3cc083a07bb284f371deac5372dc20e411",
+          "line": 184,
+          "path": "packages/components/nodes/documentloaders/Playwright/Playwright.ts",
+          "role": "source_chain",
+          "symbol": "Playwright_DocumentLoaders.init"
+        },
+        {
+          "excerpt": "docs = await loader.load()",
+          "excerpt_sha256": "7fe7f4ae80f61ffe515bc42743fcbbd3fcc4ec6e68a02e5bcb6db99fb1d2d4a5",
+          "line": 231,
+          "path": "packages/components/nodes/documentloaders/Playwright/Playwright.ts",
+          "role": "source_chain",
+          "symbol": "playwrightLoader"
+        },
+        {
+          "excerpt": "const result = await playwrightLoader(page)",
+          "excerpt_sha256": "b1b1bca8f05824b46fd1f96853428631ad6c33a55da11dc215cba5bd30895c98",
+          "line": 257,
+          "path": "packages/components/nodes/documentloaders/Playwright/Playwright.ts",
+          "role": "source_chain",
+          "symbol": "Playwright_DocumentLoaders.init"
+        }
+      ],
+      "invariant": "浏览器加载不得访问被禁止的内网/元数据目的地。",
+      "node_id": "F016",
+      "potential_artifact": "loader 输入到浏览器导航及派生页面访问的目的地检查证据。",
+      "security_question": "Playwright loader 对初始 URL、派生链接及跳转是否施加出口限制？"
+    },
+    {
+      "code_scope": [
+        "packages/server/src/controllers/export-import/index.ts",
+        "packages/server/src/database/entities/Variable.ts",
+        "packages/server/src/enterprise/rbac/Permissions.ts",
+        "packages/server/src/routes/export-import/index.ts",
+        "packages/server/src/routes/variables/index.ts",
+        "packages/server/src/services/export-import/index.ts",
+        "packages/server/src/services/variables/index.ts"
+      ],
+      "evidence_refs": [
+        {
+          "excerpt": "Variable = 'data' in Variable ? Variable.data : Variable",
+          "excerpt_sha256": "53e2386cb1279b4f2e3f893504eeb7efd6ff1b85eb91b83115efb3bf755818f8",
+          "line": 158,
+          "path": "packages/server/src/services/export-import/index.ts",
+          "symbol": "exportData"
+        },
+        {
+          "excerpt": "exportInput.variable === true ? await variableService.getAllVariables(activeWorkspaceId) : []",
+          "excerpt_sha256": "a7981e588b6ca0770fbec246cff1c01f2838688cbc77525170a2599bc34f1312",
+          "line": 157,
+          "path": "packages/server/src/services/export-import/index.ts",
+          "symbol": "exportData"
+        },
+        {
+          "excerpt": "Variable",
+          "excerpt_sha256": "e57e998726030b84d971fa8bd41e1ebe0bc4cd40474e79f7e927efb00f9f348f",
+          "line": 176,
+          "path": "packages/server/src/services/export-import/index.ts",
+          "symbol": "exportData"
+        },
+        {
+          "excerpt": "value: string",
+          "excerpt_sha256": "eff3a5295e6d198f3a13fe4d461c3edcbd74487481da752a9cf23f166b5d7fcb",
+          "line": 14,
+          "path": "packages/server/src/database/entities/Variable.ts",
+          "symbol": "Variable.value"
+        },
+        {
+          "excerpt": "if (workspaceId) queryBuilder.andWhere('variable.workspaceId = :workspaceId', { workspaceId })",
+          "excerpt_sha256": "34b57c51e96f2bb4423741d4c451474e0e01ea47a57caebea22919b2c0e3c6b9",
+          "line": 59,
+          "path": "packages/server/src/services/variables/index.ts",
+          "symbol": "getAllVariables"
+        },
+        {
+          "excerpt": "router.post('/export', checkPermission('workspace:export'), exportImportController.exportData)",
+          "excerpt_sha256": "2af16eb0fdce9678da9ef69c6613cfbd63264ad1727d6f93ec67f53a01dff1dd",
+          "line": 6,
+          "path": "packages/server/src/routes/export-import/index.ts",
+          "symbol": "router.post export"
+        },
+        {
+          "excerpt": "router.get('/', checkPermission('variables:view'), variablesController.getAllVariables)",
+          "excerpt_sha256": "395612ce360eb1cbab422b04a94e4187c1a187c3c29b782a618ab83d2c6ad155",
+          "line": 11,
+          "path": "packages/server/src/routes/variables/index.ts",
+          "symbol": "router.get variables"
+        },
+        {
+          "excerpt": "variablesCategory.addPermission(new Permission('variables:view', 'View', true, true, true))",
+          "excerpt_sha256": "d8d430b43d74dd6c50c579279e2db206595189320fb6eac9843a779b50b48e43",
+          "line": 56,
+          "path": "packages/server/src/enterprise/rbac/Permissions.ts",
+          "symbol": "variables permission"
+        },
+        {
+          "excerpt": "workspaceCategory.addPermission(new Permission('workspace:export', 'Export Data within Workspace', false, true, true))",
+          "excerpt_sha256": "822f44c97ef6cda45b3c7667e212fa453aef43b3682d5df636c496847fcf2523",
+          "line": 126,
+          "path": "packages/server/src/enterprise/rbac/Permissions.ts",
+          "symbol": "workspace export permission"
+        },
+        {
+          "excerpt": "return res.json(apiResponse)",
+          "excerpt_sha256": "4ce1d2d6e5328793515b44b0aa248ffdd4ab5985f432ecde5b500f4614f1d8b0",
+          "line": 16,
+          "path": "packages/server/src/controllers/export-import/index.ts",
+          "symbol": "exportData controller"
+        },
+        {
+          "excerpt": "const workspaceId = req.user?.activeWorkspaceId",
+          "excerpt_sha256": "0a2faa349d2e362317d5283fe8203207bad452c035735826510be820794f230a",
+          "line": 8,
+          "path": "packages/server/src/controllers/export-import/index.ts",
+          "symbol": "exportData controller"
+        }
+      ],
+      "invariant": "变量值的明文导出应由明确允许读取该值的权限/政策覆盖；workspace 所有权过滤与值遮盖是两个独立守卫。",
+      "node_id": "F017",
+      "potential_artifact": "POST /export 的权限中间件 -> exportData 控制器读取 req.user.activeWorkspaceId -> exportData 在 variable=true 时调用 getAllVariables(activeWorkspaceId) -> variables 服务以 variable.workspaceId 过滤 -> exportData 仅将 Variable.data 或数组写入响应。",
+      "security_question": "拥有 workspace:export、却没有 variables:view 的调用者请求 variable=true 时，POST /export 是否把当前工作区的 Variable.value 原值放进 JSON 响应，而未遮盖敏感变量值？"
+    },
+    {
+      "code_scope": [
+        "packages/server/src/controllers/assistants/index.ts",
+        "packages/server/src/routes/assistants/index.ts",
+        "packages/server/src/services/assistants/index.ts"
+      ],
+      "evidence_refs": [
+        {
+          "excerpt": "checkPermission('assistants:view')",
+          "excerpt_sha256": "0147ca5e5e44a8be7755979f27b46659b554ead9c6254b2a996c1c6fae54ca9a",
+          "line": 12,
+          "path": "packages/server/src/routes/assistants/index.ts",
+          "symbol": "router.get assistant detail"
+        },
+        {
+          "excerpt": "const workspaceId = req.user?.activeWorkspaceId",
+          "excerpt_sha256": "0a2faa349d2e362317d5283fe8203207bad452c035735826510be820794f230a",
+          "line": 93,
+          "path": "packages/server/src/controllers/assistants/index.ts",
+          "symbol": "getAssistantById controller"
+        },
+        {
+          "excerpt": "const apiResponse = await assistantsService.getAssistantById(req.params.id, workspaceId)",
+          "excerpt_sha256": "94e696a0a51cdf8888f1c84c7ed93c95d307a293d2b0115e65755fda02cd936c",
+          "line": 100,
+          "path": "packages/server/src/controllers/assistants/index.ts",
+          "symbol": "getAssistantById controller"
+        },
+        {
+          "excerpt": "const dbResponse = await appServer.AppDataSource.getRepository(Assistant).findOneBy({",
+          "excerpt_sha256": "133d9f94254f04a70f2ddb4ee2a2f4e9ad2f86402b383a52d357acadb5612951",
+          "line": 278,
+          "path": "packages/server/src/services/assistants/index.ts",
+          "symbol": "getAssistantById"
+        },
+        {
+          "excerpt": "id: assistantId,",
+          "excerpt_sha256": "715fcdb774777775af669b27d89447d4e8ebd9982e8e127eb7c387f5dbb97c86",
+          "line": 279,
+          "path": "packages/server/src/services/assistants/index.ts",
+          "symbol": "getAssistantById"
+        },
+        {
+          "excerpt": "workspaceId: workspaceId",
+          "excerpt_sha256": "469c0b7eaf09ea93f3ef0d9dcbdf92db7fe416b6f3f9add847db4f23a97a3579",
+          "line": 280,
+          "path": "packages/server/src/services/assistants/index.ts",
+          "symbol": "getAssistantById"
+        },
+        {
+          "excerpt": "const credential = await appServer.AppDataSource.getRepository(Credential).findOneBy({",
+          "excerpt_sha256": "3e1b4f26f0d719b219d1085d28fbb421d5579dabd661e172c1e3915951c6c582",
+          "line": 185,
+          "path": "packages/server/src/services/assistants/index.ts",
+          "symbol": "deleteAssistant"
+        },
+        {
+          "excerpt": "id: assistant.credential",
+          "excerpt_sha256": "7a8cef0f73dd4b6cba215e216c7621915239bcd5f091fa984acdb53e627bc705",
+          "line": 186,
+          "path": "packages/server/src/services/assistants/index.ts",
+          "symbol": "deleteAssistant"
+        },
+        {
+          "excerpt": "const getAssistantById = async (req: Request, res: Response, next: NextFunction) => {",
+          "excerpt_sha256": "905f519910b61a6b8eae419eaede782ed1c8661eb04d9e9f193ea17e3416393d",
+          "line": 85,
+          "path": "packages/server/src/controllers/assistants/index.ts",
+          "symbol": "controller"
+        },
+        {
+          "excerpt": "const getAssistantById = async (assistantId: string, workspaceId: string): Promise<Assistant> => {",
+          "excerpt_sha256": "7fa85c85fab1814256f9b3b7254c626a00643cc269cfb94d6ada03178f09f204",
+          "line": 275,
+          "path": "packages/server/src/services/assistants/index.ts",
+          "symbol": "workspace-boundary"
+        }
+      ],
+      "invariant": "读取单个 Assistant 详情须具备 assistants:view 权限，且返回对象必须属于调用者的 activeWorkspaceId。",
+      "node_id": "F018",
+      "potential_artifact": "GET /assistants/:id → checkPermission('assistants:view') → controller 读取 req.user.activeWorkspaceId → getAssistantById(id, workspaceId) → Assistant.findOneBy({id, workspaceId}) → JSON 响应。若去掉 workspace 条件，已认证且有 assistants:view 的请求可用他 workspace 的 id 命中对象。",
+      "security_question": "GET /assistants/:id 能否在缺少 assistants:view 权限或对象不属于 activeWorkspaceId 时返回 Assistant 详情？"
+    },
+    {
+      "code_scope": [
+        "packages/server/src/controllers/internal-predictions/index.ts",
+        "packages/server/src/controllers/leads/index.ts",
+        "packages/server/src/services/chatflows/index.ts"
+      ],
+      "evidence_refs": [
+        {
+          "excerpt": "return getChatflowById(chatflowId, workspaceId)",
+          "excerpt_sha256": "c707d9429a8da8020def438e6dc1e6ca8a7c17f69baffe63081898af5903411d",
+          "line": 312,
+          "path": "packages/server/src/services/chatflows/index.ts",
+          "symbol": "getChatflowByIdForWorkspace"
+        },
+        {
+          "excerpt": "if (!workspaceId) {",
+          "excerpt_sha256": "43e9f176948363adb2c03409c54b08aaa8888a856d0e251d33a70f8bb6366676",
+          "line": 309,
+          "path": "packages/server/src/services/chatflows/index.ts",
+          "symbol": "getChatflowByIdForWorkspace"
+        },
+        {
+          "excerpt": "...(workspaceId ? { workspaceId } : {})",
+          "excerpt_sha256": "45934faf7a1d6998c4b85965ff1b178ca3550c6e212028742ab5239a1cbbe62d",
+          "line": 289,
+          "path": "packages/server/src/services/chatflows/index.ts",
+          "symbol": "getChatflowById"
+        },
+        {
+          "excerpt": "const chatflow = await chatflowService.getChatflowByIdForWorkspace(req.params.id, workspaceId)",
+          "excerpt_sha256": "9b3e2f588e12b895f0b65ab9e3e7717aef14a0a53f403ff13d66a8d0e79699c2",
+          "line": 15,
+          "path": "packages/server/src/controllers/internal-predictions/index.ts",
+          "symbol": "createInternalPrediction"
+        },
+        {
+          "excerpt": "const chatflow = await chatflowsService.getChatflowByIdForWorkspace(chatflowid, workspaceId)",
+          "excerpt_sha256": "b70455482299a6bb8d8c1cb7ffc1452020b8fc54e96bdca982d706094e386584",
+          "line": 23,
+          "path": "packages/server/src/controllers/leads/index.ts",
+          "symbol": "getAllLeadsForChatflow"
+        },
+        {
+          "excerpt": "const getChatflowById = async (chatflowId: string, workspaceId?: string): Promise<any> => {",
+          "excerpt_sha256": "7cab9ce1e27f80692cee7f12b1d1e17febb0cc910db59e9f5d7152e78683141a",
+          "line": 280,
+          "path": "packages/server/src/services/chatflows/index.ts",
+          "symbol": "workspace-boundary"
+        },
+        {
+          "excerpt": "const workspaceId = req.user?.activeWorkspaceId",
+          "excerpt_sha256": "0a2faa349d2e362317d5283fe8203207bad452c035735826510be820794f230a",
+          "line": 161,
+          "path": "packages/server/src/controllers/chat-messages/index.ts",
+          "symbol": "controller"
+        }
+      ],
+      "invariant": "需要工作区所有权的 ChatFlow 操作必须在使用对象前拒绝缺失的 workspaceId，并按该 workspaceId 查询。",
+      "node_id": "F019",
+      "potential_artifact": "调用方传入 chatflowId/workspaceId → helper 对 workspaceId 缺失返回 BAD_REQUEST → helper 调 getChatflowById(id, workspaceId) → ChatFlow.findOneBy({id, workspaceId}) → 返回或 NOT_FOUND。若允许 undefined workspace，getChatflowById 的可选 workspace 条件会恢复全局 id lookup。",
+      "security_question": "getChatflowByIdForWorkspace 能否在未给 workspaceId 或 ChatFlow 不属于该工作区时返回对象，供内部预测或 lead 读取继续使用？"
+    },
+    {
+      "code_scope": [
+        "packages/server/src/controllers/chat-messages/index.ts",
+        "packages/server/src/enterprise/rbac/PermissionCheck.ts",
+        "packages/server/src/index.ts",
+        "packages/server/src/routes/chat-messages/index.ts",
+        "packages/server/src/routes/chatflows/index.ts",
+        "packages/server/src/utils/getChatMessage.ts"
+      ],
+      "evidence_refs": [
+        {
+          "excerpt": "chatMessageController.getAllChatMessages",
+          "excerpt_sha256": "ba4367cdfbca4ae32df8579892c67bbef59479e11d745ff33cb33068b66c9b9b",
+          "line": 10,
+          "path": "packages/server/src/routes/chat-messages/index.ts",
+          "symbol": "router.get/router.delete"
+        },
+        {
+          "excerpt": "router.delete(['/', '/:id'], chatMessageController.removeAllChatMessages)",
+          "excerpt_sha256": "71c22da3f67f62212f6167dc5ed080c26e2565133612f3e121f41eaeb4761251",
+          "line": 16,
+          "path": "packages/server/src/routes/chat-messages/index.ts",
+          "symbol": "chatMessageRouter"
+        },
+        {
+          "excerpt": "activeWorkspaceId,",
+          "excerpt_sha256": "f4c66632b2c43f5eed57d5bdbc175d5eccbda357a1e3f54b5b3b9a50c4a84e09",
+          "line": 100,
+          "path": "packages/server/src/controllers/chat-messages/index.ts",
+          "symbol": "getAllChatMessages"
+        },
+        {
+          "excerpt": "workspaceId: activeWorkspaceId",
+          "excerpt_sha256": "5d1e5f80f99be601239c1c67cca87fb8fb384c386080921cadc8743692661083",
+          "line": 64,
+          "path": "packages/server/src/utils/getChatMessage.ts",
+          "symbol": "utilGetChatMessage"
+        },
+        {
+          "excerpt": "const chatflow = await chatflowsService.getChatflowByIdForWorkspace(req.params.id, workspaceId)",
+          "excerpt_sha256": "d3a7b6c20d198334d7acbf009e104f1d552b72378a50ddc102a2aec44552cf5d",
+          "line": 169,
+          "path": "packages/server/src/controllers/chat-messages/index.ts",
+          "symbol": "removeAllChatMessages"
+        },
+        {
+          "excerpt": "const apiResponse = await chatMessagesService.removeAllChatMessages(",
+          "excerpt_sha256": "532e16676b349b56f5fce43e322fa3e921846fa707162079297b8889a8c65b19",
+          "line": 292,
+          "path": "packages/server/src/controllers/chat-messages/index.ts",
+          "symbol": "removeAllChatMessages"
+        },
+        {
+          "excerpt": "permissions: apiKey.permissions,",
+          "excerpt_sha256": "2c8711f1a3f356b6af572a35b248da1045f63c1bcb18f9dd57ba25bf0ea80f3d",
+          "line": 281,
+          "path": "packages/server/src/index.ts",
+          "symbol": "FlowiseApp.start"
+        },
+        {
+          "excerpt": "export const checkAnyPermission = (permissionsString: string) => {",
+          "excerpt_sha256": "dd58c057cebfcaf84fe62aca8a02bc26230b6b269ac4bec4ed474e48bc77537b",
+          "line": 24,
+          "path": "packages/server/src/enterprise/rbac/PermissionCheck.ts",
+          "symbol": "checkAnyPermission"
+        },
+        {
+          "excerpt": "checkAnyPermission('chatflows:view,chatflows:update,chatflows:delete,agentflows:view,agentflows:update,agentflows:delete'),",
+          "excerpt_sha256": "09aed13ba8d394a2813176a807ab8855d0e6b04582c9d1042b8dcac8af1d149e",
+          "line": 21,
+          "path": "packages/server/src/routes/chatflows/index.ts",
+          "symbol": "chatflowsRouter"
+        },
+        {
+          "excerpt": "router.delete(['/', '/:id'], checkAnyPermission('chatflows:delete,agentflows:delete,assistants:delete'), chatflowsController.deleteChatflow)",
+          "excerpt_sha256": "12603ae2686cc6ca061b1a5214c7dfb321c21fcc4e2058778ec60f4447466bce",
+          "line": 34,
+          "path": "packages/server/src/routes/chatflows/index.ts",
+          "symbol": "chatflowsRouter"
+        },
+        {
+          "excerpt": "const activeWorkspaceId = req.user?.activeWorkspaceId",
+          "excerpt_sha256": "ea0641ca2ffa1b8c75b9850bab2bb802befc81c3c67af11b02dd4314fa9c0655",
+          "line": 66,
+          "path": "packages/server/src/controllers/chat-messages/index.ts",
+          "symbol": "controller"
+        },
+        {
+          "excerpt": "// Check if chatflow workspaceId is same as activeWorkspaceId",
+          "excerpt_sha256": "6026673223bd603b3f09c7a394c57ce2bf6e3bb484f97a54b3e96ac7cbbc3871",
+          "line": 60,
+          "path": "packages/server/src/utils/getChatMessage.ts",
+          "symbol": "workspace-boundary"
+        },
+        {
+          "excerpt": "const workspaceId = req.user?.activeWorkspaceId",
+          "excerpt_sha256": "0a2faa349d2e362317d5283fe8203207bad452c035735826510be820794f230a",
+          "line": 161,
+          "path": "packages/server/src/controllers/chat-messages/index.ts",
+          "symbol": "controller"
+        }
+      ],
+      "invariant": "chat-messages 的读取与删除须分别通过对应动作权限检查；工作区对象归属校验不能替代 RBAC 动作权限。",
+      "node_id": "F020",
+      "potential_artifact": "/chatmessage/:id → controller 传 req.user.activeWorkspaceId → utilGetChatMessage 先以 ChatFlow.findOneBy({id, workspaceId}) 校验 → 再按 chatflowid 与筛选条件读消息；DELETE 先 getChatflowByIdForWorkspace，再把受检 id 传给删除服务。若移除前置归属检查，攻击者可用别 workspace 的 chatflow id 读取或删除其消息。",
+      "security_question": "已获认证且属于 chatflow 工作区、但缺少相应查看或删除动作权限的主体，能否经 chat-messages GET/DELETE 路由读取或删除该 chatflow 的消息？"
+    },
+    {
+      "code_scope": [
+        "packages/server/src/enterprise/services/account.service.ts",
+        "packages/server/src/enterprise/services/workspace-user.service.ts",
+        "packages/server/src/enterprise/sso/SSOBase.ts"
+      ],
+      "evidence_refs": [
+        {
+          "excerpt": "if (user.status === UserStatus.INVITED)",
+          "excerpt_sha256": "38f00a3b745f0a99b65a63fe38b255e48b938e74280864106e15df046922ecce",
+          "line": 81,
+          "path": "packages/server/src/enterprise/sso/SSOBase.ts",
+          "symbol": "SSOBase.getUser"
+        },
+        {
+          "excerpt": "...user,",
+          "excerpt_sha256": "71f740f14b4a79955b1ea0cdd352071d94c843a1460e0be49aaa73f90b2e7cad",
+          "line": 84,
+          "path": "packages/server/src/enterprise/sso/SSOBase.ts",
+          "symbol": "SSOBase.verifyAndLogin"
+        },
+        {
+          "excerpt": "const newAccount = await accountService.register(data)",
+          "excerpt_sha256": "723436faeb15493531f5e302e3942a4359e1324ce6041071e1354e8de974c209",
+          "line": 92,
+          "path": "packages/server/src/enterprise/sso/SSOBase.ts",
+          "symbol": "SSOBase.verifyAndLogin"
+        },
+        {
+          "excerpt": "if (data.user.tempToken) {",
+          "excerpt_sha256": "e567ef0c23753230427e555d4043c3597354388d8f8df71dae1e625c953c67b1",
+          "line": 245,
+          "path": "packages/server/src/enterprise/services/account.service.ts",
+          "symbol": "AccountService.createRegisterAccount"
+        },
+        {
+          "excerpt": "const user = await this.userService.readUserByToken(data.user.tempToken, queryRunner)",
+          "excerpt_sha256": "6d011b3b0a19fa4abe590268e960e3f9700ccc8e7ee0a48319b0e5ed5f343d1b",
+          "line": 246,
+          "path": "packages/server/src/enterprise/services/account.service.ts",
+          "symbol": "AccountService.createRegisterAccount"
+        },
+        {
+          "excerpt": "data.user.status = UserStatus.ACTIVE",
+          "excerpt_sha256": "71ff8db5f169e798547a49f5d3f3f4630e2eb094653451a60c726b5783d68128",
+          "line": 269,
+          "path": "packages/server/src/enterprise/services/account.service.ts",
+          "symbol": "AccountService.createRegisterAccount"
+        },
+        {
+          "excerpt": "return done(null, loggedInUser as Express.User, { message: 'Logged in Successfully' })",
+          "excerpt_sha256": "354ec2657f5b71e594ab3393e8e4570b095e1694155be4f32d0cc785c4bba7fb",
+          "line": 141,
+          "path": "packages/server/src/enterprise/sso/SSOBase.ts",
+          "symbol": "SSOBase.verifyAndLogin"
+        },
+        {
+          "excerpt": "let user: any = await userService.readUserByEmail(email, queryRunner)",
+          "excerpt_sha256": "2e96e2f80171096e7580e8596fbd70fc34464ec7a17016aaea48df10b825f750",
+          "line": 56,
+          "path": "packages/server/src/enterprise/sso/SSOBase.ts",
+          "symbol": "enterprise-auth"
+        },
+        {
+          "excerpt": "case Platform.ENTERPRISE: {",
+          "excerpt_sha256": "1abbed98f0006e90366c98d9272f93c80aedbf0e95ad758155bd3d062f282f79",
+          "line": 244,
+          "path": "packages/server/src/enterprise/services/account.service.ts",
+          "symbol": "service"
+        },
+        {
+          "excerpt": "private async saveRegisterAccount(data: AccountDTO) {",
+          "excerpt_sha256": "013ffe0237b9c549fe9043f459bfb795065453a032b02b63d4dfb78c174f9f5e",
+          "line": 308,
+          "path": "packages/server/src/enterprise/services/account.service.ts",
+          "symbol": "service"
+        }
+      ],
+      "invariant": "邀请态账号的激活及工作区身份发放必须经过独立的邀请接受证明；不能把库内已存的 token 当成调用者出示的 token。",
+      "node_id": "F021",
+      "potential_artifact": "SSOBase.verifyAndLogin 读取用户 → INVITED 分支复制用户并把 credential 置空 → AccountService Enterprise register 分支按 tempToken 读回同一用户、校验 email、检查 expiry、设置 ACTIVE 并清空 tempToken/tokenExpiry → saveRegisterAccount 提交后删除 credential/tempToken/tokenExpiry，再构造登录用户。若 token/email 校验或返回清理缺失，邀请可被错误激活或敏感字段泄露。",
+      "security_question": "SSO 声称的邮箱命中 INVITED 用户时，服务端能否仅凭数据库中已有邀请 token 完成注册激活并发放 workspace 登录身份，而不验证请求者持有邀请 token？"
+    },
+    {
+      "code_scope": [
+        "packages/server/src/enterprise/services/user.service.ts",
+        "packages/server/src/enterprise/services/workspace-user.service.ts",
+        "packages/server/src/enterprise/sso/GithubSSO.ts",
+        "packages/server/src/enterprise/sso/SSOBase.ts"
+      ],
+      "evidence_refs": [
+        {
+          "excerpt": "userService.readUserByEmail(email, queryRunner)",
+          "excerpt_sha256": "de13b701abdc5bb52aaba782258f464366acc7d7fb05beedafdc37514137aeeb",
+          "line": 56,
+          "path": "packages/server/src/enterprise/sso/SSOBase.ts",
+          "symbol": "SSOBase.getUser"
+        },
+        {
+          "excerpt": "if (!primaryEmail && Array.isArray(emails) && emails.length > 0) {",
+          "excerpt_sha256": "cb739421a4724eec8f6d9b15873fd8c298b3409937ec0a9a456f7cd37aecf7fe",
+          "line": 47,
+          "path": "packages/server/src/enterprise/sso/GithubSSO.ts",
+          "symbol": "GithubSSO.setSSOConfig"
+        },
+        {
+          "excerpt": "primaryEmail = emails[0].email",
+          "excerpt_sha256": "d0f5539c7c37113daefa0a017c243a15b97383df8d6a72551a4d3c4ae9520a26",
+          "line": 48,
+          "path": "packages/server/src/enterprise/sso/GithubSSO.ts",
+          "symbol": "GithubSSO.setSSOConfig"
+        },
+        {
+          "excerpt": "return await queryRunner.manager.findOneBy(User, { email: ILike(email) })",
+          "excerpt_sha256": "f19047acf065e1d84a2cff410abfa32e805d5ca0bdcf6a614861a52e1dd5df45",
+          "line": 61,
+          "path": "packages/server/src/enterprise/services/user.service.ts",
+          "symbol": "UserService.readUserByEmail"
+        },
+        {
+          "excerpt": "let wsUserOrUsers = await workspaceUserService.readWorkspaceUserByLastLogin(user?.id, queryRunner)",
+          "excerpt_sha256": "956ffccd0cb2c5f1ca72c6545b49363d904f2206b7aa10d10172287ff7bb6fce",
+          "line": 95,
+          "path": "packages/server/src/enterprise/sso/SSOBase.ts",
+          "symbol": "SSOBase.verifyAndLogin"
+        },
+        {
+          "excerpt": "const loggedInUser: LoggedInUser = {",
+          "excerpt_sha256": "b24f524835727fa9f42762fe117a90b2bb788822b39c9440f81142114dee06a2",
+          "line": 122,
+          "path": "packages/server/src/enterprise/sso/SSOBase.ts",
+          "symbol": "SSOBase.verifyAndLogin"
+        },
+        {
+          "excerpt": "return done(null, loggedInUser as Express.User, { message: 'Logged in Successfully' })",
+          "excerpt_sha256": "354ec2657f5b71e594ab3393e8e4570b095e1694155be4f32d0cc785c4bba7fb",
+          "line": 141,
+          "path": "packages/server/src/enterprise/sso/SSOBase.ts",
+          "symbol": "SSOBase.verifyAndLogin"
+        },
+        {
+          "excerpt": "const email = profile.emails[0].value",
+          "excerpt_sha256": "6e168e84a3b2dc5e6106b61d4b35aeb74846e4bd52f30daa5bf493c36360b996",
+          "line": 53,
+          "path": "packages/server/src/enterprise/sso/GoogleSSO.ts",
+          "symbol": "Google strategy callback"
+        },
+        {
+          "excerpt": "return this.verifyAndLogin(this.app, email, done, profile, accessToken, refreshToken)",
+          "excerpt_sha256": "ea597983bd70775ab2a0b83c7541fde7c6d235f3ac2ef2292ddf15e384904a0a",
+          "line": 54,
+          "path": "packages/server/src/enterprise/sso/GoogleSSO.ts",
+          "symbol": "Google strategy callback"
+        },
+        {
+          "excerpt": "let user: any = await userService.readUserByEmail(email, queryRunner)",
+          "excerpt_sha256": "2e96e2f80171096e7580e8596fbd70fc34464ec7a17016aaea48df10b825f750",
+          "line": 56,
+          "path": "packages/server/src/enterprise/sso/SSOBase.ts",
+          "symbol": "SSOBase.verifyAndLogin"
+        }
+      ],
+      "invariant": "既有本地用户的 SSO 登录必须将可信的提供者身份与该用户绑定；邮箱字符串匹配本身不应替代该身份绑定。",
+      "node_id": "F022",
+      "potential_artifact": "Google SSO 回调取 profile.emails[0].value -> SSOBase.verifyAndLogin 以 email 调用 UserService.readUserByEmail -> UserService 通过 ILike(email) 在 User 表全局查找 -> SSOBase 将命中的 user 与 workspace/role 信息组装为 LoggedInUser 并 done 登录。",
+      "security_question": "SSO 回调只用提供者给出的邮箱匹配本地既有用户时，是否可能把尚未证明属于该本地用户的 SSO 主体登录为该用户及其工作区身份？"
+    },
+    {
+      "code_scope": [
+        "packages/server/src/enterprise/middleware/passport/index.ts",
+        "packages/server/src/index.ts"
+      ],
+      "evidence_refs": [
+        {
+          "excerpt": "this.app.use('/admin/queues', rateLimiter, verifyTokenForBullMQDashboard",
+          "excerpt_sha256": "7c2df839dbc872b931e86b72d80fe3f4e4e0fc34a71dc52622aaa6739ff425ee",
+          "line": 350,
+          "path": "packages/server/src/index.ts",
+          "symbol": "App.init queue dashboard mount"
+        },
+        {
+          "excerpt": "if (process.env.MODE === MODE.QUEUE && process.env.ENABLE_BULLMQ_DASHBOARD === 'true' && !this.identityManager.isCloud()) {",
+          "excerpt_sha256": "b92d7a7db1fcc4d5f1e7897153ce80040ca58c77419d723e62302ef07f913a11",
+          "line": 339,
+          "path": "packages/server/src/index.ts",
+          "symbol": "App.init queue dashboard mount"
+        },
+        {
+          "excerpt": "passport.authenticate('jwt', { session: true }, (err: any, user: LoggedInUser, info: object) => {",
+          "excerpt_sha256": "a329ee2af12505e3ce4337fe7005487b528636df59c2dbe5eac0bc7daa6af5d8",
+          "line": 438,
+          "path": "packages/server/src/enterprise/middleware/passport/index.ts",
+          "symbol": "verifyTokenForBullMQDashboard"
+        },
+        {
+          "excerpt": "if (!user) {",
+          "excerpt_sha256": "72f09465aea04133ed0cdf6f646a47291e584bf7ab373ffa96e4febdd6082125",
+          "line": 451,
+          "path": "packages/server/src/enterprise/middleware/passport/index.ts",
+          "symbol": "verifyTokenForBullMQDashboard"
+        },
+        {
+          "excerpt": "req.user = user",
+          "excerpt_sha256": "9dc034dd2771753f244b245eb31878c22e60c6213e0e08a045c0c40e9277d1f4",
+          "line": 460,
+          "path": "packages/server/src/enterprise/middleware/passport/index.ts",
+          "symbol": "verifyTokenForBullMQDashboard"
+        },
+        {
+          "excerpt": "next()",
+          "excerpt_sha256": "faa91ee90040b086114a362567489d782d302e909e076dee38bead948a5a59ca",
+          "line": 461,
+          "path": "packages/server/src/enterprise/middleware/passport/index.ts",
+          "symbol": "verifyTokenForBullMQDashboard"
+        },
+        {
+          "excerpt": "export const verifyTokenForBullMQDashboard = (req: Request, res: Response, next: NextFunction) => {",
+          "excerpt_sha256": "ed1c88038ebe0f0a5326604fb61a8311f74c46ca46fd2dd326c7a84cb40cadb4",
+          "line": 437,
+          "path": "packages/server/src/enterprise/middleware/passport/index.ts",
+          "symbol": "enterprise-auth"
+        }
+      ],
+      "invariant": "BullMQ 管理面板应只对获准管理队列的主体开放，令牌有效性和管理授权都须在挂载前得到满足。",
+      "node_id": "F023",
+      "potential_artifact": "MODE=QUEUE 且 ENABLE_BULLMQ_DASHBOARD=true 且非 cloud → rateLimiter → verifyTokenForBullMQDashboard → queueManager.getBullBoardRouter。当前 dashboard middleware 只处理 token/许可证并把 user 放入 req，没有 checkPermission 或 admin-role guard；若普通已登录用户可到达 bull board，即突破管理面板边界。",
+      "security_question": "在队列模式且启用 dashboard 时，/admin/queues 是否只凭有效 JWT 就让普通登录用户进入 BullMQ 管理面板？"
+    },
+    {
+      "code_scope": [
+        "packages/components/src/textToSpeech.ts",
+        "packages/server/src/controllers/text-to-speech/index.ts",
+        "packages/server/src/index.ts",
+        "packages/server/src/routes/openai-realtime/index.ts",
+        "packages/server/src/services/chatflows/index.ts",
+        "packages/server/src/services/openai-realtime/index.ts",
+        "packages/server/src/utils/constants.ts"
+      ],
+      "evidence_refs": [
+        {
+          "excerpt": "id: chatflowid",
+          "excerpt_sha256": "b2276a116bd2b12f4ee1aec5ffb75558a3d602dd54358f4aaa1b2191452dcd1f",
+          "line": 32,
+          "path": "packages/server/src/services/openai-realtime/index.ts",
+          "symbol": "buildAndInitTool"
+        },
+        {
+          "excerpt": "router.post(['/', '/:id'], openaiRealTimeController.executeAgentTool)",
+          "excerpt_sha256": "befee27cd0af358f0534a35f193402c73379c48578b6b1c71130f5b556ef3e8e",
+          "line": 10,
+          "path": "packages/server/src/routes/openai-realtime/index.ts",
+          "symbol": "openaiRealtimeRouter"
+        },
+        {
+          "excerpt": "const { isValid, apiKey } = await validateAPIKey(req)",
+          "excerpt_sha256": "c729664947ca91d2cdc71851de3d2f83baf5250891ddb242f33e2fa43cac69d3",
+          "line": 254,
+          "path": "packages/server/src/index.ts",
+          "symbol": "FlowiseApp.start"
+        },
+        {
+          "excerpt": "activeWorkspaceId: workspace.id,",
+          "excerpt_sha256": "f9a5f371a02d965ae62801a43f6f216d86b4712fb2297cb25e7d9a0f5e8e00ec",
+          "line": 288,
+          "path": "packages/server/src/index.ts",
+          "symbol": "FlowiseApp.start"
+        },
+        {
+          "excerpt": "const availableVariables = await appServer.AppDataSource.getRepository(Variable).findBy(getWorkspaceSearchOptions(chatflow.workspaceId))",
+          "excerpt_sha256": "225cb3d584fb5e30b3b79ada4f8a2db471254d30af5437bf144486fe6c52b65f",
+          "line": 69,
+          "path": "packages/server/src/services/openai-realtime/index.ts",
+          "symbol": "buildAndInitTool"
+        },
+        {
+          "excerpt": "const agent = await nodeInstance.init(nodeToExecuteData, '', {",
+          "excerpt_sha256": "8cca426ee51c3ae26071e9eede41bc86fce439055161aa4ba2ef4580c4794060",
+          "line": 146,
+          "path": "packages/server/src/services/openai-realtime/index.ts",
+          "symbol": "buildAndInitTool"
+        },
+        {
+          "excerpt": "let toolOutput = await tool.call(inputArgsObj, undefined, undefined, { chatId })",
+          "excerpt_sha256": "641aa5aad8cefd1bc1783c1e49916d482b7d576b4c2737b8aa761b18c505ff2e",
+          "line": 190,
+          "path": "packages/server/src/services/openai-realtime/index.ts",
+          "symbol": "executeAgentTool"
+        },
+        {
+          "excerpt": "'/api/v1/text-to-speech/generate',",
+          "excerpt_sha256": "0fcbda29c2f56c08ad9bda72509f965f5afe11f2455c8cbdff259e460528929d",
+          "line": 44,
+          "path": "packages/server/src/utils/constants.ts",
+          "symbol": "WHITELIST_URLS"
+        },
+        {
+          "excerpt": "chatflow = await chatflowsService.getChatflowById(chatflowId)",
+          "excerpt_sha256": "618a423410a74b1022187153d69408feaa1673da80b8a758ff046fe5d2424303",
+          "line": 40,
+          "path": "packages/server/src/controllers/text-to-speech/index.ts",
+          "symbol": "generateTextToSpeech"
+        },
+        {
+          "excerpt": "const dbResponse = await appServer.AppDataSource.getRepository(ChatFlow).findOne({",
+          "excerpt_sha256": "82a86c50037ec45bde3049e4926f27eeaecfbc4df3a7968353aa24a551b831fe",
+          "line": 286,
+          "path": "packages/server/src/services/chatflows/index.ts",
+          "symbol": "getChatflowById"
+        },
+        {
+          "excerpt": "const credentialData = await getCredentialData(credentialId ?? '', options)",
+          "excerpt_sha256": "a48096da22e27bf882c2abd869c743fc3ed7dd3786da4821ede54f81e566832b",
+          "line": 34,
+          "path": "packages/components/src/textToSpeech.ts",
+          "symbol": "convertTextToSpeechStream"
+        },
+        {
+          "excerpt": "router.get(['/', '/:id'], openaiRealTimeController.getAgentTools)",
+          "excerpt_sha256": "6931ef3c5686c0e315a6338854d23deb35d701329eb6ee1308e1293961a52910",
+          "line": 7,
+          "path": "packages/server/src/routes/openai-realtime/index.ts",
+          "symbol": "router"
+        },
+        {
+          "excerpt": "const buildAndInitTool = async (chatflowid: string, _chatId?: string, _apiMessageId?: string) => {",
+          "excerpt_sha256": "555ba0c3531c235e9b19b09941c1c0f19665610ab590f8576df1521ec67074bb",
+          "line": 29,
+          "path": "packages/server/src/services/openai-realtime/index.ts",
+          "symbol": "service"
+        }
+      ],
+      "invariant": "实时 agent 工具的 chatflow 加载及执行必须受已认证请求者的 workspace 约束，不能仅以 chatflowId 反查目标 workspace 后执行。",
+      "node_id": "F024",
+      "potential_artifact": "全局 /api/v1 middleware 验证 API key 并把其 workspace 写入 req.user → /openai-realtime/:id 路由直接进入 controller/service → buildAndInitTool 以 ChatFlow.findOneBy({id: chatflowid}) 无 workspace 条件读取 → 依据该 chatflow.workspaceId 加载变量并 buildFlow/init 工具 → executeAgentTool 调用任意工具。若补充 workspace 条件并与 API key workspace 比较，跨租户 id 将在读取前失败。",
+      "security_question": "持有某 workspace 的有效 API Key 的调用者，能否通过 openai-realtime 的任意 chatflowId 加载并执行另一个 workspace 的私有 agent 工具？"
+    },
+    {
+      "code_scope": [
+        "packages/server/src/controllers/upsert-history/index.ts",
+        "packages/server/src/enterprise/rbac/PermissionCheck.ts",
+        "packages/server/src/index.ts",
+        "packages/server/src/routes/chatflows/index.ts",
+        "packages/server/src/routes/upsert-history/index.ts",
+        "packages/server/src/services/upsert-history/index.ts"
+      ],
+      "evidence_refs": [
+        {
+          "excerpt": "upsertHistoryController.getAllUpsertHistory",
+          "excerpt_sha256": "2fcde2e11e1e4513f9441544098ef9a6d8ed55ce8aa2ac3f94b495b1c789f893",
+          "line": 8,
+          "path": "packages/server/src/routes/upsert-history/index.ts",
+          "symbol": "router.get/router.patch"
+        },
+        {
+          "excerpt": "router.patch('/', upsertHistoryController.patchDeleteUpsertHistory)",
+          "excerpt_sha256": "fb5dd5d9d6008caf4cc052fb2d1479a15532c900e1b3a4abb79de7801d6a552c",
+          "line": 11,
+          "path": "packages/server/src/routes/upsert-history/index.ts",
+          "symbol": "upsertHistoryRouter"
+        },
+        {
+          "excerpt": "await chatflowsService.getChatflowById(chatflowid, workspaceId)",
+          "excerpt_sha256": "6c4edf7f31af531534b9acfb2fe7bf150533e5098786b6957c7d903b7de30783",
+          "line": 23,
+          "path": "packages/server/src/controllers/upsert-history/index.ts",
+          "symbol": "getAllUpsertHistory"
+        },
+        {
+          "excerpt": "const apiResponse = await upsertHistoryService.getAllUpsertHistory(sortOrder, chatflowid, startDate, endDate)",
+          "excerpt_sha256": "1e8473ea0db16be60604f519d4dc22705afaceee64146cc08510b9d31579e006",
+          "line": 28,
+          "path": "packages/server/src/controllers/upsert-history/index.ts",
+          "symbol": "getAllUpsertHistory"
+        },
+        {
+          "excerpt": "const apiResponse = await upsertHistoryService.patchDeleteUpsertHistory(ids, workspaceId)",
+          "excerpt_sha256": "69dfdf114fbca8e2b21048e8923c0d35e8738c7fde70d01531295224d90a4bbf",
+          "line": 45,
+          "path": "packages/server/src/controllers/upsert-history/index.ts",
+          "symbol": "patchDeleteUpsertHistory"
+        },
+        {
+          "excerpt": "await chatflowsService.assertChatflowIdsInWorkspace(chatflowIds, workspaceId, queryRunner)",
+          "excerpt_sha256": "92766918c1cc3bda25c4c4b09172671c327d43099b45e08bbb930017bea18cbb",
+          "line": 84,
+          "path": "packages/server/src/services/upsert-history/index.ts",
+          "symbol": "patchDeleteUpsertHistory"
+        },
+        {
+          "excerpt": "const deleteResult = await repo.delete({ id: In(uniqueIds) })",
+          "excerpt_sha256": "f2ce57c40ce5963de95d760486203ea748e0d086cf1915017a753cc4fcf258cf",
+          "line": 86,
+          "path": "packages/server/src/services/upsert-history/index.ts",
+          "symbol": "patchDeleteUpsertHistory"
+        },
+        {
+          "excerpt": "permissions: apiKey.permissions,",
+          "excerpt_sha256": "2c8711f1a3f356b6af572a35b248da1045f63c1bcb18f9dd57ba25bf0ea80f3d",
+          "line": 281,
+          "path": "packages/server/src/index.ts",
+          "symbol": "FlowiseApp.start"
+        },
+        {
+          "excerpt": "export const checkAnyPermission = (permissionsString: string) => {",
+          "excerpt_sha256": "dd58c057cebfcaf84fe62aca8a02bc26230b6b269ac4bec4ed474e48bc77537b",
+          "line": 24,
+          "path": "packages/server/src/enterprise/rbac/PermissionCheck.ts",
+          "symbol": "checkAnyPermission"
+        },
+        {
+          "excerpt": "checkAnyPermission('chatflows:view,chatflows:update,chatflows:delete,agentflows:view,agentflows:update,agentflows:delete'),",
+          "excerpt_sha256": "09aed13ba8d394a2813176a807ab8855d0e6b04582c9d1042b8dcac8af1d149e",
+          "line": 21,
+          "path": "packages/server/src/routes/chatflows/index.ts",
+          "symbol": "chatflowsRouter"
+        },
+        {
+          "excerpt": "router.delete(['/', '/:id'], checkAnyPermission('chatflows:delete,agentflows:delete,assistants:delete'), chatflowsController.deleteChatflow)",
+          "excerpt_sha256": "12603ae2686cc6ca061b1a5214c7dfb321c21fcc4e2058778ec60f4447466bce",
+          "line": 34,
+          "path": "packages/server/src/routes/chatflows/index.ts",
+          "symbol": "chatflowsRouter"
+        },
+        {
+          "excerpt": "const getAllUpsertHistory = async (req: Request, res: Response, next: NextFunction) => {",
+          "excerpt_sha256": "466faf411ab5eac376bdb45a775d1c0e44391d6755ae4dd8318714b773f991ab",
+          "line": 7,
+          "path": "packages/server/src/controllers/upsert-history/index.ts",
+          "symbol": "controller"
+        },
+        {
+          "excerpt": "const patchDeleteUpsertHistory = async (ids: string[] = [], workspaceId: string): Promise<any> => {",
+          "excerpt_sha256": "9921fc8e0667a34f50462865c69287040eaccb8f2902d5ff8be3bd9c430363a7",
+          "line": 54,
+          "path": "packages/server/src/services/upsert-history/index.ts",
+          "symbol": "workspace-boundary"
+        },
+        {
+          "excerpt": "/** Ensures every id exists as a chatflow in workspaceId. One DB query; pass queryRunner when inside a transaction for consistent reads. */",
+          "excerpt_sha256": "8ceb5662be7724a82c8a1fc683850ddfdc4489d069454dbeffca51b2f24c9fdc",
+          "line": 315,
+          "path": "packages/server/src/services/chatflows/index.ts",
+          "symbol": "workspace-boundary"
+        }
+      ],
+      "invariant": "UpsertHistory 的读取与删除须分别通过对应动作权限检查，并继续受 chatflow workspace 归属约束；workspace 归属不是 RBAC 动作许可。",
+      "node_id": "F025",
+      "potential_artifact": "GET controller 要求 activeWorkspaceId → getChatflowById(chatflowid, workspaceId) → upsertHistoryService.getAllUpsertHistory(chatflowid) 查询并解析结果；PATCH service 先按 ids 取 rows/chatflowid → assertChatflowIdsInWorkspace(chatflowIds, workspaceId, queryRunner) → 同一事务 delete。若移除任一前置检查，GET 可读他 workspace 历史或 PATCH 可删他 workspace 记录。",
+      "security_question": "已获认证且属于 chatflow 工作区、但缺少相应查看或删除动作权限的主体，能否经 upsert-history GET/PATCH 路由读取或删除该 chatflow 的 UpsertHistory 记录？"
+    },
+    {
+      "code_scope": [
+        "packages/components/nodes/tools/MCP/CustomMCP/CustomMCP.ts",
+        "packages/components/nodes/tools/MCP/core.ts"
+      ],
+      "evidence_refs": [
+        {
+          "excerpt": "const allowedCommands = ['node', 'npx', 'python', 'python3', 'docker']",
+          "excerpt_sha256": "f043beef9975e36f0542cbf4ab07a684c6d881e6939b3882dbf034e774ff3302",
+          "line": 381,
+          "path": "packages/components/nodes/tools/MCP/core.ts",
+          "symbol": "validateMCPServerConfig"
+        },
+        {
+          "excerpt": "if (serverParams.command && !allowedCommands.includes(serverParams.command)) {",
+          "excerpt_sha256": "883096b849dcc854c09769224ac9c0246d21a5ec1c457ed4c48367b6ce41c936",
+          "line": 383,
+          "path": "packages/components/nodes/tools/MCP/core.ts",
+          "symbol": "validateMCPServerConfig"
+        },
+        {
+          "excerpt": "if (serverParams.args && Array.isArray(serverParams.args)) {",
+          "excerpt_sha256": "125bd953d8f48125feeeffda7d8dbe03423dc36840127704dceba339fbc50e6e",
+          "line": 388,
+          "path": "packages/components/nodes/tools/MCP/core.ts",
+          "symbol": "validateMCPServerConfig"
+        },
+        {
+          "excerpt": "validateCommandFlags(serverParams.command, serverParams.args)",
+          "excerpt_sha256": "cd6c84fdc79bcb806ea9e42c9ab505c7849228f904607f3cd9f21a61250d8d67",
+          "line": 394,
+          "path": "packages/components/nodes/tools/MCP/core.ts",
+          "symbol": "validateMCPServerConfig"
+        },
+        {
+          "excerpt": "serverParams = JSON.parse(serverParamsString)",
+          "excerpt_sha256": "fed3931cf3c74ed5281a937650dda523e1b4e0205898a55417c2be38586e9f4e",
+          "line": 173,
+          "path": "packages/components/nodes/tools/MCP/CustomMCP/CustomMCP.ts",
+          "symbol": "CustomMCP.init"
+        },
+        {
+          "excerpt": "validateMCPServerConfig(serverParams)",
+          "excerpt_sha256": "ac50acef4e8c7b1366040b32ff571761ee481ecfc90e382dc5d485feb789a05f",
+          "line": 178,
+          "path": "packages/components/nodes/tools/MCP/CustomMCP/CustomMCP.ts",
+          "symbol": "CustomMCP.init"
+        },
+        {
+          "excerpt": "if (process.env.CUSTOM_MCP_PROTOCOL === 'stdio' && serverParams!.command) toolkit = new MCPToolkit(serverParams, 'stdio')",
+          "excerpt_sha256": "35efea93bd860b6b2815584fa6eda77bacabe739dc402b46b4d6264706d98748",
+          "line": 186,
+          "path": "packages/components/nodes/tools/MCP/CustomMCP/CustomMCP.ts",
+          "symbol": "CustomMCP.init"
+        },
+        {
+          "excerpt": "transport = new StdioClientTransport(params as StdioServerParameters)",
+          "excerpt_sha256": "108d8df4e063661fc39ae08ee0d6b1a3a04efe6cc51aff3444b5a2933b05745d",
+          "line": 52,
+          "path": "packages/components/nodes/tools/MCP/core.ts",
+          "symbol": "MCPToolkit.initialize"
+        },
+        {
+          "excerpt": "export const validateMCPServerConfig = (serverParams: any): void => {",
+          "excerpt_sha256": "473f2d181561bbb528a28cdfece2bfc9420e0cac799fdc7615fbfdcd71f7cb64",
+          "line": 374,
+          "path": "packages/components/nodes/tools/MCP/core.ts",
+          "symbol": "validation"
+        },
+        {
+          "excerpt": "export const validateArgsForLocalFileAccess = (args: string[]): void => {",
+          "excerpt_sha256": "ec4349d2663b1f2f8850aa83025aeec92ccb259c9d5fba23037cde1bbde1e9ca",
+          "line": 181,
+          "path": "packages/components/nodes/tools/MCP/core.ts",
+          "symbol": "validation"
+        },
+        {
+          "excerpt": "try {",
+          "excerpt_sha256": "03d9aba6351173e5f8c479f3e786247afca28bd814dd42e6477fa51b48c9fe36",
+          "line": 166,
+          "path": "packages/components/nodes/tools/MCP/CustomMCP/CustomMCP.ts",
+          "symbol": "validation"
+        }
+      ],
+      "invariant": "低信任 MCP stdio 配置不能借允许的 command/args 获得任意代码执行能力；命令白名单和参数过滤须覆盖实际执行语义。",
+      "node_id": "F026",
+      "potential_artifact": "CustomMCP 解析/替换变量 →（CUSTOM_MCP_SECURITY_CHECK 非 false 时）validateMCPServerConfig → allowedCommands → validateArgsForLocalFileAccess/validateCommandInjection/validateCommandFlags → validateEnvironmentVariables → MCPToolkit stdio transport。若跳过 validator，node/python/docker 参数可执行代码或挂载主机；当前检查开关的反事实也必须纳入 pilot。",
+      "security_question": "validateMCPServerConfig 允许 node/npx/python/python3/docker 后，参数校验能否阻止配置调用者在宿主机任意执行代码？"
+    },
+    {
+      "code_scope": [
+        "packages/components/nodes/memory/MongoDBMemory/MongoDBMemory.ts",
+        "packages/components/nodes/memory/RedisBackedChatMemory/RedisBackedChatMemory.ts",
+        "packages/server/src/Interface.ts",
+        "packages/server/src/utils/buildChatflow.ts",
+        "packages/server/src/utils/index.ts"
+      ],
+      "evidence_refs": [
+        {
+          "excerpt": "return incomingInput.overrideConfig?.sessionId",
+          "excerpt_sha256": "92ac2edb84b060525d4d49d5354cb940373e0f73b5c82572df02ad1cb3b32164",
+          "line": 1832,
+          "path": "packages/server/src/utils/index.ts",
+          "symbol": "getMemorySessionId"
+        },
+        {
+          "excerpt": "if (incomingInput.overrideConfig?.sessionId) {",
+          "excerpt_sha256": "d91584292e7372cb2e8c7eeeedc95bab2b1bfdc2ce6b8831bc7b8937936c4faf",
+          "line": 1831,
+          "path": "packages/server/src/utils/index.ts",
+          "symbol": "getMemorySessionId"
+        },
+        {
+          "excerpt": "if (incomingInput.chatId) {",
+          "excerpt_sha256": "ca814e6bd28c5cca217db4ffc23eb89b5f1c167f9460b874da119a87c35dc60e",
+          "line": 1835,
+          "path": "packages/server/src/utils/index.ts",
+          "symbol": "getMemorySessionId"
+        },
+        {
+          "excerpt": "return incomingInput.chatId",
+          "excerpt_sha256": "644a3414a9ce67937739e4c522d0067179375b5c1285ee1e5fed01f6becd9a35",
+          "line": 1836,
+          "path": "packages/server/src/utils/index.ts",
+          "symbol": "getMemorySessionId"
+        },
+        {
+          "excerpt": "overrideConfig?: ICommonObject",
+          "excerpt_sha256": "5749280c09b193d3ad74026af6422e792815962add94817168949aa69d931174",
+          "line": 364,
+          "path": "packages/server/src/Interface.ts",
+          "symbol": "IncomingInput"
+        },
+        {
+          "excerpt": "const incomingInput: IncomingInput = req.body || {} // Ensure incomingInput is never undefined",
+          "excerpt_sha256": "9724665290ad9f93153478b18d878575d986bf440a2a01098ea358b555ccdfdf",
+          "line": 1006,
+          "path": "packages/server/src/utils/buildChatflow.ts",
+          "symbol": "utilBuildChatflow"
+        },
+        {
+          "excerpt": "const chatId = incomingInput.chatId ?? incomingInput.overrideConfig?.sessionId ?? uuidv4()",
+          "excerpt_sha256": "f2d7298ae1fcc8a17628492df1123bdb9cde8518da95ad9ddaa5b9e5f5345bf4",
+          "line": 1007,
+          "path": "packages/server/src/utils/buildChatflow.ts",
+          "symbol": "utilBuildChatflow"
+        },
+        {
+          "excerpt": "getMemorySessionId(memoryNode, incomingInput, chatId, isInternal),",
+          "excerpt_sha256": "7ac10e5619f5308b262740889b0d106386a9ae0f623bf60de88e73c6d5422684",
+          "line": 242,
+          "path": "packages/server/src/utils/buildChatflow.ts",
+          "symbol": "getChatHistory"
+        },
+        {
+          "excerpt": "return (await initializedInstance.getChatMessages(sessionId, undefined, prependMessages)) as IMessage[]",
+          "excerpt_sha256": "f105bc83fa4c0b10df4eceaa1775fdfd6361587329ee12e9a97eecb9d1521781",
+          "line": 1886,
+          "path": "packages/server/src/utils/index.ts",
+          "symbol": "getSessionChatHistory"
+        },
+        {
+          "excerpt": "const document = await collection.findOne({ sessionId: id })",
+          "excerpt_sha256": "46bd051c5fbd5046e42d41580f2c25b503a457a6d69522c5fd7e657ebd33f047",
+          "line": 143,
+          "path": "packages/components/nodes/memory/MongoDBMemory/MongoDBMemory.ts",
+          "symbol": "MongoDBMemory.getChatMessages"
+        },
+        {
+          "excerpt": "const rawStoredMessages = await client.lrange(id, this.windowSize ? this.windowSize * -1 : 0, -1)",
+          "excerpt_sha256": "53aa59f446b8f1ac1256eeeaa4530c09f5a82e12eea8622c45e8d5adc11a964a",
+          "line": 169,
+          "path": "packages/components/nodes/memory/RedisBackedChatMemory/RedisBackedChatMemory.ts",
+          "symbol": "RedisBackedChatMemory.getChatMessages"
+        },
+        {
+          "excerpt": "const dbResponse = await utilBuildChatflow(req, false, chatType)",
+          "excerpt_sha256": "d8bced2033dcc26a0e8d23777695807fa492b9c5f48b9c41f9e66a5c4d3f02ba",
+          "line": 10,
+          "path": "packages/server/src/services/predictions/index.ts",
+          "symbol": "predictionsService.buildChatflow"
+        },
+        {
+          "excerpt": "getMemorySessionId(memoryNode, incomingInput, chatId, isInternal),",
+          "excerpt_sha256": "7ac10e5619f5308b262740889b0d106386a9ae0f623bf60de88e73c6d5422684",
+          "line": 268,
+          "path": "packages/server/src/utils/buildChatflow.ts",
+          "symbol": "getChatHistory"
+        },
+        {
+          "excerpt": "sessionId: id,",
+          "excerpt_sha256": "d31c7fb0dc5c0f4eb2c45616a092b4fea390a6f8fc54fcfaf9f328539edbcdcc",
+          "line": 112,
+          "path": "packages/components/nodes/memory/BufferMemory/BufferMemory.ts",
+          "symbol": "BufferMemoryExtended.getChatMessages"
+        },
+        {
+          "excerpt": "chatflowid: this.chatflowid",
+          "excerpt_sha256": "cf0a17e4bce8044b60955b2afc48259ed3026b64e40637a0c1e0f634eee4cd3f",
+          "line": 113,
+          "path": "packages/components/nodes/memory/BufferMemory/BufferMemory.ts",
+          "symbol": "BufferMemoryExtended.getChatMessages"
+        }
+      ],
+      "invariant": "会话查询/存储键只能接受经运行时验证的标量字符串；TypeScript 声明和 truthy 检查不能约束 HTTP JSON 输入类型。",
+      "node_id": "F027",
+      "potential_artifact": "公开 prediction service 以 isInternal=false 调用 utilBuildChatflow -> utilBuildChatflow 从 req.body 取得 overrideConfig.sessionId 并作为 chatId/session 输入 -> executeFlow/getChatHistory 调用 getMemorySessionId -> 非内部路径直接返回该 sessionId -> memory 节点以该值读写历史（BufferMemory 以 sessionId+chatflowid，Redis memory 以 Redis key sessionId）。",
+      "security_question": "外部 prediction 的 overrideConfig.sessionId 或 chatId 若是数组/对象等非字符串 JSON 值，是否可未经运行时标量类型验证进入 memory 的 session/query key？"
+    }
+  ],
+  "packet_version": "sampled-opportunity-review-v1",
+  "sample_manifest_sha256": "1e795ddd52338df11d0ed045cafe076091efcbdd1e1afb1f3810c8ed23f56981"
+}

@@ -1,0 +1,25 @@
+{
+  "adjudication_sha256": "c336a805b36edb2e218492023bea979335b69bc335bd71c89afa927de245058b",
+  "adjudicator_access_sha256": "e34d1400d2659a6e92035a63dccaff58944dc6a7259005e8e2aa8b6f48779bfc",
+  "input_hashes": {
+    "adjudication_input.json": "43c81fb28d86f04de7ff3d2b327ad2237338d1ba88fb94149461b37c49c75b4f",
+    "density_estimate.json": "f45a6c39ed6bcadcfc47239731278b2ea2752943d649360fa2b31720a3f07d7d",
+    "final_sample_labels.jsonl": "9e82c5bd85155511d85607f38abbc2cdaaeab6db08492c1ec28707110bfaeee8",
+    "packet/packet_manifest.json": "1890614a6914fcb7b32728a7e2075b02cc3558ddca5b3a6f7aa4d0570670c71c",
+    "packet/review_form_template.jsonl": "ad5a831957c21934d953602c2187b818c59530540c53c395607986a80ce160e7",
+    "packet/reviewer_bundle.json": "2813fd26141069b10de8a22f32e3926539c8532c53a6857049734493284b28e4",
+    "packet/reviewer_rubric.json": "571ca62b293b4447ceb01d955290030fb1e0b55fde43b3fc0b0492ebfeb25885",
+    "qc_report.json": "4b00ba95a7b2ac4e5b8f1d475143a26fc88489f6047187e6419dfe3e5db2e78a",
+    "reviews/adjudicator.jsonl": "c336a805b36edb2e218492023bea979335b69bc335bd71c89afa927de245058b",
+    "reviews/adjudicator_access.json": "e34d1400d2659a6e92035a63dccaff58944dc6a7259005e8e2aa8b6f48779bfc",
+    "reviews/reviewer_a.jsonl": "ac3c258fd25af1960dfa3391090e27fff59aebe4e0836b4b1960061a8d79f9f7",
+    "reviews/reviewer_a_access.json": "e4ac1c7124d048a81ee5ceaa4c0142f723b88a1f9a98e606ff2ee7b9c94b3f77",
+    "reviews/reviewer_b.jsonl": "d9e9562abd02718e0ec63a15d7e8d73064a27d4b5b1932cf29a4abbee9927c67",
+    "reviews/reviewer_b_access.json": "3e3f64c0eb06b38ce293cf500b05f44fda311dd5888130ed7de0d9b2576be735",
+    "sampled_pairs.jsonl": "1e795ddd52338df11d0ed045cafe076091efcbdd1e1afb1f3810c8ed23f56981",
+    "sampling_prereg.json": "9e31824ee4802e2597723e460848f6f7285c7843ac44812957ee51e128a45b05",
+    "smoke_qc.json": "28a02095f7e701010a1094dc19bf2391ebe6715e8ddf6d8830be0438d2ca9e63"
+  },
+  "status": "frozen_sampled_estimate",
+  "version": "sampled-opportunity-density-v1"
+}

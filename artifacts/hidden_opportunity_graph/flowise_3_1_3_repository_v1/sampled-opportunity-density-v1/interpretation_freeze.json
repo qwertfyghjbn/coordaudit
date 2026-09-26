@@ -1,0 +1,8 @@
+{
+  "design_report_sha256": "cefdc4c8ec0c3d788b4003028cadeeecb475b1d61af05ab4d57dc862cd00322c",
+  "limited_interpretation_report_sha256": "47e7f7d260c20e17a53a93f3194c63a3d32869f9409bf97da7073d71cbffc15a",
+  "posthoc_robustness_sha256": "ba4cf5a9aef29699caf83e815cd93896d641a249406b2ced3edacc641e1e3c89",
+  "sample_freeze_sha256": "8d0e14ddc8a6d59d4418896a42df51db6f86a36770bd1b126b2e35ffe72dd6cf",
+  "scope": "estimated benchmark density only; no exact full graph or architecture utilization",
+  "status": "frozen_sampled_density_interpretation"
+}

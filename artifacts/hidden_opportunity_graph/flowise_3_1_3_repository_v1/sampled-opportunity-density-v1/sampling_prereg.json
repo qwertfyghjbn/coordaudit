@@ -1,0 +1,50 @@
+{
+  "actionable_types": [
+    "actionable cross-check",
+    "strong dependency"
+  ],
+  "adjudication": "Only sampled pairs with reviewer disagreement or actionable-boundary uncertainty, and only after binary QC passes; preserve raw records.",
+  "allocation_reason": "Approximately proportional allocation, 100/702 sampling fraction; at a 5-10% prevalence, binomial-scale 95% uncertainty is roughly plus/minus 4-6 percentage points before finite-population correction. Keeps two independent reviews near 200 records.",
+  "base_graph_manifest_sha256": "d7013f79ffd21a7d7eb4a989ed44d16f46fd3d342ae167ca86a085311f69c041",
+  "denominator": 702,
+  "estimand": "27-node repository-v1 directed-pair actionable structural opportunity density",
+  "estimator": "sum_h (N_h/702)*(y_h/n_h); estimated count=702*density. Use final adjudicated binary labels for disagreements and agreed raw labels otherwise.",
+  "history_policy": "Selection uses node IDs, frozen old/new membership and frozen pair universe only; no edge labels, T4 behavior, collaboration outcomes, or Batch-03 failed records.",
+  "node_set_manifest_sha256": "9a745bc77c4d9ad2f9a34e9946546459f9899ac10e0860b435921af96c96b840",
+  "node_set_nodes_sha256": "c506905e72c90f6712136c114840fc8867d8f824809ac8869db8f8b0a3726807",
+  "pair_universe_manifest_sha256": "e6308ea59dbb152a3591a955a1522ddf5b5995bdc765f09a3356f5b202e337c4",
+  "pair_universe_pairs_sha256": "8bcd6380dd1cc765c39482875041ea4d053281ca97357c4b660c196e7c2c302c",
+  "primary_qc": "At least ceil(0.90*100)=90 raw binary agreements before adjudication. If it fails, stop primary estimation and report taxonomy reliability failure.",
+  "prior_label_policy": "All selected pairs receive new independent blind reviews, including any Pilot or Batch-01 overlap. Prior labels are excluded from reviewer bundles and estimator.",
+  "sample_manifest_sha256": "1e795ddd52338df11d0ed045cafe076091efcbdd1e1afb1f3810c8ed23f56981",
+  "sample_size": 100,
+  "sampling_rule": "Within each fixed stratum, rank every directed pair by SHA-256(seed|stratum|source_node|target_node), tie-break lexically, and take the first n without replacement.",
+  "secondary_qc": "Report exact five-class agreement, five-class confusion matrix, reviewer marginals and disagreement types; five-class disagreement is not a primary gate.",
+  "seed": "repository-v1-hog-density-20260926-v1",
+  "sensitivity": "For unresolved actionable-boundary uncertain sampled pairs, recalculate weighted density with all uncertain set to 0 and all set to 1.",
+  "status": "preregistered_before_sample_reviews",
+  "strata": {
+    "new_to_new": {
+      "inclusion_probability": 0.14545454545454545,
+      "population": 110,
+      "sample": 16
+    },
+    "new_to_old": {
+      "inclusion_probability": 0.14204545454545456,
+      "population": 176,
+      "sample": 25
+    },
+    "old_to_new": {
+      "inclusion_probability": 0.14204545454545456,
+      "population": 176,
+      "sample": 25
+    },
+    "old_to_old": {
+      "inclusion_probability": 0.14166666666666666,
+      "population": 240,
+      "sample": 34
+    }
+  },
+  "variance": "sum_h (N_h/702)^2*(1-n_h/N_h)*s_h^2/n_h, with s_h^2=n_h*p_h*(1-p_h)/(n_h-1); report a 95% design-based normal interval clipped to [0,1], noting low-count limitations.",
+  "version": "sampled-opportunity-density-v1"
+}

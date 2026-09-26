@@ -1,0 +1,10 @@
+{
+  "access_log_schema_and_scope_positive_negative_controls_passed": true,
+  "bundle_has_no_historical_structural_labels": true,
+  "checked_pair_count": 2,
+  "packet_manifest_sha256": "1890614a6914fcb7b32728a7e2075b02cc3558ddca5b3a6f7aa4d0570670c71c",
+  "sample_records_have_exact_template_keys": true,
+  "scope": "mechanical packet/schema/access-policy check; no semantic labels or production review",
+  "source_rubric_taxonomy_and_decision_rules_unchanged": true,
+  "status": "synthetic_schema_and_blindness_smoke_passed"
+}

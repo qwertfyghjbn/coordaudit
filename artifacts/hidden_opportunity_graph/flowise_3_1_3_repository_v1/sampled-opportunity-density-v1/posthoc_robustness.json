@@ -1,0 +1,34 @@
+{
+  "boundary_disagreement_all_negative_density": 0.029877241494888553,
+  "boundary_disagreement_all_positive_density": 0.060043154013742245,
+  "boundary_disagreement_pair_count": 3,
+  "boundary_sensitivity_note": "Posthoc sensitivity to the three raw actionable-boundary disputes; adjudicated labels remain the primary estimate.",
+  "density_estimate_sha256": "f45a6c39ed6bcadcfc47239731278b2ea2752943d649360fa2b31720a3f07d7d",
+  "historical_frozen_label_overlap": {
+    "batch-01": {
+      "actionable_binary_match_count": 11,
+      "binary_conflicts": [
+        "sampled-opportunity-density-v1:F026:F024"
+      ],
+      "exact_five_class_match_count": 6,
+      "overlap_count": 12
+    },
+    "graph-v2": {
+      "actionable_binary_match_count": 31,
+      "binary_conflicts": [
+        "sampled-opportunity-density-v1:F003:F005",
+        "sampled-opportunity-density-v1:F004:F003",
+        "sampled-opportunity-density-v1:F006:F004"
+      ],
+      "exact_five_class_match_count": 14,
+      "overlap_count": 34
+    }
+  },
+  "historical_overlap_note": "Checked only after sample adjudication. Prior frozen labels were excluded from selection, blind bundles, QC gate and primary estimator. This is a cross-round stability diagnostic, not a replacement estimate.",
+  "historical_overlap_replacement_density_exploratory_only": 0.04019440254734372,
+  "primary_estimate_unchanged": 0.06004315401374225,
+  "qc_report_sha256": "4b00ba95a7b2ac4e5b8f1d475143a26fc88489f6047187e6419dfe3e5db2e78a",
+  "raw_binary_cohen_kappa": 0.6511627906976745,
+  "raw_binary_positive_agreement": 0.6666666666666666,
+  "status": "post_estimate_robustness_only"
+}

@@ -1,0 +1,21 @@
+{
+  "packet_sha256": {
+    "review_form_template.jsonl": "ad5a831957c21934d953602c2187b818c59530540c53c395607986a80ce160e7",
+    "reviewer_bundle.json": "2813fd26141069b10de8a22f32e3926539c8532c53a6857049734493284b28e4",
+    "reviewer_rubric.json": "571ca62b293b4447ceb01d955290030fb1e0b55fde43b3fc0b0492ebfeb25885"
+  },
+  "packet_version": "sampled-opportunity-review-v1",
+  "pair_count": 100,
+  "sample_manifest_sha256": "1e795ddd52338df11d0ed045cafe076091efcbdd1e1afb1f3810c8ed23f56981",
+  "scope_change": "Administrative scope narrowed to sampled pairs and frozen target source; no taxonomy, decision rule, or threshold calibration change.",
+  "source_rubric_sha256": "c2dd6ba70dff5b76f6a72ccbc0c8a2c5a23dc75c5b264bf61609fba6128c5f7d",
+  "status": "frozen_label_blind_packet",
+  "substantive_rubric_fields_copied_verbatim": [
+    "rubric_version",
+    "decision_order",
+    "mechanisms_examples",
+    "mechanisms_examples_open_vocabulary",
+    "record_requirements",
+    "taxonomy"
+  ]
+}

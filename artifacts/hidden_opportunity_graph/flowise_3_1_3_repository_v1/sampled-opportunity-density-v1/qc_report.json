@@ -1,0 +1,122 @@
+{
+  "access_log_limit": "Reviewer file access is self-reported; this QC verifies declared scope and evidence in frozen target, not OS-level file-open telemetry.",
+  "access_logs": [
+    {
+      "access_log_sha256": "e4ac1c7124d048a81ee5ceaa4c0142f723b88a1f9a98e606ff2ee7b9c94b3f77",
+      "declared_file_count": 79,
+      "reviewer_id": "sampled-density-reviewer-a",
+      "scope_violations": []
+    },
+    {
+      "access_log_sha256": "3e3f64c0eb06b38ce293cf500b05f44fda311dd5888130ed7de0d9b2576be735",
+      "declared_file_count": 77,
+      "reviewer_id": "sampled-density-reviewer-b",
+      "scope_violations": []
+    }
+  ],
+  "binary_agreement_count": 97,
+  "binary_agreement_rate": 0.97,
+  "binary_threshold_count": 90,
+  "binary_threshold_met": true,
+  "boundary_disagreement_pair_ids": [
+    "sampled-opportunity-density-v1:F004:F012",
+    "sampled-opportunity-density-v1:F003:F005",
+    "sampled-opportunity-density-v1:F004:F003"
+  ],
+  "disagreement_pair_ids": [
+    "sampled-opportunity-density-v1:F004:F012",
+    "sampled-opportunity-density-v1:F008:F009",
+    "sampled-opportunity-density-v1:F008:F003",
+    "sampled-opportunity-density-v1:F003:F005",
+    "sampled-opportunity-density-v1:F008:F002",
+    "sampled-opportunity-density-v1:F012:F006",
+    "sampled-opportunity-density-v1:F001:F006",
+    "sampled-opportunity-density-v1:F003:F008",
+    "sampled-opportunity-density-v1:F008:F015",
+    "sampled-opportunity-density-v1:F005:F009",
+    "sampled-opportunity-density-v1:F015:F014",
+    "sampled-opportunity-density-v1:F004:F003",
+    "sampled-opportunity-density-v1:F007:F024",
+    "sampled-opportunity-density-v1:F003:F024",
+    "sampled-opportunity-density-v1:F002:F019",
+    "sampled-opportunity-density-v1:F013:F024",
+    "sampled-opportunity-density-v1:F013:F019",
+    "sampled-opportunity-density-v1:F007:F022",
+    "sampled-opportunity-density-v1:F016:F026",
+    "sampled-opportunity-density-v1:F022:F010",
+    "sampled-opportunity-density-v1:F022:F007",
+    "sampled-opportunity-density-v1:F018:F010",
+    "sampled-opportunity-density-v1:F017:F018",
+    "sampled-opportunity-density-v1:F024:F022",
+    "sampled-opportunity-density-v1:F017:F026",
+    "sampled-opportunity-density-v1:F025:F022"
+  ],
+  "disagreement_types": {
+    "actionable_subtype": 0,
+    "binary_boundary": 3,
+    "non_actionable_subtype": 23,
+    "same_binary_different_five_class": 23,
+    "uncertain_boundary_notes": 0
+  },
+  "exact_five_class_agreement_count": 74,
+  "exact_five_class_agreement_rate": 0.74,
+  "five_class_confusion_rows_a_cols_b": {
+    "actionable cross-check": {
+      "actionable cross-check": 3,
+      "direct relation": 0,
+      "none": 0,
+      "strong dependency": 0,
+      "thematic-only": 1
+    },
+    "direct relation": {
+      "actionable cross-check": 2,
+      "direct relation": 5,
+      "none": 3,
+      "strong dependency": 0,
+      "thematic-only": 8
+    },
+    "none": {
+      "actionable cross-check": 0,
+      "direct relation": 0,
+      "none": 46,
+      "strong dependency": 0,
+      "thematic-only": 4
+    },
+    "strong dependency": {
+      "actionable cross-check": 0,
+      "direct relation": 0,
+      "none": 0,
+      "strong dependency": 0,
+      "thematic-only": 0
+    },
+    "thematic-only": {
+      "actionable cross-check": 0,
+      "direct relation": 1,
+      "none": 7,
+      "strong dependency": 0,
+      "thematic-only": 20
+    }
+  },
+  "packet_manifest_sha256": "1890614a6914fcb7b32728a7e2075b02cc3558ddca5b3a6f7aa4d0570670c71c",
+  "review_sha256": {
+    "a": "ac3c258fd25af1960dfa3391090e27fff59aebe4e0836b4b1960061a8d79f9f7",
+    "b": "d9e9562abd02718e0ec63a15d7e8d73064a27d4b5b1932cf29a4abbee9927c67"
+  },
+  "reviewer_marginals": {
+    "a": {
+      "actionable cross-check": 4,
+      "direct relation": 18,
+      "none": 50,
+      "thematic-only": 28
+    },
+    "b": {
+      "actionable cross-check": 5,
+      "direct relation": 6,
+      "none": 56,
+      "thematic-only": 33
+    }
+  },
+  "sample_manifest_sha256": "1e795ddd52338df11d0ed045cafe076091efcbdd1e1afb1f3810c8ed23f56981",
+  "sample_size": 100,
+  "status": "pending_disagreement_only_adjudication"
+}
