@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "contract_id": "t_pilot_1_shared_objective_v1",
+  "repository": {"id": "flowise_3_1_3_repository_v1", "version": "repository-v1-candidate"},
+  "model": {"provider": "openai_compatible", "requested_model": "deepseek-flash", "thinking_mode": "disabled", "temperature": 0.0, "max_output_tokens": 4096},
+  "budget": {"hard_team_call_permits": 192, "reserved_final_synthesis_permits": 0, "token_stop_threshold": null, "per_agent_token_cap": null},
+  "runtime": {"max_steps": 96, "wall_clock_timeout_seconds": 1200},
+  "retry": {"max_provider_retries": 1, "final_synthesis_retries": 0},
+  "completion_generation": "completion_v2_team",
+  "completion_policy": "convergent_v2",
+  "team_completion_policy": "all_agents_terminal_v1",
+  "team_finalization_policy": "team_remaining_permits_v1",
+  "team_finalization_reserve": 32,
+  "task_board_sequencing_policy": "initialization_lease_v2_optional",
+  "task_closure_policy": "task_closure_gate_v1",
+  "result_sync_policy": null,
+  "post_sync_window_policy": null,
+  "prompt_profile": "repository_v1_t_pilot_1_shared_objective",
+  "conditions": [{"id": "T4", "mode": "structured_team", "agent_count": 4}],
+  "preregistration": {
+    "status": "frozen_zero_network_preflight_passed_pending_live_authorization",
+    "live_execution_authorized": false,
+    "seed_identity": "t-pilot-1-flowise-shared-objective-seed-01",
+    "research_question": "在共享仓库级安全审计目标下，T4 是否自然产生可见的工作范围分化与 board-linked scope decisions？",
+    "design_document": "docs/plans/T_PILOT_1_DESIGN.md",
+    "prompt_freeze_packet": "docs/plans/t_pilot_1_freeze/final_prompt_packet_v1.json",
+    "excluded_conditions": ["S1", "P4", "B4", "M4"],
+    "not_an_architecture_benchmark": true
+  }
+}

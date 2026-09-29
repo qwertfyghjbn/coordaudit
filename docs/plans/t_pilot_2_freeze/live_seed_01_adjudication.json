@@ -1,0 +1,66 @@
+{
+  "schema_version": "t-pilot-2-live-adjudication-v1",
+  "run_id": "formal_t-pilot-2-final-synthesis-v1",
+  "seed_identity": "t-pilot-2-final-synthesis-seed-01",
+  "review_status": "primary_code_level_review_complete",
+  "review_method_limit": "Primary reviewer knew the T4 run identity; raw and final claims were read separately before inspecting explicit dispositions, but this was not an independent second blind review.",
+  "stage_1_truth_and_roots": {
+    "raw": [
+      {
+        "raw_id": "raw_00",
+        "truth": "novel_valid_gt_unmatched",
+        "root": "oauth_callback_unscoped_credential",
+        "qualification": "Public callback selects a credential by caller-supplied state without workspace scope and uses its decrypted OAuth fields. No plaintext secret is returned to the caller; token overwrite requires a successful provider code exchange."
+      },
+      {
+        "raw_id": "raw_01",
+        "truth": "novel_valid_gt_unmatched",
+        "root": "tts_generate_unscoped_credential_use",
+        "qualification": "Public generate route accepts body credentialId and getCredentialData resolves it by id alone. The extra assertion that /voices is the same whitelisted public route is false: /voices is not in WHITELIST_URLS."
+      },
+      {
+        "raw_id": "raw_02",
+        "truth": "novel_valid_gt_unmatched",
+        "root": "oauth_callback_unscoped_credential",
+        "qualification": "Same callback lookup and OAuth token exchange as raw_00. Token write-back is conditional on a valid authorization code."
+      }
+    ],
+    "final": [
+      {
+        "final_id": "fin_00",
+        "truth": "novel_valid_gt_unmatched",
+        "root": "oauth_callback_unscoped_credential",
+        "qualification": "The shared unscoped callback invariant is supported. The wording about reading the victim secret should mean server-side use, not attacker-visible plaintext disclosure; write-back requires successful code exchange."
+      },
+      {
+        "final_id": "fin_01",
+        "truth": "novel_valid_gt_unmatched",
+        "root": "tts_generate_unscoped_credential_use",
+        "qualification": "Core stored-key use is supported. Retained /voices whitelist wording is inaccurate because /voices is authenticated by the global middleware."
+      }
+    ]
+  },
+  "stage_2_provenance": {
+    "raw_00": {"action": "merge", "target_final_id": "fin_00", "merged_with": ["raw_02"]},
+    "raw_01": {"action": "retain", "target_final_id": "fin_01", "merged_with": []},
+    "raw_02": {"action": "merge", "target_final_id": "fin_00", "merged_with": ["raw_00"]}
+  },
+  "stage_3_transformations": {
+    "true_duplicate_merge_groups": 1,
+    "false_merge_groups": 0,
+    "duplicate_findings_remaining": 0,
+    "valid_unique_roots_retained": 2,
+    "valid_unique_roots_total": 2,
+    "valid_roots_incorrectly_dropped": 0,
+    "unsupported_roots_suppressed": 0,
+    "unsupported_roots_retained": 0,
+    "single_source_corrections": 0,
+    "incorrect_corrections": 0,
+    "qualified_text_issues": [
+      "fin_00's secret-reading phrasing can imply direct disclosure, which the code does not show.",
+      "fin_01 retains a false assertion that /voices is publicly whitelisted."
+    ]
+  },
+  "result_label": "mechanism_pass_useful",
+  "result_basis": "The raw set contained one code-supported same-root pair; the finalizer merged it without losing either of the two valid unique roots. Text qualifications are reported separately and prevent a blanket quality claim."
+}

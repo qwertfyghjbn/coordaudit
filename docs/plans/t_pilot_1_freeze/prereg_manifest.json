@@ -1,0 +1,51 @@
+{
+  "status": "preflight_blocked_runtime_lease_defect",
+  "contract_reference": "experiments/emergent_coordination/manifests/t4_flowise_sequenced_bootstrap_task_closure_v1.json",
+  "planned_seed_identity": "t-pilot-1-flowise-shared-objective-seed-01",
+  "target_tree_sha256": "c612819a833fc8ab3c58fe5085fb80fc0a6c4cb1d86cbb8ed41b0b431e4a1638",
+  "evaluator_private_tree_sha256_control_only": "76aaef174369769e70b8ef61cda454d96a503fc033e1437a6b6efba934915e12",
+  "model_profile": {
+    "provider": "openai_compatible",
+    "requested_model": "deepseek-flash",
+    "thinking_mode": "disabled",
+    "temperature": 0.0,
+    "max_output_tokens": 4096
+  },
+  "budget": {
+    "hard_team_call_permits": 192,
+    "team_finalization_reserve": 32,
+    "max_steps": 96,
+    "wall_clock_timeout_seconds": 1200,
+    "max_provider_retries": 1
+  },
+  "runtime_policies": {
+    "task_board_sequencing_policy": "initialization_lease_v1",
+    "task_closure_policy": "task_closure_gate_v1",
+    "result_sync_policy": null,
+    "post_sync_window_policy": null,
+    "completion_policy": "convergent_v2",
+    "team_completion_policy": "all_agents_terminal_v1",
+    "team_finalization_policy": "team_remaining_permits_v1"
+  },
+  "prompt_packet_path": "docs/plans/t_pilot_1_freeze/rendered_prompt_candidate.json",
+  "sha256": {
+    "shared_objective": "59f4519fc53cb1dca940ac636747fd0443221410163ce6930f75e267c405d28b",
+    "task_board_capability": "c396950d227f08b8c1af168ba3d391a9a490bd1f95a9b49d94064c9b66a374c1",
+    "team_finalization_message": "a67d60e1486854c3bc46c6241e9fd7e7390672511f0298dfcd6a22ddc99935a7",
+    "finding_schema_instructions": "d11718955edb090f0b3a5533c59ded82bfa34831082e33932a034c5d8c06d142",
+    "tool_schema_canonical_json": "81707c840e64c97540da11f856ff1b7ca56b2c0b0d5ab073a44f0c4c52ac29d9",
+    "rendered_prompt_candidate_file": "733b5b10d1f69254a7777b5c87e5362e0f7c1120619de200928cc5ccbddc6f7d",
+    "initial_model_request_canonical_json_by_agent": {
+      "agent_001": "32a21e0eac79bbff162ddf6b9eba2830fee93035f1d24fdec2698d166cb8eaf5",
+      "agent_002": "d159d338130fb5e62c31c6ff815471ebc400507747e9757593b392e9b4bb3fb3",
+      "agent_003": "263fe7cf30d6ec5659dd6c3456460190907612c62ee7c368b74e275a9fcd19a5",
+      "agent_004": "d0b8994dbd7de81e32e96a3e3b65337eca544faa656c21744599cf5a59e47950"
+    }
+  },
+  "candidate_contamination_audit": {
+    "status": "pass_candidate_text_only",
+    "forbidden_hits": {}
+  },
+  "actual_runtime_request_audit": "not_run_new_prompt_profile_not_registered",
+  "live_seed_authorized": false
+}

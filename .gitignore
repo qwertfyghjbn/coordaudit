@@ -9,6 +9,9 @@ artifacts/*
 !artifacts/retrospective/
 artifacts/retrospective/*
 !artifacts/retrospective/flowise_repository_v1_1_evaluator_v2_20260921/
+!artifacts/run_work_front_audit/
+artifacts/run_work_front_audit/*
+!artifacts/run_work_front_audit/t4-post-sync-window-v2-192p-v2/
 
 # Python cache
 __pycache__/

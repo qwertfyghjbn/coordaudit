@@ -1,0 +1,38 @@
+{
+  "pairs": 78,
+  "reviewer_a_actionable": 7,
+  "reviewer_b_raw_actionable": 16,
+  "reviewer_b_effective_actionable": 14,
+  "raw_b_internal_inconsistencies": [
+    "03-P004",
+    "03-P023"
+  ],
+  "effective_binary_matrix": {
+    "actionable|actionable": 6,
+    "actionable|non-actionable": 1,
+    "non-actionable|actionable": 8,
+    "non-actionable|non-actionable": 63
+  },
+  "binary_agreement": {
+    "numerator": 69,
+    "denominator": 78,
+    "rate": 0.8846153846153846
+  },
+  "positive_specific_agreement": 0.5714285714285714,
+  "cohen_kappa": 0.5131761442441052,
+  "secondary_exact_agreement": 50,
+  "binary_disagreements": [
+    "01-P014",
+    "01-P025",
+    "02-P007",
+    "02-P012",
+    "02-P019",
+    "02-P020",
+    "03-P004",
+    "03-P013",
+    "03-P025"
+  ],
+  "adjudicated_actionable": 11,
+  "gate_90_percent_passed": false,
+  "interpretation": "exploratory run-local adjudicated counts; primary QC gate failed, do not treat as stable opportunity density"
+}

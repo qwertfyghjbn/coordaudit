@@ -1,0 +1,107 @@
+{
+  "schema_version": "t-pilot-1-prereg-v2",
+  "status": "frozen_zero_network_preflight_passed_single_live_seed_authorized",
+  "live_execution_authorized": true,
+  "authorization": "用户指令 2026-09-28：完成 v2 冻结流程，之后开始正式运行 v2；单 seed，不追加、不按结果调整阈值",
+  "seed_identity": "t-pilot-1-flowise-shared-objective-seed-02",
+  "supersedes": {
+    "v1_prereg": "docs/plans/t_pilot_1_freeze/final_prereg_v1.json",
+    "v1_disposition": "treatment-integrity failure / lease-starvation diagnostic; not A/B/C classified; all v1 frozen artifacts and runs unchanged",
+    "v1_failure_evidence": "runs/t-pilot-1-shared-objective-v1-192p/formal_t-pilot-1-shared-objective-v1/logs/events.jsonl (all four lease releases reason=agent_terminal; permits 96/65/30/1; agent_004 lifetime model calls = 1; board writes = 0)",
+    "root_cause_and_audit": "docs/plans/INITIALIZATION_LEASE_V3_DESIGN.md section 1"
+  },
+  "condition": {
+    "id": "T4",
+    "mode": "structured_team",
+    "agent_count": 4
+  },
+  "paths": {
+    "design": "docs/plans/T_PILOT_1_DESIGN.md",
+    "lease_v3_design": "docs/plans/INITIALIZATION_LEASE_V3_DESIGN.md",
+    "contract_config": "experiments/emergent_coordination/manifests/t_pilot_1_shared_objective_v2.json",
+    "block_manifest": "docs/plans/t_pilot_1_freeze/t_pilot_1_shared_objective_v2/block_manifest.json",
+    "rendered_prompt_packet": "docs/plans/t_pilot_1_freeze/final_prompt_packet_v1.json"
+  },
+  "sha256": {
+    "contract_config_file": "425f3c066e3f8dff4d0b283cd0e44babac81ac70f0479ff40bbf07bb8c4eebc2",
+    "block_manifest_file": "a99022f3451a0626906c480a54045b6485bf09d9c27cc8129e97d85559ab60c3",
+    "block_manifest_canonical": "10b78742681fb3053bdd7f3e18fad790ff7649e69c82a5e380633def84c50e42",
+    "rendered_prompt_packet_file": "c313d25b104b6eace8feb51d12ca1f7602e20e3b70477fe61b0ba159c157609a",
+    "shared_objective_text": "59f4519fc53cb1dca940ac636747fd0443221410163ce6930f75e267c405d28b",
+    "task_board_capability_text": "c396950d227f08b8c1af168ba3d391a9a490bd1f95a9b49d94064c9b66a374c1",
+    "team_finalization_message_text": "a67d60e1486854c3bc46c6241e9fd7e7390672511f0298dfcd6a22ddc99935a7",
+    "tool_schema_canonical": "81707c840e64c97540da11f856ff1b7ca56b2c0b0d5ab073a44f0c4c52ac29d9",
+    "target_tree": "c612819a833fc8ab3c58fe5085fb80fc0a6c4cb1d86cbb8ed41b0b431e4a1638",
+    "evaluator_private_tree": "76aaef174369769e70b8ef61cda454d96a503fc033e1437a6b6efba934915e12",
+    "runtime_source_tree": "5b4fe4b57e7120f2e006838545c24cfb3015dcf029d8b7cbd800865979676712",
+    "git_commit": "bce8892e80843cd8278a278cb5fde00acd1c6b57"
+  },
+  "identity_vs_v1": {
+    "byte_identical_to_v1": [
+      "shared objective text, task-board capability text, team finalization message",
+      "rendered system/user prompt templates and tool schema (block-manifest T4 hash group equal)",
+      "target_tree and evaluator_private_tree digests",
+      "finding schema, budgets (192/96/1200/1 retry/reserve 32), model deepseek-flash disabled-thinking temperature-0 4096",
+      "closure/finalization/completion policies: task_closure_gate_v1, convergent_v2, all_agents_terminal_v1, team_remaining_permits_v1"
+    ],
+    "only_runtime_delta": {
+      "task_board_sequencing_policy": {"from": "initialization_lease_v2_optional", "to": "initialization_lease_v3"}
+    },
+    "expected_digest_changes": ["runtime_source_tree (lease v3 code)", "contract/block manifest hashes"]
+  },
+  "policies": {
+    "task_board_sequencing_policy": "initialization_lease_v3",
+    "task_closure_policy": "task_closure_gate_v1",
+    "result_sync_policy": null,
+    "post_sync_window_policy": null,
+    "completion_policy": "convergent_v2",
+    "team_completion_policy": "all_agents_terminal_v1",
+    "team_finalization_policy": "team_remaining_permits_v1",
+    "team_finalization_reserve": 32
+  },
+  "admission": {
+    "run_validity": "valid",
+    "reconciliation": "valid",
+    "first_model_request": "4/4 exact packet match",
+    "contract_prompt_tool_budget_digest_match": true,
+    "lifecycle_explainable": true,
+    "provider_or_runtime_defect_not_dominant": true,
+    "finite_termination": true,
+    "claimed_task_closure_legal": true,
+    "board_use_required": false,
+    "nonempty_findings_required": false,
+    "lease_integrity": "no task_initialization_lease_waited may remain unresolved at run end; report per-agent permits, bootstrap acquisition/release reasons, and confirm no agent is reduced to a single call by the lease"
+  },
+  "rubric": {
+    "A": {
+      "distinct_primary_work_fronts_at_least": 3,
+      "duplicate_focused_actions_at_most_fraction": "1/4",
+      "two_agents_majority_same_front": false,
+      "explicit_board_linked_agents_at_least": 2,
+      "avoid_covered_or_fill_uncovered_episode_at_least": 1
+    },
+    "B": "A diversity and low-overlap criteria, without A board-linked evidence",
+    "C": "at least two agents share primary front and duplicate focused actions >1/3, or cosmetic task diversity with actual majority investigation on one security question and no board-induced adjustment",
+    "other": "mixed / indeterminate",
+    "report_raw_numerators_denominators_and_sensitivity": true,
+    "single_seed_mechanism_smoke_only": true,
+    "unchanged_from_v1": true
+  },
+  "adjudication": {
+    "stage_1": "automatic timeline, tasks, model-visible board snapshots, file/symbol actions, candidate front evidence",
+    "stage_2": "one primary reviewer marks fronts, scope/overlap, board-linked decisions, preliminary classification",
+    "stage_3": "second reviewer checks ambiguous front split/merge, all explicit board-linked positives, classification-changing overlap, and final classification",
+    "adjudicate_only_key_disagreements": true,
+    "manual_fields": ["transcript/event/evidence refs", "rationale", "uncertainty label"],
+    "unchanged_from_v1": true
+  },
+  "zero_network_preflight": {
+    "lease_v3_targeted_suite": "tests/test_initialization_lease_v3.py 26 passed (edge cases A-J, exactly-once, v1/v2 regression, sequencing preserved with model-visible claimed snapshot, starvation stress, all-opt-out, mixed, closure/finalization, contract registration)",
+    "full_experiment_test_suite": "369 passed; 9 subtests passed (baseline 343 + 26 new, zero regressions)",
+    "spbt_cli_mock_smoke": "S1/P4/B4/T4(valid with initialization_lease_v3) all run_validity=valid and reconciliation=valid",
+    "v2_freeze_verification": "block manifest frozen (canonical hash above); contract field diff vs v1 = {contract_id, task_board_sequencing_policy} only; T4 hash group (system/user/tool_schema/identity) equal; v3 mock run 4/4 initial model_request.messages and advertised tools byte-identical to frozen packet; contamination scan 0 forbidden hits (path menu / board bootstrap / nonoverlap / RESULT_SYNC / POST_SYNC / avoid-duplicate / inspect-others / choose-uncovered); finalization text and {read_file, submit_findings, complete_task} surface unchanged",
+    "live_api_calls_before_authorization": 0
+  },
+  "completion_interpretation": "budget-triggered finalization does not mean repository coverage complete",
+  "t_pilot_2_deferred": ["team synthesis", "finding deduplication", "final TP/FP ranking"]
+}

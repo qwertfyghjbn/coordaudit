@@ -1,0 +1,94 @@
+{
+  "schema_version": 2,
+  "block_id": "t_pilot_1_shared_objective_v2",
+  "frozen_at": "2026-09-28T04:19:11.736685+00:00",
+  "contract": {
+    "schema_version": 1,
+    "contract_id": "t_pilot_1_shared_objective_v2",
+    "repository": {
+      "id": "flowise_3_1_3_repository_v1",
+      "version": "repository-v1-candidate"
+    },
+    "model": {
+      "provider": "openai_compatible",
+      "requested_model": "deepseek-flash",
+      "thinking_mode": "disabled",
+      "temperature": 0.0,
+      "max_output_tokens": 4096
+    },
+    "hard_team_call_permits": 192,
+    "max_steps": 96,
+    "wall_clock_timeout_seconds": 1200,
+    "token_stop_threshold": null,
+    "per_agent_token_cap": null,
+    "max_provider_retries": 1,
+    "final_synthesis_retries": 0,
+    "conditions": [
+      {
+        "id": "T4",
+        "mode": "structured_team",
+        "agent_count": 4
+      }
+    ],
+    "completion_policy": "convergent_v2",
+    "team_completion_policy": "all_agents_terminal_v1",
+    "team_finalization_policy": "team_remaining_permits_v1",
+    "team_finalization_reserve": 32,
+    "task_board_sequencing_policy": "initialization_lease_v3",
+    "task_closure_policy": "task_closure_gate_v1",
+    "result_sync_policy": null,
+    "post_sync_window_policy": null,
+    "post_sync_reservation_per_agent": 0,
+    "reserved_final_synthesis_permits": 0,
+    "completion_generation": "completion_v2_team",
+    "team_finalization_deadline_seconds": null,
+    "prompt_profile": "repository_v1_t_pilot_1_shared_objective"
+  },
+  "evaluator_generation": "repository_v1",
+  "hashes": {
+    "common_prompt": "59b3662b26662b810a74d0ea0d51bf76c5ac8348733809a55bfb356401f8f171",
+    "conditions": {
+      "T4": {
+        "system_prompt_template": "d8b23a5e939d386e61d15ff25ccb615a457c598384c06f97e4c565734034f400",
+        "user_prompt_template": "59f4519fc53cb1dca940ac636747fd0443221410163ce6930f75e267c405d28b",
+        "tool_schema": "81707c840e64c97540da11f856ff1b7ca56b2c0b0d5ab073a44f0c4c52ac29d9",
+        "identity_rule": "agent_001..agent_N"
+      }
+    },
+    "source_config": "87aecf0eb84fde04b1632da1a25a00c41a9f17222d6daaf6015e49e1cc27f689"
+  },
+  "digests": {
+    "target_tree": "c612819a833fc8ab3c58fe5085fb80fc0a6c4cb1d86cbb8ed41b0b431e4a1638",
+    "evaluator_private_tree": "76aaef174369769e70b8ef61cda454d96a503fc033e1437a6b6efba934915e12",
+    "runtime_tree": "5b4fe4b57e7120f2e006838545c24cfb3015dcf029d8b7cbd800865979676712",
+    "git_commit": "bce8892e80843cd8278a278cb5fde00acd1c6b57",
+    "git_status": "6e4496dd7ce687ef605035a455f6f843c595e09a7001fb1bfd3c4a0af64e4d7c"
+  },
+  "live_gate": {
+    "status": "open",
+    "opened_on": "2026-09-18",
+    "satisfied_before_execution": [
+      {
+        "requirement": "pre_call_permit_ledger",
+        "evidence": "harness/budget.py acquire_call_permit reserves a hard team permit before provider dispatch and a retry always consumes a fresh permit; covered by harness unit tests and exercised live by the S1 smoke of 2026-09-15"
+      },
+      {
+        "requirement": "fail_closed_os_sandbox",
+        "evidence": "harness/tools/sandbox.py assert_os_sandbox_ready fails closed when bwrap is missing (local bwrap 0.6.1); live bwrap self-check and real tool calls passed in the S1 smoke of 2026-09-15"
+      },
+      {
+        "requirement": "model_visible_transcript_and_reconciliation",
+        "evidence": "harness/events.py TranscriptLog records model-visible messages and reconcile_run runs after every condition; the S1 smoke of 2026-09-15 closed the loop with run_validity=valid and reconciliation=valid"
+      },
+      {
+        "requirement": "strict_finding_schema_dedup_and_private_verification",
+        "evidence": "harness/findings.py and repository_v1_findings.py reject duplicate evidence refs and anchor reuse; evaluator/repository_v1_score.py records evaluator_verification separately from agent verification claims"
+      },
+      {
+        "requirement": "team_level_finalization_trigger",
+        "evidence": "BudgetTracker atomically triggers team_remaining_permits_v1 when remaining team permits are <= the frozen reserve=32; transition is exactly-once and all active agents enter the same finalization epoch without extra permits."
+      }
+    ]
+  },
+  "manifest_hash": "10b78742681fb3053bdd7f3e18fad790ff7649e69c82a5e380633def84c50e42"
+}

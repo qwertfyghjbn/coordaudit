@@ -1,0 +1,50 @@
+{
+  "schema_version": "t-pilot-2-live-admission-v1",
+  "run_id": "formal_t-pilot-2-final-synthesis-v1",
+  "status": "PASS",
+  "checks": {
+    "frozen_runtime_tree": true,
+    "frozen_target_tree": true,
+    "single_frozen_seed": true,
+    "matched_model": true,
+    "matched_budget": true,
+    "search_packet_byte_equal": true,
+    "all_search_submitted": true,
+    "raw_frozen_before_visible": true,
+    "model_snapshot_hash_visible": true,
+    "explicit_decisions_exact": true,
+    "all_final_provenance_nonempty": true,
+    "run_validity": true,
+    "reconciliation": true,
+    "dual_evaluation": true,
+    "no_provider_failures": true
+  },
+  "search_packet_equal_by_agent": {
+    "agent_001": true,
+    "agent_002": true,
+    "agent_003": true,
+    "agent_004": true
+  },
+  "event_sequences": {
+    "team_completion": 1127,
+    "raw_candidate_set_frozen": 1128,
+    "synthesis_input_model_visible": 1132,
+    "team_findings_submitted": 1146
+  },
+  "counts": {
+    "raw_findings": 3,
+    "final_findings": 2,
+    "team_calls": 171,
+    "synthesis_calls": 3
+  },
+  "artifact_sha256": {
+    "run_manifest.json": "d018138ffb5c7b99b38157a9ca7b39d32ba4634cc7e24ae10c68b456c7b4d93a",
+    "summary.json": "86a49d01a4bfdcb33df97378632c8c5d9215cce85f43cac07e221b26bfdbe8dc",
+    "artifacts/raw_candidate_set.json": "b563b692b191c4819c3ded308fbeaea155fa9660e430d2815d9fa5261e0e7fb2",
+    "artifacts/team_final_findings.json": "00751ca8acd377cf1c63205dddf373df9b8b7274c84d1ee05c23dc7c6235161b",
+    "artifacts/raw_disposition.json": "248e7fe919110358e15774b8d5dc27fe72c31f49429c33b4b8bf4c2a610325c5",
+    "evaluation_raw.json": "23a77f6627a0592e9ccdba182c1a29cb55e3bb0f9f71c0310ab6fa839419cf42",
+    "evaluation_final.json": "a740d19d8c50a6f7da11fe7a9ff01fb143ab1ce878be5c3aeb09ffedd845b590",
+    "synthesis_delta.json": "c4f8fb0fc07494a4204c734c73f013a1d717fc7612bd506e5a71e494820c612c"
+  }
+}

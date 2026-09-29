@@ -1,0 +1,69 @@
+{
+  "scope": "three existing matched seeds only",
+  "unit": "run-local directed cross-agent work-front pair",
+  "per_seed": {
+    "matched-seed-01": {
+      "agents": 4,
+      "fronts": 6,
+      "pairs": 26,
+      "actionable": 2,
+      "realizable": 1,
+      "delivered": 1,
+      "discovered": 0
+    },
+    "matched-seed-02": {
+      "agents": 4,
+      "fronts": 6,
+      "pairs": 26,
+      "actionable": 6,
+      "realizable": 3,
+      "delivered": 1,
+      "discovered": 0
+    },
+    "matched-seed-03": {
+      "agents": 4,
+      "fronts": 6,
+      "pairs": 26,
+      "actionable": 3,
+      "realizable": 3,
+      "delivered": 1,
+      "discovered": 0
+    }
+  },
+  "total": {
+    "agents": 12,
+    "fronts": 18,
+    "pairs": 78,
+    "actionable": 11,
+    "realizable": 7,
+    "delivered": 3,
+    "discovered": 0
+  },
+  "conditional_transitions": {
+    "actionable_per_covered_pairs": "11/78",
+    "realizable_per_actionable": "7/11",
+    "delivered_per_realizable": "3/7",
+    "discovered_per_delivered": "0/3",
+    "actionable_lead_per_discovered": "N/A",
+    "verification_per_actionable_lead": "N/A",
+    "evidence_visible_per_verification": "N/A",
+    "disposition_per_evidence_visible": "N/A"
+  },
+  "terminal_states": {
+    "delivered_not_discovered": 3,
+    "covered_non_actionable": 67,
+    "actionable_not_realizable": 4,
+    "realizable_not_delivered": 4
+  },
+  "historical_trajectories": {
+    "observed_verifications": 2,
+    "structurally_mapped": 1,
+    "realizable_mapped": 1,
+    "strict_delivered_mapped": 0,
+    "aligned_verification_per_actionable_edges": "1/11",
+    "aligned_verification_per_realizable_edges": "1/7",
+    "aligned_verification_per_strict_delivered_edges": "0/3"
+  },
+  "qc_gate_passed": false,
+  "interpretation_limit": "structural binary agreement 69/78 < 90%; adjudicated counts are exploratory, not a stable density estimate"
+}

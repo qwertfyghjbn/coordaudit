@@ -362,6 +362,87 @@ REPOSITORY_V1_SUBMIT_FINDINGS_TOOL = {
 }
 
 
+SYNTHESIS_READ_FILE_TOOL = {
+    "type": "function",
+    "function": {
+        "name": "read_file",
+        "description": "Read a text file and return its content with an evidence_ref. Use only to verify an existing raw candidate's claim.",
+        "parameters": {
+            "type": "object",
+            "properties": {"path": {"type": "string"}},
+            "required": ["path"],
+        },
+    },
+}
+
+
+SUBMIT_TEAM_FINDINGS_TOOL = {
+    "type": "function",
+    "function": {
+        "name": "submit_team_findings",
+        "description": (
+            "Atomically submit the team-final synthesis payload: the complete final finding "
+            "set plus one explicit decision per raw candidate. Invalid payloads return field "
+            "errors and may be retried while reserved permits remain."
+        ),
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "schema_version": {"type": "string", "enum": ["repository-v1-synthesis-v1"]},
+                "findings": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": False,
+                        "required": ["final_id", "derived_from", "title", "category", "severity", "source", "sink", "guard", "affected_object", "trust_boundary", "reasoning_summary", "evidence_refs", "verification", "variant_coverage", "confidence"],
+                        "properties": {
+                            "final_id": {"type": "string", "description": "Stable id for this final finding, e.g. fin_00."},
+                            "derived_from": {"type": "array", "items": {"type": "string"}, "minItems": 1, "description": "Raw candidate ids this finding retains, merges, or corrects. Never empty."},
+                            "title": {"type": "string"},
+                            "category": {"type": "string", "enum": ["access_control", "authentication", "authorization", "command_injection", "information_disclosure", "misconfiguration", "other", "path_traversal", "sql_injection", "ssrf"]},
+                            "severity": {"type": "string", "enum": ["critical", "high", "medium", "low", "info"]},
+                            "source": {"type": "object"},
+                            "sink": {"type": "object"},
+                            "guard": {"type": "object"},
+                            "affected_object": {"type": "string"},
+                            "trust_boundary": {"type": "string"},
+                            "reasoning_summary": {"type": "string"},
+                            "evidence_refs": {"type": "array", "items": {"type": "string"}},
+                            "verification": {"type": "object"},
+                            "variant_coverage": {"type": "array", "items": {"type": "object"}},
+                            "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+                        },
+                    },
+                },
+                "raw_decisions": {
+                    "type": "array",
+                    "description": "Exactly one decision per raw candidate in the frozen input.",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": False,
+                        "required": ["raw_id", "action", "target_final_id", "merged_with", "evidence_refs", "rationale"],
+                        "properties": {
+                            "raw_id": {"type": "string"},
+                            "action": {"type": "string", "enum": ["retain", "merge", "correct", "drop"]},
+                            "target_final_id": {"type": ["string", "null"], "description": "Final finding id this raw maps into; null only for drop."},
+                            "merged_with": {"type": ["array", "null"], "items": {"type": "string"}, "description": "Other raw ids merged into the same target; non-empty only for merge."},
+                            "evidence_refs": {"type": "array", "items": {"type": "string"}, "description": "May be empty only for drop."},
+                            "rationale": {"type": "string"},
+                        },
+                    },
+                },
+            },
+            "required": ["schema_version", "findings", "raw_decisions"],
+        },
+    },
+}
+
+
+def synthesis_tools() -> list[dict[str, Any]]:
+    """The frozen finalizer surface: bounded verification read + team submit."""
+    return [SYNTHESIS_READ_FILE_TOOL, SUBMIT_TEAM_FINDINGS_TOOL]
+
+
 def tools_for_mode(mode: str, finding_schema: str = "repository_pilot_v0", role: str | None = None) -> list[dict[str, Any]]:
     tools = list(COMMON_TOOLS)
     if finding_schema == "repository_v1":

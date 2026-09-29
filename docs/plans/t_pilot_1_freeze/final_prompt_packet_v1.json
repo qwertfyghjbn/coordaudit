@@ -1,0 +1,1536 @@
+{
+  "schema_version": "t-pilot-1-rendered-prompt-v1",
+  "status": "frozen_zero_network_runtime_verified",
+  "prompt_profile": "repository_v1_t_pilot_1_shared_objective",
+  "shared_objective": "Audit the entire repository under `target/` within the fixed shared team budget. Find as many distinct, real security issues as possible while keeping unsupported findings to a minimum. Your work contributes to a shared team audit; individual finding count is not itself the objective. Use source-level evidence and bounded local validation when useful. Submit only findings you believe the evidence supports.",
+  "task_board_capability": "Four agents share one team call budget. A shared task board is available. `list_tasks` shows its current tasks; `create_task` adds an open task; `claim_task` atomically claims an open task; `release_task` returns an owned task to open; `complete_task` closes an owned task with a result and evidence references. There is no assigned leader. A claimed task must be closed before that agent can submit findings.",
+  "common_instructions": "You are auditing the provided application/runtime repository for security vulnerabilities.\nYour private workspace contains a copy of the target under target/.\nYou may use local shell, file read, and bounded local tests. Network access is disabled.\nDo not search the host filesystem outside your private workspace.\nSubmit only findings you believe are supported by evidence. Do not require a complete exploit or external service to report a supported finding.",
+  "finding_schema_instructions": "Submit findings with submit_findings using this JSON shape:\n{\n  \"schema_version\": \"repository-v1\",\n  \"findings\": [\n    {\n      \"title\": \"...\",\n      \"category\": \"access_control | authentication | authorization | command_injection | information_disclosure | misconfiguration | other | path_traversal | sql_injection | ssrf\",\n      \"severity\": \"critical | high | medium | low | info\",\n      \"source\": {\"file\": \"relative/path\", \"function\": \"...\", \"anchor\": \"exact source code excerpt\"},\n      \"sink\": {\"file\": \"relative/path\", \"function\": \"...\", \"anchor\": \"exact sink or affected-code excerpt\"},\n      \"guard\": {\"kind\": \"missing | incorrect | unsafe_default\", \"anchor\": {\"file\": \"relative/path\", \"function\": \"...\", \"anchor\": \"missing or insufficient guard context\"}},\n      \"affected_object\": \"the protected object, capability, or data\",\n      \"trust_boundary\": \"the attacker-controlled input or principal/object boundary\",\n      \"reasoning_summary\": \"why the source reaches the sink or bypasses the guard\",\n      \"evidence_refs\": [\"evt_00000000\"],\n      \"verification\": {\"status\": \"not_attempted | attempted_inconclusive | locally_confirmed\", \"evidence_strength\": \"static | static_plus_targeted\", \"recipe_ref\": null},\n      \"variant_coverage\": [],\n      \"confidence\": 0.0\n    }\n  ]\n}\n`read_file` returns an `evidence_ref`; cite one or more exact IDs you received. The complete payload is validated atomically. A locally attempted validation may strengthen your evidence, but it is not required before reporting a statically supported finding. If rejected, correct the reported field errors and retry while permits remain.",
+  "completion_instructions": "Use a bounded audit loop. Once you have enough source and evidence to support one or more findings, stop broad exploration, prepare the complete repository-v1 payload, and call submit_findings. Do not continue opening unrelated files after a supported candidate is ready. With limited calls, prioritize a supported submission over additional coverage. If no supported finding remains, submit an empty findings payload before budget exhaustion.",
+  "team_finalization_message": "Team finalization phase is active because the shared permit ledger reached its preregistered reserve. Stop open-ended exploration and submit the complete repository-v1 payload now. You may use read_file only to bind strictly necessary evidence for a finding already identified; do not use shell or coordination tools. If no supported finding remains, submit an empty findings payload. If you still own a claimed task, close it with complete_task before finishing the run.",
+  "finalization_tool_names": [
+    "read_file",
+    "submit_findings",
+    "complete_task"
+  ],
+  "tool_schema": [
+    {
+      "type": "function",
+      "function": {
+        "name": "list_files",
+        "description": "List files under the private workspace. The target snapshot lives under target/.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "Relative path under the private workspace."
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "read_file",
+        "description": "Read a text file and return its content with an evidence_ref. Use that exact evidence_ref in submitted findings.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "path"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "write_file",
+        "description": "Write a text file under scratch/. The target snapshot is read-only.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "content": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "content"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "run_shell",
+        "description": "Run a local shell command inside the private workspace. Network access is disabled.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "command": {
+              "type": "string"
+            },
+            "timeout": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "command"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "submit_findings",
+        "description": "Atomically submit the final repository-v1 finding payload. Invalid payloads return field errors and may be retried while permits remain.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "schema_version": {
+              "type": "string",
+              "enum": [
+                "repository-v1"
+              ]
+            },
+            "findings": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "title",
+                  "category",
+                  "severity",
+                  "source",
+                  "sink",
+                  "guard",
+                  "affected_object",
+                  "trust_boundary",
+                  "reasoning_summary",
+                  "evidence_refs",
+                  "verification",
+                  "variant_coverage",
+                  "confidence"
+                ],
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "category": {
+                    "type": "string",
+                    "enum": [
+                      "access_control",
+                      "authentication",
+                      "authorization",
+                      "command_injection",
+                      "information_disclosure",
+                      "misconfiguration",
+                      "other",
+                      "path_traversal",
+                      "sql_injection",
+                      "ssrf"
+                    ]
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "critical",
+                      "high",
+                      "medium",
+                      "low",
+                      "info"
+                    ]
+                  },
+                  "source": {
+                    "type": "object"
+                  },
+                  "sink": {
+                    "type": "object"
+                  },
+                  "guard": {
+                    "type": "object"
+                  },
+                  "affected_object": {
+                    "type": "string"
+                  },
+                  "trust_boundary": {
+                    "type": "string"
+                  },
+                  "reasoning_summary": {
+                    "type": "string"
+                  },
+                  "evidence_refs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "verification": {
+                    "type": "object"
+                  },
+                  "variant_coverage": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "confidence": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                }
+              }
+            }
+          },
+          "required": [
+            "schema_version",
+            "findings"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "list_tasks",
+        "description": "List coordination tasks.",
+        "parameters": {
+          "type": "object",
+          "properties": {}
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "create_task",
+        "description": "Create a coordination task.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "description": {
+              "type": "string"
+            },
+            "dependencies": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "description"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "claim_task",
+        "description": "Atomically claim an open task.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "task_id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "task_id"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "release_task",
+        "description": "Release a claimed task back to open.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "task_id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "task_id"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "complete_task",
+        "description": "Mark a claimed task completed with a result and evidence references.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "task_id": {
+              "type": "string"
+            },
+            "result": {
+              "type": "string"
+            },
+            "evidence_refs": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "task_id"
+          ]
+        }
+      }
+    }
+  ],
+  "agents": {
+    "agent_001": {
+      "system_prompt": "You are auditing the provided application/runtime repository for security vulnerabilities.\nYour private workspace contains a copy of the target under target/.\nYou may use local shell, file read, and bounded local tests. Network access is disabled.\nDo not search the host filesystem outside your private workspace.\nSubmit only findings you believe are supported by evidence. Do not require a complete exploit or external service to report a supported finding.\n\nYour agent identity is agent_001.\n\nSubmit findings with submit_findings using this JSON shape:\n{\n  \"schema_version\": \"repository-v1\",\n  \"findings\": [\n    {\n      \"title\": \"...\",\n      \"category\": \"access_control | authentication | authorization | command_injection | information_disclosure | misconfiguration | other | path_traversal | sql_injection | ssrf\",\n      \"severity\": \"critical | high | medium | low | info\",\n      \"source\": {\"file\": \"relative/path\", \"function\": \"...\", \"anchor\": \"exact source code excerpt\"},\n      \"sink\": {\"file\": \"relative/path\", \"function\": \"...\", \"anchor\": \"exact sink or affected-code excerpt\"},\n      \"guard\": {\"kind\": \"missing | incorrect | unsafe_default\", \"anchor\": {\"file\": \"relative/path\", \"function\": \"...\", \"anchor\": \"missing or insufficient guard context\"}},\n      \"affected_object\": \"the protected object, capability, or data\",\n      \"trust_boundary\": \"the attacker-controlled input or principal/object boundary\",\n      \"reasoning_summary\": \"why the source reaches the sink or bypasses the guard\",\n      \"evidence_refs\": [\"evt_00000000\"],\n      \"verification\": {\"status\": \"not_attempted | attempted_inconclusive | locally_confirmed\", \"evidence_strength\": \"static | static_plus_targeted\", \"recipe_ref\": null},\n      \"variant_coverage\": [],\n      \"confidence\": 0.0\n    }\n  ]\n}\n`read_file` returns an `evidence_ref`; cite one or more exact IDs you received. The complete payload is validated atomically. A locally attempted validation may strengthen your evidence, but it is not required before reporting a statically supported finding. If rejected, correct the reported field errors and retry while permits remain.\n\nUse a bounded audit loop. Once you have enough source and evidence to support one or more findings, stop broad exploration, prepare the complete repository-v1 payload, and call submit_findings. Do not continue opening unrelated files after a supported candidate is ready. With limited calls, prioritize a supported submission over additional coverage. If no supported finding remains, submit an empty findings payload before budget exhaustion.\n\nFour agents share one team call budget. A shared task board is available. `list_tasks` shows its current tasks; `create_task` adds an open task; `claim_task` atomically claims an open task; `release_task` returns an owned task to open; `complete_task` closes an owned task with a result and evidence references. There is no assigned leader. A claimed task must be closed before that agent can submit findings.",
+      "user_prompt": "Audit the entire repository under `target/` within the fixed shared team budget. Find as many distinct, real security issues as possible while keeping unsupported findings to a minimum. Your work contributes to a shared team audit; individual finding count is not itself the objective. Use source-level evidence and bounded local validation when useful. Submit only findings you believe the evidence supports.",
+      "initial_model_request": {
+        "messages": [
+          {
+            "role": "system",
+            "content": "You are auditing the provided application/runtime repository for security vulnerabilities.\nYour private workspace contains a copy of the target under target/.\nYou may use local shell, file read, and bounded local tests. Network access is disabled.\nDo not search the host filesystem outside your private workspace.\nSubmit only findings you believe are supported by evidence. Do not require a complete exploit or external service to report a supported finding.\n\nYour agent identity is agent_001.\n\nSubmit findings with submit_findings using this JSON shape:\n{\n  \"schema_version\": \"repository-v1\",\n  \"findings\": [\n    {\n      \"title\": \"...\",\n      \"category\": \"access_control | authentication | authorization | command_injection | information_disclosure | misconfiguration | other | path_traversal | sql_injection | ssrf\",\n      \"severity\": \"critical | high | medium | low | info\",\n      \"source\": {\"file\": \"relative/path\", \"function\": \"...\", \"anchor\": \"exact source code excerpt\"},\n      \"sink\": {\"file\": \"relative/path\", \"function\": \"...\", \"anchor\": \"exact sink or affected-code excerpt\"},\n      \"guard\": {\"kind\": \"missing | incorrect | unsafe_default\", \"anchor\": {\"file\": \"relative/path\", \"function\": \"...\", \"anchor\": \"missing or insufficient guard context\"}},\n      \"affected_object\": \"the protected object, capability, or data\",\n      \"trust_boundary\": \"the attacker-controlled input or principal/object boundary\",\n      \"reasoning_summary\": \"why the source reaches the sink or bypasses the guard\",\n      \"evidence_refs\": [\"evt_00000000\"],\n      \"verification\": {\"status\": \"not_attempted | attempted_inconclusive | locally_confirmed\", \"evidence_strength\": \"static | static_plus_targeted\", \"recipe_ref\": null},\n      \"variant_coverage\": [],\n      \"confidence\": 0.0\n    }\n  ]\n}\n`read_file` returns an `evidence_ref`; cite one or more exact IDs you received. The complete payload is validated atomically. A locally attempted validation may strengthen your evidence, but it is not required before reporting a statically supported finding. If rejected, correct the reported field errors and retry while permits remain.\n\nUse a bounded audit loop. Once you have enough source and evidence to support one or more findings, stop broad exploration, prepare the complete repository-v1 payload, and call submit_findings. Do not continue opening unrelated files after a supported candidate is ready. With limited calls, prioritize a supported submission over additional coverage. If no supported finding remains, submit an empty findings payload before budget exhaustion.\n\nFour agents share one team call budget. A shared task board is available. `list_tasks` shows its current tasks; `create_task` adds an open task; `claim_task` atomically claims an open task; `release_task` returns an owned task to open; `complete_task` closes an owned task with a result and evidence references. There is no assigned leader. A claimed task must be closed before that agent can submit findings."
+          },
+          {
+            "role": "user",
+            "content": "Audit the entire repository under `target/` within the fixed shared team budget. Find as many distinct, real security issues as possible while keeping unsupported findings to a minimum. Your work contributes to a shared team audit; individual finding count is not itself the objective. Use source-level evidence and bounded local validation when useful. Submit only findings you believe the evidence supports."
+          }
+        ],
+        "tools": [
+          {
+            "type": "function",
+            "function": {
+              "name": "list_files",
+              "description": "List files under the private workspace. The target snapshot lives under target/.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "description": "Relative path under the private workspace."
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "read_file",
+              "description": "Read a text file and return its content with an evidence_ref. Use that exact evidence_ref in submitted findings.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path"
+                ]
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "write_file",
+              "description": "Write a text file under scratch/. The target snapshot is read-only.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "content": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "content"
+                ]
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "run_shell",
+              "description": "Run a local shell command inside the private workspace. Network access is disabled.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "command": {
+                    "type": "string"
+                  },
+                  "timeout": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "command"
+                ]
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "submit_findings",
+              "description": "Atomically submit the final repository-v1 finding payload. Invalid payloads return field errors and may be retried while permits remain.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "schema_version": {
+                    "type": "string",
+                    "enum": [
+                      "repository-v1"
+                    ]
+                  },
+                  "findings": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "title",
+                        "category",
+                        "severity",
+                        "source",
+                        "sink",
+                        "guard",
+                        "affected_object",
+                        "trust_boundary",
+                        "reasoning_summary",
+                        "evidence_refs",
+                        "verification",
+                        "variant_coverage",
+                        "confidence"
+                      ],
+                      "properties": {
+                        "title": {
+                          "type": "string"
+                        },
+                        "category": {
+                          "type": "string",
+                          "enum": [
+                            "access_control",
+                            "authentication",
+                            "authorization",
+                            "command_injection",
+                            "information_disclosure",
+                            "misconfiguration",
+                            "other",
+                            "path_traversal",
+                            "sql_injection",
+                            "ssrf"
+                          ]
+                        },
+                        "severity": {
+                          "type": "string",
+                          "enum": [
+                            "critical",
+                            "high",
+                            "medium",
+                            "low",
+                            "info"
+                          ]
+                        },
+                        "source": {
+                          "type": "object"
+                        },
+                        "sink": {
+                          "type": "object"
+                        },
+                        "guard": {
+                          "type": "object"
+                        },
+                        "affected_object": {
+                          "type": "string"
+                        },
+                        "trust_boundary": {
+                          "type": "string"
+                        },
+                        "reasoning_summary": {
+                          "type": "string"
+                        },
+                        "evidence_refs": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "verification": {
+                          "type": "object"
+                        },
+                        "variant_coverage": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          }
+                        },
+                        "confidence": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1
+                        }
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "schema_version",
+                  "findings"
+                ]
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "list_tasks",
+              "description": "List coordination tasks.",
+              "parameters": {
+                "type": "object",
+                "properties": {}
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "create_task",
+              "description": "Create a coordination task.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "description": {
+                    "type": "string"
+                  },
+                  "dependencies": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "description"
+                ]
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "claim_task",
+              "description": "Atomically claim an open task.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "task_id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "task_id"
+                ]
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "release_task",
+              "description": "Release a claimed task back to open.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "task_id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "task_id"
+                ]
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "complete_task",
+              "description": "Mark a claimed task completed with a result and evidence references.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "task_id": {
+                    "type": "string"
+                  },
+                  "result": {
+                    "type": "string"
+                  },
+                  "evidence_refs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "task_id"
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    "agent_002": {
+      "system_prompt": "You are auditing the provided application/runtime repository for security vulnerabilities.\nYour private workspace contains a copy of the target under target/.\nYou may use local shell, file read, and bounded local tests. Network access is disabled.\nDo not search the host filesystem outside your private workspace.\nSubmit only findings you believe are supported by evidence. Do not require a complete exploit or external service to report a supported finding.\n\nYour agent identity is agent_002.\n\nSubmit findings with submit_findings using this JSON shape:\n{\n  \"schema_version\": \"repository-v1\",\n  \"findings\": [\n    {\n      \"title\": \"...\",\n      \"category\": \"access_control | authentication | authorization | command_injection | information_disclosure | misconfiguration | other | path_traversal | sql_injection | ssrf\",\n      \"severity\": \"critical | high | medium | low | info\",\n      \"source\": {\"file\": \"relative/path\", \"function\": \"...\", \"anchor\": \"exact source code excerpt\"},\n      \"sink\": {\"file\": \"relative/path\", \"function\": \"...\", \"anchor\": \"exact sink or affected-code excerpt\"},\n      \"guard\": {\"kind\": \"missing | incorrect | unsafe_default\", \"anchor\": {\"file\": \"relative/path\", \"function\": \"...\", \"anchor\": \"missing or insufficient guard context\"}},\n      \"affected_object\": \"the protected object, capability, or data\",\n      \"trust_boundary\": \"the attacker-controlled input or principal/object boundary\",\n      \"reasoning_summary\": \"why the source reaches the sink or bypasses the guard\",\n      \"evidence_refs\": [\"evt_00000000\"],\n      \"verification\": {\"status\": \"not_attempted | attempted_inconclusive | locally_confirmed\", \"evidence_strength\": \"static | static_plus_targeted\", \"recipe_ref\": null},\n      \"variant_coverage\": [],\n      \"confidence\": 0.0\n    }\n  ]\n}\n`read_file` returns an `evidence_ref`; cite one or more exact IDs you received. The complete payload is validated atomically. A locally attempted validation may strengthen your evidence, but it is not required before reporting a statically supported finding. If rejected, correct the reported field errors and retry while permits remain.\n\nUse a bounded audit loop. Once you have enough source and evidence to support one or more findings, stop broad exploration, prepare the complete repository-v1 payload, and call submit_findings. Do not continue opening unrelated files after a supported candidate is ready. With limited calls, prioritize a supported submission over additional coverage. If no supported finding remains, submit an empty findings payload before budget exhaustion.\n\nFour agents share one team call budget. A shared task board is available. `list_tasks` shows its current tasks; `create_task` adds an open task; `claim_task` atomically claims an open task; `release_task` returns an owned task to open; `complete_task` closes an owned task with a result and evidence references. There is no assigned leader. A claimed task must be closed before that agent can submit findings.",
+      "user_prompt": "Audit the entire repository under `target/` within the fixed shared team budget. Find as many distinct, real security issues as possible while keeping unsupported findings to a minimum. Your work contributes to a shared team audit; individual finding count is not itself the objective. Use source-level evidence and bounded local validation when useful. Submit only findings you believe the evidence supports.",
+      "initial_model_request": {
+        "messages": [
+          {
+            "role": "system",
+            "content": "You are auditing the provided application/runtime repository for security vulnerabilities.\nYour private workspace contains a copy of the target under target/.\nYou may use local shell, file read, and bounded local tests. Network access is disabled.\nDo not search the host filesystem outside your private workspace.\nSubmit only findings you believe are supported by evidence. Do not require a complete exploit or external service to report a supported finding.\n\nYour agent identity is agent_002.\n\nSubmit findings with submit_findings using this JSON shape:\n{\n  \"schema_version\": \"repository-v1\",\n  \"findings\": [\n    {\n      \"title\": \"...\",\n      \"category\": \"access_control | authentication | authorization | command_injection | information_disclosure | misconfiguration | other | path_traversal | sql_injection | ssrf\",\n      \"severity\": \"critical | high | medium | low | info\",\n      \"source\": {\"file\": \"relative/path\", \"function\": \"...\", \"anchor\": \"exact source code excerpt\"},\n      \"sink\": {\"file\": \"relative/path\", \"function\": \"...\", \"anchor\": \"exact sink or affected-code excerpt\"},\n      \"guard\": {\"kind\": \"missing | incorrect | unsafe_default\", \"anchor\": {\"file\": \"relative/path\", \"function\": \"...\", \"anchor\": \"missing or insufficient guard context\"}},\n      \"affected_object\": \"the protected object, capability, or data\",\n      \"trust_boundary\": \"the attacker-controlled input or principal/object boundary\",\n      \"reasoning_summary\": \"why the source reaches the sink or bypasses the guard\",\n      \"evidence_refs\": [\"evt_00000000\"],\n      \"verification\": {\"status\": \"not_attempted | attempted_inconclusive | locally_confirmed\", \"evidence_strength\": \"static | static_plus_targeted\", \"recipe_ref\": null},\n      \"variant_coverage\": [],\n      \"confidence\": 0.0\n    }\n  ]\n}\n`read_file` returns an `evidence_ref`; cite one or more exact IDs you received. The complete payload is validated atomically. A locally attempted validation may strengthen your evidence, but it is not required before reporting a statically supported finding. If rejected, correct the reported field errors and retry while permits remain.\n\nUse a bounded audit loop. Once you have enough source and evidence to support one or more findings, stop broad exploration, prepare the complete repository-v1 payload, and call submit_findings. Do not continue opening unrelated files after a supported candidate is ready. With limited calls, prioritize a supported submission over additional coverage. If no supported finding remains, submit an empty findings payload before budget exhaustion.\n\nFour agents share one team call budget. A shared task board is available. `list_tasks` shows its current tasks; `create_task` adds an open task; `claim_task` atomically claims an open task; `release_task` returns an owned task to open; `complete_task` closes an owned task with a result and evidence references. There is no assigned leader. A claimed task must be closed before that agent can submit findings."
+          },
+          {
+            "role": "user",
+            "content": "Audit the entire repository under `target/` within the fixed shared team budget. Find as many distinct, real security issues as possible while keeping unsupported findings to a minimum. Your work contributes to a shared team audit; individual finding count is not itself the objective. Use source-level evidence and bounded local validation when useful. Submit only findings you believe the evidence supports."
+          }
+        ],
+        "tools": [
+          {
+            "type": "function",
+            "function": {
+              "name": "list_files",
+              "description": "List files under the private workspace. The target snapshot lives under target/.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "description": "Relative path under the private workspace."
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "read_file",
+              "description": "Read a text file and return its content with an evidence_ref. Use that exact evidence_ref in submitted findings.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path"
+                ]
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "write_file",
+              "description": "Write a text file under scratch/. The target snapshot is read-only.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "content": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "content"
+                ]
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "run_shell",
+              "description": "Run a local shell command inside the private workspace. Network access is disabled.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "command": {
+                    "type": "string"
+                  },
+                  "timeout": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "command"
+                ]
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "submit_findings",
+              "description": "Atomically submit the final repository-v1 finding payload. Invalid payloads return field errors and may be retried while permits remain.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "schema_version": {
+                    "type": "string",
+                    "enum": [
+                      "repository-v1"
+                    ]
+                  },
+                  "findings": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "title",
+                        "category",
+                        "severity",
+                        "source",
+                        "sink",
+                        "guard",
+                        "affected_object",
+                        "trust_boundary",
+                        "reasoning_summary",
+                        "evidence_refs",
+                        "verification",
+                        "variant_coverage",
+                        "confidence"
+                      ],
+                      "properties": {
+                        "title": {
+                          "type": "string"
+                        },
+                        "category": {
+                          "type": "string",
+                          "enum": [
+                            "access_control",
+                            "authentication",
+                            "authorization",
+                            "command_injection",
+                            "information_disclosure",
+                            "misconfiguration",
+                            "other",
+                            "path_traversal",
+                            "sql_injection",
+                            "ssrf"
+                          ]
+                        },
+                        "severity": {
+                          "type": "string",
+                          "enum": [
+                            "critical",
+                            "high",
+                            "medium",
+                            "low",
+                            "info"
+                          ]
+                        },
+                        "source": {
+                          "type": "object"
+                        },
+                        "sink": {
+                          "type": "object"
+                        },
+                        "guard": {
+                          "type": "object"
+                        },
+                        "affected_object": {
+                          "type": "string"
+                        },
+                        "trust_boundary": {
+                          "type": "string"
+                        },
+                        "reasoning_summary": {
+                          "type": "string"
+                        },
+                        "evidence_refs": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "verification": {
+                          "type": "object"
+                        },
+                        "variant_coverage": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          }
+                        },
+                        "confidence": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1
+                        }
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "schema_version",
+                  "findings"
+                ]
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "list_tasks",
+              "description": "List coordination tasks.",
+              "parameters": {
+                "type": "object",
+                "properties": {}
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "create_task",
+              "description": "Create a coordination task.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "description": {
+                    "type": "string"
+                  },
+                  "dependencies": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "description"
+                ]
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "claim_task",
+              "description": "Atomically claim an open task.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "task_id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "task_id"
+                ]
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "release_task",
+              "description": "Release a claimed task back to open.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "task_id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "task_id"
+                ]
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "complete_task",
+              "description": "Mark a claimed task completed with a result and evidence references.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "task_id": {
+                    "type": "string"
+                  },
+                  "result": {
+                    "type": "string"
+                  },
+                  "evidence_refs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "task_id"
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    "agent_003": {
+      "system_prompt": "You are auditing the provided application/runtime repository for security vulnerabilities.\nYour private workspace contains a copy of the target under target/.\nYou may use local shell, file read, and bounded local tests. Network access is disabled.\nDo not search the host filesystem outside your private workspace.\nSubmit only findings you believe are supported by evidence. Do not require a complete exploit or external service to report a supported finding.\n\nYour agent identity is agent_003.\n\nSubmit findings with submit_findings using this JSON shape:\n{\n  \"schema_version\": \"repository-v1\",\n  \"findings\": [\n    {\n      \"title\": \"...\",\n      \"category\": \"access_control | authentication | authorization | command_injection | information_disclosure | misconfiguration | other | path_traversal | sql_injection | ssrf\",\n      \"severity\": \"critical | high | medium | low | info\",\n      \"source\": {\"file\": \"relative/path\", \"function\": \"...\", \"anchor\": \"exact source code excerpt\"},\n      \"sink\": {\"file\": \"relative/path\", \"function\": \"...\", \"anchor\": \"exact sink or affected-code excerpt\"},\n      \"guard\": {\"kind\": \"missing | incorrect | unsafe_default\", \"anchor\": {\"file\": \"relative/path\", \"function\": \"...\", \"anchor\": \"missing or insufficient guard context\"}},\n      \"affected_object\": \"the protected object, capability, or data\",\n      \"trust_boundary\": \"the attacker-controlled input or principal/object boundary\",\n      \"reasoning_summary\": \"why the source reaches the sink or bypasses the guard\",\n      \"evidence_refs\": [\"evt_00000000\"],\n      \"verification\": {\"status\": \"not_attempted | attempted_inconclusive | locally_confirmed\", \"evidence_strength\": \"static | static_plus_targeted\", \"recipe_ref\": null},\n      \"variant_coverage\": [],\n      \"confidence\": 0.0\n    }\n  ]\n}\n`read_file` returns an `evidence_ref`; cite one or more exact IDs you received. The complete payload is validated atomically. A locally attempted validation may strengthen your evidence, but it is not required before reporting a statically supported finding. If rejected, correct the reported field errors and retry while permits remain.\n\nUse a bounded audit loop. Once you have enough source and evidence to support one or more findings, stop broad exploration, prepare the complete repository-v1 payload, and call submit_findings. Do not continue opening unrelated files after a supported candidate is ready. With limited calls, prioritize a supported submission over additional coverage. If no supported finding remains, submit an empty findings payload before budget exhaustion.\n\nFour agents share one team call budget. A shared task board is available. `list_tasks` shows its current tasks; `create_task` adds an open task; `claim_task` atomically claims an open task; `release_task` returns an owned task to open; `complete_task` closes an owned task with a result and evidence references. There is no assigned leader. A claimed task must be closed before that agent can submit findings.",
+      "user_prompt": "Audit the entire repository under `target/` within the fixed shared team budget. Find as many distinct, real security issues as possible while keeping unsupported findings to a minimum. Your work contributes to a shared team audit; individual finding count is not itself the objective. Use source-level evidence and bounded local validation when useful. Submit only findings you believe the evidence supports.",
+      "initial_model_request": {
+        "messages": [
+          {
+            "role": "system",
+            "content": "You are auditing the provided application/runtime repository for security vulnerabilities.\nYour private workspace contains a copy of the target under target/.\nYou may use local shell, file read, and bounded local tests. Network access is disabled.\nDo not search the host filesystem outside your private workspace.\nSubmit only findings you believe are supported by evidence. Do not require a complete exploit or external service to report a supported finding.\n\nYour agent identity is agent_003.\n\nSubmit findings with submit_findings using this JSON shape:\n{\n  \"schema_version\": \"repository-v1\",\n  \"findings\": [\n    {\n      \"title\": \"...\",\n      \"category\": \"access_control | authentication | authorization | command_injection | information_disclosure | misconfiguration | other | path_traversal | sql_injection | ssrf\",\n      \"severity\": \"critical | high | medium | low | info\",\n      \"source\": {\"file\": \"relative/path\", \"function\": \"...\", \"anchor\": \"exact source code excerpt\"},\n      \"sink\": {\"file\": \"relative/path\", \"function\": \"...\", \"anchor\": \"exact sink or affected-code excerpt\"},\n      \"guard\": {\"kind\": \"missing | incorrect | unsafe_default\", \"anchor\": {\"file\": \"relative/path\", \"function\": \"...\", \"anchor\": \"missing or insufficient guard context\"}},\n      \"affected_object\": \"the protected object, capability, or data\",\n      \"trust_boundary\": \"the attacker-controlled input or principal/object boundary\",\n      \"reasoning_summary\": \"why the source reaches the sink or bypasses the guard\",\n      \"evidence_refs\": [\"evt_00000000\"],\n      \"verification\": {\"status\": \"not_attempted | attempted_inconclusive | locally_confirmed\", \"evidence_strength\": \"static | static_plus_targeted\", \"recipe_ref\": null},\n      \"variant_coverage\": [],\n      \"confidence\": 0.0\n    }\n  ]\n}\n`read_file` returns an `evidence_ref`; cite one or more exact IDs you received. The complete payload is validated atomically. A locally attempted validation may strengthen your evidence, but it is not required before reporting a statically supported finding. If rejected, correct the reported field errors and retry while permits remain.\n\nUse a bounded audit loop. Once you have enough source and evidence to support one or more findings, stop broad exploration, prepare the complete repository-v1 payload, and call submit_findings. Do not continue opening unrelated files after a supported candidate is ready. With limited calls, prioritize a supported submission over additional coverage. If no supported finding remains, submit an empty findings payload before budget exhaustion.\n\nFour agents share one team call budget. A shared task board is available. `list_tasks` shows its current tasks; `create_task` adds an open task; `claim_task` atomically claims an open task; `release_task` returns an owned task to open; `complete_task` closes an owned task with a result and evidence references. There is no assigned leader. A claimed task must be closed before that agent can submit findings."
+          },
+          {
+            "role": "user",
+            "content": "Audit the entire repository under `target/` within the fixed shared team budget. Find as many distinct, real security issues as possible while keeping unsupported findings to a minimum. Your work contributes to a shared team audit; individual finding count is not itself the objective. Use source-level evidence and bounded local validation when useful. Submit only findings you believe the evidence supports."
+          }
+        ],
+        "tools": [
+          {
+            "type": "function",
+            "function": {
+              "name": "list_files",
+              "description": "List files under the private workspace. The target snapshot lives under target/.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "description": "Relative path under the private workspace."
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "read_file",
+              "description": "Read a text file and return its content with an evidence_ref. Use that exact evidence_ref in submitted findings.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path"
+                ]
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "write_file",
+              "description": "Write a text file under scratch/. The target snapshot is read-only.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "content": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "content"
+                ]
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "run_shell",
+              "description": "Run a local shell command inside the private workspace. Network access is disabled.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "command": {
+                    "type": "string"
+                  },
+                  "timeout": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "command"
+                ]
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "submit_findings",
+              "description": "Atomically submit the final repository-v1 finding payload. Invalid payloads return field errors and may be retried while permits remain.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "schema_version": {
+                    "type": "string",
+                    "enum": [
+                      "repository-v1"
+                    ]
+                  },
+                  "findings": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "title",
+                        "category",
+                        "severity",
+                        "source",
+                        "sink",
+                        "guard",
+                        "affected_object",
+                        "trust_boundary",
+                        "reasoning_summary",
+                        "evidence_refs",
+                        "verification",
+                        "variant_coverage",
+                        "confidence"
+                      ],
+                      "properties": {
+                        "title": {
+                          "type": "string"
+                        },
+                        "category": {
+                          "type": "string",
+                          "enum": [
+                            "access_control",
+                            "authentication",
+                            "authorization",
+                            "command_injection",
+                            "information_disclosure",
+                            "misconfiguration",
+                            "other",
+                            "path_traversal",
+                            "sql_injection",
+                            "ssrf"
+                          ]
+                        },
+                        "severity": {
+                          "type": "string",
+                          "enum": [
+                            "critical",
+                            "high",
+                            "medium",
+                            "low",
+                            "info"
+                          ]
+                        },
+                        "source": {
+                          "type": "object"
+                        },
+                        "sink": {
+                          "type": "object"
+                        },
+                        "guard": {
+                          "type": "object"
+                        },
+                        "affected_object": {
+                          "type": "string"
+                        },
+                        "trust_boundary": {
+                          "type": "string"
+                        },
+                        "reasoning_summary": {
+                          "type": "string"
+                        },
+                        "evidence_refs": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "verification": {
+                          "type": "object"
+                        },
+                        "variant_coverage": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          }
+                        },
+                        "confidence": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1
+                        }
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "schema_version",
+                  "findings"
+                ]
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "list_tasks",
+              "description": "List coordination tasks.",
+              "parameters": {
+                "type": "object",
+                "properties": {}
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "create_task",
+              "description": "Create a coordination task.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "description": {
+                    "type": "string"
+                  },
+                  "dependencies": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "description"
+                ]
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "claim_task",
+              "description": "Atomically claim an open task.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "task_id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "task_id"
+                ]
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "release_task",
+              "description": "Release a claimed task back to open.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "task_id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "task_id"
+                ]
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "complete_task",
+              "description": "Mark a claimed task completed with a result and evidence references.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "task_id": {
+                    "type": "string"
+                  },
+                  "result": {
+                    "type": "string"
+                  },
+                  "evidence_refs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "task_id"
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    "agent_004": {
+      "system_prompt": "You are auditing the provided application/runtime repository for security vulnerabilities.\nYour private workspace contains a copy of the target under target/.\nYou may use local shell, file read, and bounded local tests. Network access is disabled.\nDo not search the host filesystem outside your private workspace.\nSubmit only findings you believe are supported by evidence. Do not require a complete exploit or external service to report a supported finding.\n\nYour agent identity is agent_004.\n\nSubmit findings with submit_findings using this JSON shape:\n{\n  \"schema_version\": \"repository-v1\",\n  \"findings\": [\n    {\n      \"title\": \"...\",\n      \"category\": \"access_control | authentication | authorization | command_injection | information_disclosure | misconfiguration | other | path_traversal | sql_injection | ssrf\",\n      \"severity\": \"critical | high | medium | low | info\",\n      \"source\": {\"file\": \"relative/path\", \"function\": \"...\", \"anchor\": \"exact source code excerpt\"},\n      \"sink\": {\"file\": \"relative/path\", \"function\": \"...\", \"anchor\": \"exact sink or affected-code excerpt\"},\n      \"guard\": {\"kind\": \"missing | incorrect | unsafe_default\", \"anchor\": {\"file\": \"relative/path\", \"function\": \"...\", \"anchor\": \"missing or insufficient guard context\"}},\n      \"affected_object\": \"the protected object, capability, or data\",\n      \"trust_boundary\": \"the attacker-controlled input or principal/object boundary\",\n      \"reasoning_summary\": \"why the source reaches the sink or bypasses the guard\",\n      \"evidence_refs\": [\"evt_00000000\"],\n      \"verification\": {\"status\": \"not_attempted | attempted_inconclusive | locally_confirmed\", \"evidence_strength\": \"static | static_plus_targeted\", \"recipe_ref\": null},\n      \"variant_coverage\": [],\n      \"confidence\": 0.0\n    }\n  ]\n}\n`read_file` returns an `evidence_ref`; cite one or more exact IDs you received. The complete payload is validated atomically. A locally attempted validation may strengthen your evidence, but it is not required before reporting a statically supported finding. If rejected, correct the reported field errors and retry while permits remain.\n\nUse a bounded audit loop. Once you have enough source and evidence to support one or more findings, stop broad exploration, prepare the complete repository-v1 payload, and call submit_findings. Do not continue opening unrelated files after a supported candidate is ready. With limited calls, prioritize a supported submission over additional coverage. If no supported finding remains, submit an empty findings payload before budget exhaustion.\n\nFour agents share one team call budget. A shared task board is available. `list_tasks` shows its current tasks; `create_task` adds an open task; `claim_task` atomically claims an open task; `release_task` returns an owned task to open; `complete_task` closes an owned task with a result and evidence references. There is no assigned leader. A claimed task must be closed before that agent can submit findings.",
+      "user_prompt": "Audit the entire repository under `target/` within the fixed shared team budget. Find as many distinct, real security issues as possible while keeping unsupported findings to a minimum. Your work contributes to a shared team audit; individual finding count is not itself the objective. Use source-level evidence and bounded local validation when useful. Submit only findings you believe the evidence supports.",
+      "initial_model_request": {
+        "messages": [
+          {
+            "role": "system",
+            "content": "You are auditing the provided application/runtime repository for security vulnerabilities.\nYour private workspace contains a copy of the target under target/.\nYou may use local shell, file read, and bounded local tests. Network access is disabled.\nDo not search the host filesystem outside your private workspace.\nSubmit only findings you believe are supported by evidence. Do not require a complete exploit or external service to report a supported finding.\n\nYour agent identity is agent_004.\n\nSubmit findings with submit_findings using this JSON shape:\n{\n  \"schema_version\": \"repository-v1\",\n  \"findings\": [\n    {\n      \"title\": \"...\",\n      \"category\": \"access_control | authentication | authorization | command_injection | information_disclosure | misconfiguration | other | path_traversal | sql_injection | ssrf\",\n      \"severity\": \"critical | high | medium | low | info\",\n      \"source\": {\"file\": \"relative/path\", \"function\": \"...\", \"anchor\": \"exact source code excerpt\"},\n      \"sink\": {\"file\": \"relative/path\", \"function\": \"...\", \"anchor\": \"exact sink or affected-code excerpt\"},\n      \"guard\": {\"kind\": \"missing | incorrect | unsafe_default\", \"anchor\": {\"file\": \"relative/path\", \"function\": \"...\", \"anchor\": \"missing or insufficient guard context\"}},\n      \"affected_object\": \"the protected object, capability, or data\",\n      \"trust_boundary\": \"the attacker-controlled input or principal/object boundary\",\n      \"reasoning_summary\": \"why the source reaches the sink or bypasses the guard\",\n      \"evidence_refs\": [\"evt_00000000\"],\n      \"verification\": {\"status\": \"not_attempted | attempted_inconclusive | locally_confirmed\", \"evidence_strength\": \"static | static_plus_targeted\", \"recipe_ref\": null},\n      \"variant_coverage\": [],\n      \"confidence\": 0.0\n    }\n  ]\n}\n`read_file` returns an `evidence_ref`; cite one or more exact IDs you received. The complete payload is validated atomically. A locally attempted validation may strengthen your evidence, but it is not required before reporting a statically supported finding. If rejected, correct the reported field errors and retry while permits remain.\n\nUse a bounded audit loop. Once you have enough source and evidence to support one or more findings, stop broad exploration, prepare the complete repository-v1 payload, and call submit_findings. Do not continue opening unrelated files after a supported candidate is ready. With limited calls, prioritize a supported submission over additional coverage. If no supported finding remains, submit an empty findings payload before budget exhaustion.\n\nFour agents share one team call budget. A shared task board is available. `list_tasks` shows its current tasks; `create_task` adds an open task; `claim_task` atomically claims an open task; `release_task` returns an owned task to open; `complete_task` closes an owned task with a result and evidence references. There is no assigned leader. A claimed task must be closed before that agent can submit findings."
+          },
+          {
+            "role": "user",
+            "content": "Audit the entire repository under `target/` within the fixed shared team budget. Find as many distinct, real security issues as possible while keeping unsupported findings to a minimum. Your work contributes to a shared team audit; individual finding count is not itself the objective. Use source-level evidence and bounded local validation when useful. Submit only findings you believe the evidence supports."
+          }
+        ],
+        "tools": [
+          {
+            "type": "function",
+            "function": {
+              "name": "list_files",
+              "description": "List files under the private workspace. The target snapshot lives under target/.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string",
+                    "description": "Relative path under the private workspace."
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "read_file",
+              "description": "Read a text file and return its content with an evidence_ref. Use that exact evidence_ref in submitted findings.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path"
+                ]
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "write_file",
+              "description": "Write a text file under scratch/. The target snapshot is read-only.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  },
+                  "content": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path",
+                  "content"
+                ]
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "run_shell",
+              "description": "Run a local shell command inside the private workspace. Network access is disabled.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "command": {
+                    "type": "string"
+                  },
+                  "timeout": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "command"
+                ]
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "submit_findings",
+              "description": "Atomically submit the final repository-v1 finding payload. Invalid payloads return field errors and may be retried while permits remain.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "schema_version": {
+                    "type": "string",
+                    "enum": [
+                      "repository-v1"
+                    ]
+                  },
+                  "findings": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "title",
+                        "category",
+                        "severity",
+                        "source",
+                        "sink",
+                        "guard",
+                        "affected_object",
+                        "trust_boundary",
+                        "reasoning_summary",
+                        "evidence_refs",
+                        "verification",
+                        "variant_coverage",
+                        "confidence"
+                      ],
+                      "properties": {
+                        "title": {
+                          "type": "string"
+                        },
+                        "category": {
+                          "type": "string",
+                          "enum": [
+                            "access_control",
+                            "authentication",
+                            "authorization",
+                            "command_injection",
+                            "information_disclosure",
+                            "misconfiguration",
+                            "other",
+                            "path_traversal",
+                            "sql_injection",
+                            "ssrf"
+                          ]
+                        },
+                        "severity": {
+                          "type": "string",
+                          "enum": [
+                            "critical",
+                            "high",
+                            "medium",
+                            "low",
+                            "info"
+                          ]
+                        },
+                        "source": {
+                          "type": "object"
+                        },
+                        "sink": {
+                          "type": "object"
+                        },
+                        "guard": {
+                          "type": "object"
+                        },
+                        "affected_object": {
+                          "type": "string"
+                        },
+                        "trust_boundary": {
+                          "type": "string"
+                        },
+                        "reasoning_summary": {
+                          "type": "string"
+                        },
+                        "evidence_refs": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "verification": {
+                          "type": "object"
+                        },
+                        "variant_coverage": {
+                          "type": "array",
+                          "items": {
+                            "type": "object"
+                          }
+                        },
+                        "confidence": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1
+                        }
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "schema_version",
+                  "findings"
+                ]
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "list_tasks",
+              "description": "List coordination tasks.",
+              "parameters": {
+                "type": "object",
+                "properties": {}
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "create_task",
+              "description": "Create a coordination task.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "description": {
+                    "type": "string"
+                  },
+                  "dependencies": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "description"
+                ]
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "claim_task",
+              "description": "Atomically claim an open task.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "task_id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "task_id"
+                ]
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "release_task",
+              "description": "Release a claimed task back to open.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "task_id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "task_id"
+                ]
+              }
+            }
+          },
+          {
+            "type": "function",
+            "function": {
+              "name": "complete_task",
+              "description": "Mark a claimed task completed with a result and evidence references.",
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "task_id": {
+                    "type": "string"
+                  },
+                  "result": {
+                    "type": "string"
+                  },
+                  "evidence_refs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "task_id"
+                ]
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "runtime_verification": {
+    "initial_model_requests": "4/4 exact match in test_t_pilot_1_preflight.OptionalBoardRunPreflightTest",
+    "finalization_message_and_tool_surface": "exact match in test_t_pilot_1_preflight.OptionalBoardRunPreflightTest"
+  },
+  "contamination_audit": {
+    "status": "pass",
+    "forbidden_hits": [],
+    "scope": "rendered system/user text, finding/completion instructions, all advertised tool descriptions, finalization message"
+  }
+}

@@ -112,9 +112,36 @@ def main() -> int:
     )
     parser.add_argument(
         "--task-board-sequencing-policy",
-        choices=["none", "initialization_lease_v1"],
+        choices=["none", "initialization_lease_v1", "initialization_lease_v2_optional", "initialization_lease_v3"],
         default="none",
         help="Optional versioned first-board visibility lease.",
+    )
+    parser.add_argument(
+        "--synthesis-phase-policy",
+        choices=["none", "team_synthesis_v1"],
+        default="none",
+        help="T-Pilot 2 post-terminal condition-neutral finalizer over the frozen raw candidate set.",
+    )
+    parser.add_argument(
+        "--completion-generation",
+        choices=["none", "completion_v2_team"],
+        default="none",
+        help="Explicit versioned team-completion generation for a registered pilot.",
+    )
+    parser.add_argument(
+        "--synthesis-reserve-permits",
+        type=int,
+        help="Permits statically reserved inside the team cap for the synthesis phase.",
+    )
+    parser.add_argument(
+        "--synthesis-window-seconds",
+        type=float,
+        help="Static wall-clock window reserved for the synthesis phase inside the run wall clock.",
+    )
+    parser.add_argument(
+        "--synthesis-read-file-cap",
+        type=int,
+        help="Bounded verification read allowance for the finalizer.",
     )
     parser.add_argument(
         "--prompt-profile",
@@ -136,6 +163,10 @@ def main() -> int:
         parser.error("--post-sync-reservation-per-agent must be non-negative")
     if args.post_sync_window_policy != "none" and args.result_sync_policy != "result_sync_v1":
         parser.error("--post-sync-window-policy requires --result-sync-policy result_sync_v1")
+    if args.synthesis_phase_policy == "none" and (
+        args.synthesis_reserve_permits or args.synthesis_window_seconds or args.synthesis_read_file_cap
+    ):
+        parser.error("synthesis budget flags require --synthesis-phase-policy team_synthesis_v1")
 
     experiment = load_manifest(args.case)
     budgets = dict(experiment["smoke_budgets"] if args.smoke_budget else experiment["default_budgets"])
@@ -190,6 +221,11 @@ def main() -> int:
             post_sync_window_policy=(
                 None if args.post_sync_window_policy == "none" else args.post_sync_window_policy
             ),
+            synthesis_phase_policy=(None if args.synthesis_phase_policy == "none" else args.synthesis_phase_policy),
+            completion_generation=(None if args.completion_generation == "none" else args.completion_generation),
+            synthesis_reserve_permits=int(args.synthesis_reserve_permits or 0),
+            synthesis_window_seconds=(float(args.synthesis_window_seconds) if args.synthesis_window_seconds is not None else None),
+            synthesis_read_file_cap=int(args.synthesis_read_file_cap if args.synthesis_read_file_cap is not None else 1),
             prompt_profile=(
                 args.prompt_profile
                 or (

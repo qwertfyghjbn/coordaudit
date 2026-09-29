@@ -14,13 +14,31 @@ class CoordinationError(Exception):
     pass
 
 
+INITIALIZATION_LEASE_V3 = "initialization_lease_v3"
+INITIALIZATION_LEASE_POLICIES = frozenset(
+    {"initialization_lease_v1", "initialization_lease_v2_optional", INITIALIZATION_LEASE_V3}
+)
+# Only these operations participate in bootstrap sequencing; every other tool
+# is ordinary investigation and must never wait on the lease.
+LEASE_GATED_OPERATIONS = frozenset({"list_tasks", "create_task", "claim_task"})
+# One board observation (list_tasks) plus one allocation decision realized as
+# create_task followed by claim_task: the minimum dispatch span of a normal
+# bootstrap.  Provider retries never produce a dispatch, so the count is
+# deterministic; see docs/plans/INITIALIZATION_LEASE_V3_DESIGN.md.
+BOOTSTRAP_TOOL_DISPATCH_BOUND = 3
+
+
 class TaskBoard:
     """Filesystem-backed structured coordination state with atomic claim.
 
-    ``initialization_lease_v1`` is an optional runtime primitive for a
-    preregistered sequencing diagnostic. It serializes only the first
-    list/create/claim decision for each agent in canonical agent-ID order. It
-    never chooses a task scope or creates a task on behalf of an agent.
+    Initialization leases serialize only the first list/create/claim decision
+    in canonical agent-ID order. The opt-in v2 policy also advances past an
+    agent that terminates without ever using the board. The v3 policy keeps
+    that guarantee while bounding the episode itself: a non-board action or
+    round opts out of (or ends) the bootstrap episode, and three gated
+    dispatches without a claim force the release, so a lease can never gate
+    an agent's ordinary investigation lifecycle. None of the policies chooses
+    a scope or creates a task on behalf of an agent.
     """
 
     def __init__(
@@ -44,15 +62,17 @@ class TaskBoard:
         self._initialization_index = 0
         self._initialization_owner: str | None = None
         self._initialized_agents: set[str] = set()
+        self._initialization_skip_reasons: dict[str, str] = {}
+        self._bootstrap_dispatch_counts: dict[str, int] = {}
         self._result_sync_policy = result_sync_policy
         self._participating_agents = tuple(sorted(agent_ids or ()))
         self._initial_claims: dict[str, str] = {}
         self._result_sync_trigger: dict[str, Any] | None = None
         self._result_sync_observed: set[str] = set()
-        if initialization_policy not in {None, "initialization_lease_v1"}:
+        if initialization_policy is not None and initialization_policy not in INITIALIZATION_LEASE_POLICIES:
             raise CoordinationError(f"unsupported task-board initialization policy: {initialization_policy}")
-        if initialization_policy == "initialization_lease_v1" and not self._initialization_order:
-            raise CoordinationError("initialization_lease_v1 requires canonical agent IDs")
+        if initialization_policy is not None and not self._initialization_order:
+            raise CoordinationError(f"{initialization_policy} requires canonical agent IDs")
         if result_sync_policy not in {None, "result_sync_v1"}:
             raise CoordinationError(f"unsupported result-sync policy: {result_sync_policy}")
         if result_sync_policy == "result_sync_v1" and not self._participating_agents:
@@ -78,32 +98,35 @@ class TaskBoard:
 
     def list_tasks(self, agent_id: str) -> list[dict[str, Any]]:
         self._await_initialization_lease(agent_id, operation="list_tasks")
-        with self._lock:
-            tasks = [json.loads(path.read_text(encoding="utf-8")) for path in sorted(self.tasks_dir.glob("*.json"))]
-            sync_triggered = self._result_sync_trigger is not None
-            sync_id = self._result_sync_trigger.get("sync_id") if self._result_sync_trigger else None
-            result_observation_phase = "post_result_sync" if sync_triggered and agent_id in self._result_sync_observed else "pre_result_sync"
-        self.event_log.emit(
-            "tool_call",
-            agent_id=agent_id,
-            payload={"tool": "list_tasks", "count": len(tasks)},
-        )
-        for task in tasks:
-            if task.get("status") == "completed":
-                self.event_log.emit(
-                    "task_result_observed",
-                    agent_id=agent_id,
-                    payload={
-                        "task_id": task["id"],
-                        "owner": task.get("owner"),
-                        "foreign": task.get("owner") != agent_id,
-                        "result_available": task.get("result") is not None,
-                        "evidence_refs": task.get("evidence_refs") or [],
-                        "sync_id": sync_id,
-                        "observation_phase": result_observation_phase,
-                    },
-                )
-        return tasks
+        try:
+            with self._lock:
+                tasks = [json.loads(path.read_text(encoding="utf-8")) for path in sorted(self.tasks_dir.glob("*.json"))]
+                sync_triggered = self._result_sync_trigger is not None
+                sync_id = self._result_sync_trigger.get("sync_id") if self._result_sync_trigger else None
+                result_observation_phase = "post_result_sync" if sync_triggered and agent_id in self._result_sync_observed else "pre_result_sync"
+            self.event_log.emit(
+                "tool_call",
+                agent_id=agent_id,
+                payload={"tool": "list_tasks", "count": len(tasks)},
+            )
+            for task in tasks:
+                if task.get("status") == "completed":
+                    self.event_log.emit(
+                        "task_result_observed",
+                        agent_id=agent_id,
+                        payload={
+                            "task_id": task["id"],
+                            "owner": task.get("owner"),
+                            "foreign": task.get("owner") != agent_id,
+                            "result_available": task.get("result") is not None,
+                            "evidence_refs": task.get("evidence_refs") or [],
+                            "sync_id": sync_id,
+                            "observation_phase": result_observation_phase,
+                        },
+                    )
+            return tasks
+        finally:
+            self._enforce_bootstrap_bound(agent_id)
 
     def create_task(
         self,
@@ -112,47 +135,53 @@ class TaskBoard:
         dependencies: list[str] | None = None,
     ) -> dict[str, Any]:
         self._await_initialization_lease(agent_id, operation="create_task")
-        task = {
-            "id": f"task_{uuid.uuid4().hex[:10]}",
-            "description": description,
-            "status": "open",
-            "owner": None,
-            "dependencies": list(dependencies or []),
-            "creator": agent_id,
-            "result": None,
-            "evidence_refs": [],
-            "created_at": utc_now(),
-        }
-        with self._lock:
-            self._write_task(task)
-        self.event_log.emit("task_created", agent_id=agent_id, payload=task)
-        return task
+        try:
+            task = {
+                "id": f"task_{uuid.uuid4().hex[:10]}",
+                "description": description,
+                "status": "open",
+                "owner": None,
+                "dependencies": list(dependencies or []),
+                "creator": agent_id,
+                "result": None,
+                "evidence_refs": [],
+                "created_at": utc_now(),
+            }
+            with self._lock:
+                self._write_task(task)
+            self.event_log.emit("task_created", agent_id=agent_id, payload=task)
+            return task
+        finally:
+            self._enforce_bootstrap_bound(agent_id)
 
     def claim_task(self, agent_id: str, task_id: str) -> dict[str, Any]:
         self._await_initialization_lease(agent_id, operation="claim_task")
-        with self._lock:
-            task = self._read_task(task_id)
-            if task["status"] != "open" or task["owner"] is not None:
-                self.event_log.emit(
-                    "task_claim_conflict",
-                    agent_id=agent_id,
-                    payload={"task_id": task_id, "status": task.get("status"), "owner": task.get("owner")},
-                    outcome="rejected",
-                )
-                raise CoordinationError(f"task already claimed: {task_id}")
-            for dep in task.get("dependencies", []):
-                dep_task = self._read_task(dep)
-                if dep_task.get("status") != "completed":
-                    raise CoordinationError(f"unmet dependency: {dep}")
-            task["status"] = "claimed"
-            task["owner"] = agent_id
-            task["claimed_at"] = utc_now()
-            self._write_task(task)
-            if self._result_sync_policy == "result_sync_v1" and agent_id not in self._initial_claims:
-                self._initial_claims[agent_id] = task_id
-        self.event_log.emit("task_claimed", agent_id=agent_id, payload={"task_id": task_id})
-        self.release_initialization_lease(agent_id, reason="task_claimed")
-        return task
+        try:
+            with self._lock:
+                task = self._read_task(task_id)
+                if task["status"] != "open" or task["owner"] is not None:
+                    self.event_log.emit(
+                        "task_claim_conflict",
+                        agent_id=agent_id,
+                        payload={"task_id": task_id, "status": task.get("status"), "owner": task.get("owner")},
+                        outcome="rejected",
+                    )
+                    raise CoordinationError(f"task already claimed: {task_id}")
+                for dep in task.get("dependencies", []):
+                    dep_task = self._read_task(dep)
+                    if dep_task.get("status") != "completed":
+                        raise CoordinationError(f"unmet dependency: {dep}")
+                task["status"] = "claimed"
+                task["owner"] = agent_id
+                task["claimed_at"] = utc_now()
+                self._write_task(task)
+                if self._result_sync_policy == "result_sync_v1" and agent_id not in self._initial_claims:
+                    self._initial_claims[agent_id] = task_id
+            self.event_log.emit("task_claimed", agent_id=agent_id, payload={"task_id": task_id})
+            self.release_initialization_lease(agent_id, reason="task_claimed")
+            return task
+        finally:
+            self._enforce_bootstrap_bound(agent_id)
 
     def release_initialization_lease(self, agent_id: str, *, reason: str) -> None:
         """Release an uncompleted bootstrap lease when an agent terminates.
@@ -161,15 +190,54 @@ class TaskBoard:
         path covers a model that observes the board but submits without
         claiming, or an agent that fails after creating an open task.
         """
-        if self._initialization_policy != "initialization_lease_v1":
+        if self._initialization_policy not in INITIALIZATION_LEASE_POLICIES:
             return
         with self._initialization_condition:
-            if self._initialization_owner != agent_id:
+            if self._initialization_owner == agent_id:
+                self._release_initialization_lease_locked(agent_id, reason=reason)
                 return
-            self._release_initialization_lease_locked(agent_id, reason=reason)
+            if (
+                self._initialization_policy == "initialization_lease_v1"
+                or reason != "agent_terminal"
+                or agent_id not in self._initialization_order
+                or agent_id in self._initialized_agents
+            ):
+                return
+            self._initialized_agents.add(agent_id)
+            self._initialization_skip_reasons[agent_id] = "agent_terminal_without_lease"
+            self._skip_initialized_initialization_turns_locked()
+            self._initialization_condition.notify_all()
+
+    def note_non_board_activity(self, agent_id: str, *, trigger: str) -> None:
+        """Record that an agent chose a non-board action or round (v3 only).
+
+        A PENDING agent opts out of bootstrap sequencing immediately so later
+        agents are never waiting on someone who never touches the board; a
+        BOOTSTRAP_ACTIVE owner has left the sequenced allocation decision and
+        releases the slot. The triggering action itself is never delayed.
+        """
+        if self._initialization_policy != INITIALIZATION_LEASE_V3:
+            return
+        if agent_id not in self._initialization_order:
+            return
+        with self._initialization_condition:
+            if agent_id in self._initialized_agents:
+                return
+            if self._initialization_owner == agent_id:
+                self._release_initialization_lease_locked(
+                    agent_id,
+                    reason="investigation_started",
+                    trigger=trigger,
+                    board_dispatches=self._bootstrap_dispatch_counts.get(agent_id, 0),
+                )
+                return
+            self._initialized_agents.add(agent_id)
+            self._initialization_skip_reasons[agent_id] = "bootstrap_opt_out"
+            self._skip_initialized_initialization_turns_locked()
+            self._initialization_condition.notify_all()
 
     def _await_initialization_lease(self, agent_id: str, *, operation: str) -> None:
-        if self._initialization_policy != "initialization_lease_v1":
+        if self._initialization_policy not in INITIALIZATION_LEASE_POLICIES:
             return
         if agent_id in self._initialized_agents:
             return
@@ -179,6 +247,7 @@ class TaskBoard:
                 if agent_id in self._initialized_agents:
                     return
                 if self._initialization_owner == agent_id:
+                    self._count_bootstrap_dispatch_locked(agent_id)
                     return
                 expected = (
                     self._initialization_order[self._initialization_index]
@@ -197,6 +266,7 @@ class TaskBoard:
                             "expected_agent": expected,
                         },
                     )
+                    self._count_bootstrap_dispatch_locked(agent_id)
                     return
                 if not waited:
                     waited = True
@@ -213,28 +283,95 @@ class TaskBoard:
                     )
                 self._initialization_condition.wait()
 
-    def _release_initialization_lease_locked(self, agent_id: str, *, reason: str) -> None:
+    def _count_bootstrap_dispatch_locked(self, agent_id: str) -> None:
+        if self._initialization_policy != INITIALIZATION_LEASE_V3:
+            return
+        self._bootstrap_dispatch_counts[agent_id] = self._bootstrap_dispatch_counts.get(agent_id, 0) + 1
+
+    def _enforce_bootstrap_bound(self, agent_id: str) -> None:
+        """Force-release a v3 episode that hit the frozen dispatch bound.
+
+        Runs after the gated operation completed (or failed) so the tool
+        result still reaches the model; only an owner that has not claimed
+        and has exhausted the bound releases here.
+        """
+        if self._initialization_policy != INITIALIZATION_LEASE_V3:
+            return
+        if agent_id in self._initialized_agents:
+            return
+        with self._initialization_condition:
+            if self._initialization_owner != agent_id:
+                return
+            dispatches = self._bootstrap_dispatch_counts.get(agent_id, 0)
+            if dispatches < BOOTSTRAP_TOOL_DISPATCH_BOUND:
+                return
+            self._release_initialization_lease_locked(
+                agent_id,
+                reason="bootstrap_bound_reached",
+                board_dispatches=dispatches,
+            )
+
+    def _release_initialization_lease_locked(
+        self,
+        agent_id: str,
+        *,
+        reason: str,
+        trigger: str | None = None,
+        board_dispatches: int | None = None,
+    ) -> None:
         if self._initialization_owner != agent_id:
             return
         turn_index = self._initialization_index
         self._initialized_agents.add(agent_id)
         self._initialization_index += 1
         self._initialization_owner = None
-        self.event_log.emit(
-            "task_initialization_lease_released",
-            agent_id=agent_id,
-            payload={
-                "policy": self._initialization_policy,
-                "reason": reason,
-                "turn_index": turn_index,
-                "next_agent": (
-                    self._initialization_order[self._initialization_index]
-                    if self._initialization_index < len(self._initialization_order)
-                    else None
-                ),
-            },
-        )
+        payload: dict[str, Any] = {
+            "policy": self._initialization_policy,
+            "reason": reason,
+            "turn_index": turn_index,
+            "next_agent": (
+                self._initialization_order[self._initialization_index]
+                if self._initialization_index < len(self._initialization_order)
+                else None
+            ),
+        }
+        if trigger is not None:
+            payload["trigger"] = trigger
+        if board_dispatches is not None:
+            payload["board_dispatches"] = board_dispatches
+        self.event_log.emit("task_initialization_lease_released", agent_id=agent_id, payload=payload)
+        if self._initialization_policy in {"initialization_lease_v2_optional", INITIALIZATION_LEASE_V3}:
+            self._skip_initialized_initialization_turns_locked()
         self._initialization_condition.notify_all()
+
+    def _skip_initialized_initialization_turns_locked(self) -> None:
+        """Advance past agents already marked initialized without a turn.
+
+        v2 marks an agent only on termination; v3 additionally marks the
+        bootstrap opt-out. The emitted reason records which one applied.
+        """
+        while (
+            self._initialization_owner is None
+            and self._initialization_index < len(self._initialization_order)
+            and self._initialization_order[self._initialization_index] in self._initialized_agents
+        ):
+            skipped_agent = self._initialization_order[self._initialization_index]
+            turn_index = self._initialization_index
+            self._initialization_index += 1
+            self.event_log.emit(
+                "task_initialization_turn_skipped",
+                agent_id=skipped_agent,
+                payload={
+                    "policy": self._initialization_policy,
+                    "reason": self._initialization_skip_reasons.get(skipped_agent, "agent_terminal_without_lease"),
+                    "turn_index": turn_index,
+                    "next_agent": (
+                        self._initialization_order[self._initialization_index]
+                        if self._initialization_index < len(self._initialization_order)
+                        else None
+                    ),
+                },
+            )
 
     def release_task(self, agent_id: str, task_id: str) -> dict[str, Any]:
         with self._lock:

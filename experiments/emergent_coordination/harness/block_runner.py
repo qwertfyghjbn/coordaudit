@@ -218,8 +218,15 @@ class BlockRunner:
                     )
         defaults = manifest.get("default_budgets")
         contract_budgets = manifest.get("contract_budgets")
+        # T-Pilot 1 v1/v2 reuse the frozen T4 task-closure budget. Keep the
+        # case manifest byte-identical because private graph input locks bind it.
+        budget_contract_id = (
+            "t4_flowise_sequenced_bootstrap_task_closure_v1"
+            if self.config.contract_id in {"t_pilot_1_shared_objective_v1", "t_pilot_1_shared_objective_v2", "t_pilot_2_final_synthesis_v1"}
+            else self.config.contract_id
+        )
         selected = (
-            contract_budgets.get(self.config.contract_id)
+            contract_budgets.get(budget_contract_id)
             if isinstance(contract_budgets, dict)
             else None
         )

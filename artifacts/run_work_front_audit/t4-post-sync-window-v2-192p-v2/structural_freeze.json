@@ -1,0 +1,11 @@
+{
+  "phase": "structural_binary_freeze_before_operational_review",
+  "files": {
+    "reviewer_a.jsonl": "f941f86c630788c3791ff5386376ef6e0148cbf92358bf69423a98f9b2813d99",
+    "reviewer_b.jsonl": "2077403e3170c84f8978e4129efb237129c6b5bac1197880918cc3ac8ca852af",
+    "reviewer_b_erratum.json": "ac17aa11eedd1974e16005aa98b31badf711265609efcf96f4e07a807d758158",
+    "disagreement_adjudication.jsonl": "f40a8d2892ff925dabeb0055549f0d4e69ca8cc972da24f51b5222c2073fe24c",
+    "structural_labels_final.jsonl": "338b485cd84d02cdb39175e5131aeee71358be521c02bfbc0614e413bc812ae2",
+    "structural_qc.json": "edc115fc960788a75e294d87956f70893900909647c43ae95aa9c249b8478765"
+  }
+}

@@ -21,6 +21,7 @@ EVENT_TYPES = (
     "shared_list", "shared_read", "shared_create", "shared_mkdir",
     "task_created", "task_claimed", "task_claim_conflict", "task_released", "task_completed", "task_result_observed",
     "task_initialization_lease_waited", "task_initialization_lease_acquired", "task_initialization_lease_released",
+    "task_initialization_turn_skipped",
     "task_closure_gate_rejected", "result_sync_triggered", "result_sync_observed", "result_sync_gate_rejected",
     "post_sync_window_opened", "post_sync_instruction_model_visible", "post_sync_provider_call_admitted",
     "verification_action_attempted", "verification_evidence_model_visible", "post_sync_submit_deferred",
@@ -29,6 +30,8 @@ EVENT_TYPES = (
     "manager_report_observed", "manager_report_queued", "manager_report_delivered", "manager_report_model_visible", "manager_report_adopted",
     "manager_worker_requested_more", "team_finalization_started", "worker_terminalized",
     "final_snapshot_ready", "final_synthesis_started", "final_synthesis_finished", "team_finalization_deadline_exceeded", "late_report",
+    "raw_candidate_set_frozen", "synthesis_started", "synthesis_input_model_visible",
+    "team_findings_submitted", "team_findings_submission_rejected", "synthesis_degraded", "synthesis_skipped_empty_raw",
     "message_sent", "message_read", "artifact_published", "finding_submitted", "finding_submission_rejected",
     "completion_phase_started", "prohibited_tool_attempt", "budget_exhausted", "team_completion", "timeout", "error", "run_started", "run_finished",
 )
@@ -357,6 +360,35 @@ def reconcile_run(event_log: EventLog, transcript_log: TranscriptLog, budget_sna
             reasons.append("llm_call_missing_request_transcript")
         if entry.get("outcome") == "succeeded" and len(refs & transcript_ids) < 2:
             reasons.append("successful_llm_call_missing_response_transcript")
+
+    synthesis_permits = [entry for entry in ledger.values() if entry.get("call_kind") == "team_synthesis"]
+    if synthesis_permits:
+        frozen = next((event for event in events if event.get("event_type") == "raw_candidate_set_frozen"), None)
+        visible = next((event for event in events if event.get("event_type") == "synthesis_input_model_visible"), None)
+        first_attempt = next((event for event in events if event.get("event_type") == "llm_call_attempted" and event.get("agent_id") == "team_finalizer"), None)
+        if frozen is None or visible is None or first_attempt is None or not (
+            frozen["sequence"] < visible["sequence"] < first_attempt["sequence"]
+        ):
+            reasons.append("team_synthesis_freeze_visibility_order_mismatch")
+        else:
+            first_request = next((record for record in transcripts if record.get("transcript_id") == (visible.get("payload") or {}).get("request_transcript_id")), None)
+            messages = ((first_request or {}).get("content") or {}).get("messages") or []
+            snapshot_text = messages[1].get("content") if len(messages) == 2 and isinstance(messages[1], dict) else None
+            snapshot_hash = (visible.get("payload") or {}).get("model_snapshot_sha256")
+            if not isinstance(snapshot_text, str) or not isinstance(snapshot_hash, str) or snapshot_hash not in snapshot_text:
+                reasons.append("team_synthesis_snapshot_not_model_visible")
+            else:
+                try:
+                    rendered = json.loads(snapshot_text.split(":\n", 1)[1])
+                    rendered_hash = hashlib.sha256(json.dumps(rendered, ensure_ascii=False, sort_keys=True).encode("utf-8")).hexdigest()
+                    if rendered_hash != snapshot_hash or snapshot_hash != (frozen.get("payload") or {}).get("model_snapshot_sha256"):
+                        reasons.append("team_synthesis_snapshot_hash_mismatch")
+                except (ValueError, IndexError, TypeError):
+                    reasons.append("team_synthesis_snapshot_render_invalid")
+        for entry in synthesis_permits:
+            call = calls.get(entry.get("permit_id"))
+            if entry.get("agent_id") != "team_finalizer" or call is None or (call.get("payload") or {}).get("call_kind") != "team_synthesis":
+                reasons.append("team_synthesis_permit_identity_mismatch")
 
     unique_reasons = sorted(set(reasons))
     return {"status": "valid" if not unique_reasons else "infrastructure_invalid", "reasons": unique_reasons, "event_count": len(events), "transcript_count": len(transcripts), "artifact_count": len(artifacts), "permit_count": len(ledger)}

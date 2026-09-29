@@ -1,0 +1,31 @@
+{
+  "scope": "t4-post-sync-window-v2-192p matched-seed-01/02/03",
+  "phase": "pre_sync_work_front_and_pair_freeze",
+  "work_front_count": 18,
+  "pair_count": 78,
+  "files": {
+    "work_fronts.jsonl": {
+      "sha256": "16c8b996adb8e08a62dca9043665e08bcd8aaca083b04a0a1b84aeb7de8cc4ff",
+      "bytes": 12868
+    },
+    "cross_agent_pairs.jsonl": {
+      "sha256": "a22147435016468b8dbc2cbb2dd0ab0bb0df4144adc61010d9525f2b095ffc29",
+      "bytes": 12324
+    }
+  },
+  "matched-seed-01": {
+    "agents": 4,
+    "work_fronts": 6,
+    "cross_agent_directed_pairs": 26
+  },
+  "matched-seed-02": {
+    "agents": 4,
+    "work_fronts": 6,
+    "cross_agent_directed_pairs": 26
+  },
+  "matched-seed-03": {
+    "agents": 4,
+    "work_fronts": 6,
+    "cross_agent_directed_pairs": 26
+  }
+}

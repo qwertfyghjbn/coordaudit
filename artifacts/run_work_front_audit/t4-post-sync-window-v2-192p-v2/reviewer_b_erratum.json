@@ -1,0 +1,22 @@
+{
+  "reviewer": "B",
+  "scope": "mechanical QC erratum for original reviewer_b.jsonl; original file unchanged",
+  "corrections": [
+    {
+      "pair_id": "03-P004",
+      "corrected_primary_label": "non-actionable",
+      "corrected_secondary_tag": "direct relation",
+      "reason": "Feedback 记录可含 chatId，下载入口也接收 chatId，故保留具体字段层面的 direct relation。但目标 front 是下载路径的 UUID、文件名和 traversal guard；反馈给出的正常 chatId 不能验证、反驳或缩小这些 guard 的绕过命题。原 bounded_check 转向未闭合的下载归属问题，超出了冻结目标 front，因此 primary_label 写成 actionable 是笔误。",
+      "source_code_anchor": "packages/server/src/utils/getChatMessageFeedback.ts:utilGetChatMessageFeedback:26-35",
+      "target_code_anchor": "packages/server/src/controllers/get-upload-file/index.ts:streamUploadedFile:13-59; packages/components/src/storage/LocalStorageProvider.ts:streamStorageFile:121-139"
+    },
+    {
+      "pair_id": "03-P023",
+      "corrected_primary_label": "non-actionable",
+      "corrected_secondary_tag": "direct relation",
+      "reason": "下载入口需要 chatId，而目标 feedback 查询可返回该字段，故保留具体字段层面的 direct relation。但目标 front 的命题是公开 feedback 是否按 chatflowid 泄露内容；下载入口所需的参数并不验证、反驳或缩小 feedback 的认证与查询条件。原 bounded_check 只考察泄露数据的潜在后续用途，因此 primary_label 写成 actionable 是笔误。",
+      "source_code_anchor": "packages/server/src/controllers/get-upload-file/index.ts:streamUploadedFile:13-59",
+      "target_code_anchor": "packages/server/src/utils/getChatMessageFeedback.ts:utilGetChatMessageFeedback:26-35"
+    }
+  ]
+}

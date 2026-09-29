@@ -1,0 +1,70 @@
+{
+  "schema_version": "t-pilot-1-prereg-v2-draft",
+  "status": "draft_pending_v2_block_freeze_and_zero_network_preflight",
+  "live_execution_authorized": false,
+  "seed_identity": "t-pilot-1-flowise-shared-objective-seed-02",
+  "supersedes": {
+    "v1_prereg": "docs/plans/t_pilot_1_freeze/final_prereg_v1.json",
+    "v1_disposition": "treatment-integrity failure / lease-starvation diagnostic; not A/B/C classified; all v1 frozen artifacts and runs unchanged",
+    "v1_failure_evidence": "runs/t-pilot-1-shared-objective-v1-192p/formal_t-pilot-1-shared-objective-v1/logs/events.jsonl (all four lease releases reason=agent_terminal; permits 96/65/30/1; agent_004 lifetime model calls = 1; board writes = 0)",
+    "root_cause_and_audit": "docs/plans/INITIALIZATION_LEASE_V3_DESIGN.md section 1"
+  },
+  "condition": {
+    "id": "T4",
+    "mode": "structured_team",
+    "agent_count": 4
+  },
+  "paths": {
+    "design": "docs/plans/T_PILOT_1_DESIGN.md",
+    "lease_v3_design": "docs/plans/INITIALIZATION_LEASE_V3_DESIGN.md",
+    "contract_config": "experiments/emergent_coordination/manifests/t_pilot_1_shared_objective_v2.json",
+    "block_manifest": null,
+    "rendered_prompt_packet": "docs/plans/t_pilot_1_freeze/final_prompt_packet_v1.json"
+  },
+  "only_runtime_delta_from_v1": {
+    "task_board_sequencing_policy": {
+      "from": "initialization_lease_v2_optional",
+      "to": "initialization_lease_v3"
+    },
+    "lease_v3_semantics": [
+      "lease only sequences initial board bootstrap (list_tasks -> optional create_task -> claim_task)",
+      "first non-board tool dispatch or zero-tool-call round opts out / releases without pausing the action",
+      "bootstrap episode hard bound: 3 gated dispatches without a successful claim force-release",
+      "successful first claim releases immediately; terminal release retained; release exactly once",
+      "no extra provider calls or permits; v1/v2 semantics preserved byte-for-byte"
+    ]
+  },
+  "unchanged_from_v1": [
+    "shared-objective prompt profile repository_v1_t_pilot_1_shared_objective (byte-identical; re-verify against packet at freeze)",
+    "A/B/C rubric and adjudication protocol (design sections 5-6)",
+    "budgets: 192 hard team call permits, 96 max steps, 1200s wall clock, 1 provider retry, reserve 32",
+    "model deepseek-flash, thinking disabled, temperature 0, 4096 output ceiling",
+    "target snapshot and evaluator digests",
+    "task_closure_gate_v1, convergent_v2, all_agents_terminal_v1, team_remaining_permits_v1",
+    "finding schema and tool schemas"
+  ],
+  "policies": {
+    "task_board_sequencing_policy": "initialization_lease_v3",
+    "task_closure_policy": "task_closure_gate_v1",
+    "result_sync_policy": null,
+    "post_sync_window_policy": null,
+    "completion_policy": "convergent_v2",
+    "team_completion_policy": "all_agents_terminal_v1",
+    "team_finalization_policy": "team_remaining_permits_v1",
+    "team_finalization_reserve": 32
+  },
+  "new_starvation_invariant": "No agent may be structurally denied an ordinary investigation opportunity solely because an earlier agent chooses not to use the task board; verified deterministically (agent_001 never uses board for 24 steps -> agents 002/003/004 board observations all precede agent_001 termination; no agent reduced to a single call).",
+  "zero_network_evidence_20260927": {
+    "lease_v3_targeted_suite": "tests/test_initialization_lease_v3.py 26 passed (edge cases A-J, exactly-once release, v1/v2 regression, sequencing preserved with model-visible claimed snapshot, starvation stress, all-opt-out, mixed, closure/finalization, contract registration)",
+    "full_experiment_test_suite": "369 passed; 9 subtests passed (baseline 343 + 26 new, zero regressions)",
+    "spbt_cli_mock_smoke": "S1/P4/B4/T4(valid with initialization_lease_v3) all run_validity=valid and reconciliation=valid",
+    "live_api_calls": 0
+  },
+  "pending_before_live": [
+    "freeze v2 block manifest (runtime_source digest changes due to the v3 fix; recompute)",
+    "re-verify rendered prompts byte-identical to v1 packet and re-run contamination audit",
+    "confirm v2 contract_config file hash and record in this prereg, then mark status frozen",
+    "obtain separate live seed authorization"
+  ],
+  "admission_note_for_v2": "Admission criteria are unchanged from v1 (design section 4). The lease must not itself be a treatment-integrity confounder: report per-agent permits, bootstrap acquisition/release reasons, and confirm no task_initialization_lease_waited remains unresolved at run end."
+}

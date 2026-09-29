@@ -1,0 +1,217 @@
+{
+  "schema_version": "t-pilot-2-finalizer-prompt-packet-v1",
+  "finalizer_id": "team_finalizer",
+  "system_message": "You are the final synthesizer for a completed repository security audit. The frozen input lists every raw candidate. Produce one team-final unique finding set from those candidates.\n\nAllowed actions, per raw candidate:\n- retain: keep every repository-v1 field unchanged;\n- merge: combine candidates only when they describe the same security invariant, sink family, and protected object;\n- correct: change a claim only when the raw evidence or one bounded verification read supports the change;\n- drop: remove a candidate only when its evidence cannot support the claim.\n\nHard constraints:\n- Submit schema_version repository-v1-synthesis-v1. Every final finding must contain every repository-v1 field, a unique final_id (fin_00, fin_01, ...), and non-empty derived_from listing all source raw IDs. Do not introduce an unrelated finding, including one noticed during a verification read.\n- Include exactly one raw_decision per raw ID: raw_id, action, target_final_id, merged_with, evidence_refs, rationale. For retain or correct, target_final_id names the single final finding and merged_with is null. For each member of a merge, action is merge, target_final_id names the shared final finding, and merged_with lists every other member. For drop, target_final_id and merged_with are null.\n- A drop may have empty evidence_refs, but must have a reason. Every other decision cites visible evidence. Every final finding cites visible evidence from the frozen candidates or your own read.\n- You may call read_file only for a source, sink, guard, or evidence path already named by a raw candidate. The read allowance is one file. Do not explore other files or use coordination tools.\n- Submit the complete payload with submit_team_findings. Field errors can be corrected while reserved permits remain.\n- Keeping every candidate unchanged is a valid outcome.",
+  "user_message_rendering": "Final synthesis input (immutable frozen raw candidate set, sha256 <model_snapshot_sha256>):\\n<canonical JSON model_snapshot, ensure_ascii=False, sort_keys=True>",
+  "tool_schema": [
+    {
+      "type": "function",
+      "function": {
+        "name": "read_file",
+        "description": "Read a text file and return its content with an evidence_ref. Use only to verify an existing raw candidate's claim.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "path"
+          ]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "submit_team_findings",
+        "description": "Atomically submit the team-final synthesis payload: the complete final finding set plus one explicit decision per raw candidate. Invalid payloads return field errors and may be retried while reserved permits remain.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "schema_version": {
+              "type": "string",
+              "enum": [
+                "repository-v1-synthesis-v1"
+              ]
+            },
+            "findings": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "final_id",
+                  "derived_from",
+                  "title",
+                  "category",
+                  "severity",
+                  "source",
+                  "sink",
+                  "guard",
+                  "affected_object",
+                  "trust_boundary",
+                  "reasoning_summary",
+                  "evidence_refs",
+                  "verification",
+                  "variant_coverage",
+                  "confidence"
+                ],
+                "properties": {
+                  "final_id": {
+                    "type": "string",
+                    "description": "Stable id for this final finding, e.g. fin_00."
+                  },
+                  "derived_from": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "minItems": 1,
+                    "description": "Raw candidate ids this finding retains, merges, or corrects. Never empty."
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "category": {
+                    "type": "string",
+                    "enum": [
+                      "access_control",
+                      "authentication",
+                      "authorization",
+                      "command_injection",
+                      "information_disclosure",
+                      "misconfiguration",
+                      "other",
+                      "path_traversal",
+                      "sql_injection",
+                      "ssrf"
+                    ]
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "critical",
+                      "high",
+                      "medium",
+                      "low",
+                      "info"
+                    ]
+                  },
+                  "source": {
+                    "type": "object"
+                  },
+                  "sink": {
+                    "type": "object"
+                  },
+                  "guard": {
+                    "type": "object"
+                  },
+                  "affected_object": {
+                    "type": "string"
+                  },
+                  "trust_boundary": {
+                    "type": "string"
+                  },
+                  "reasoning_summary": {
+                    "type": "string"
+                  },
+                  "evidence_refs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "verification": {
+                    "type": "object"
+                  },
+                  "variant_coverage": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "confidence": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
+                }
+              }
+            },
+            "raw_decisions": {
+              "type": "array",
+              "description": "Exactly one decision per raw candidate in the frozen input.",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "raw_id",
+                  "action",
+                  "target_final_id",
+                  "merged_with",
+                  "evidence_refs",
+                  "rationale"
+                ],
+                "properties": {
+                  "raw_id": {
+                    "type": "string"
+                  },
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "retain",
+                      "merge",
+                      "correct",
+                      "drop"
+                    ]
+                  },
+                  "target_final_id": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "description": "Final finding id this raw maps into; null only for drop."
+                  },
+                  "merged_with": {
+                    "type": [
+                      "array",
+                      "null"
+                    ],
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Other raw ids merged into the same target; non-empty only for merge."
+                  },
+                  "evidence_refs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "May be empty only for drop."
+                  },
+                  "rationale": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "required": [
+            "schema_version",
+            "findings",
+            "raw_decisions"
+          ]
+        }
+      }
+    }
+  ],
+  "intake_schema_version": "repository-v1-synthesis-v1",
+  "read_file_cap": 1,
+  "hashes": {
+    "system_message_sha256": "082664babb668a87e5ab1a3c314068d3bf97867d8aad1523d6fc2cdec74247e2",
+    "tool_schema_sha256": "153f74586234ca49f393594c4146d60ed96161a8bc08ca72adaba34b1c1cac13",
+    "search_prompt_packet_sha256": "c313d25b104b6eace8feb51d12ca1f7602e20e3b70477fe61b0ba159c157609a"
+  }
+}

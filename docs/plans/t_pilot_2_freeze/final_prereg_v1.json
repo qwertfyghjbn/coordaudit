@@ -1,0 +1,80 @@
+{
+  "schema_version": "t-pilot-2-final-prereg-v1",
+  "status": "frozen_zero_network_preflight_passed_single_live_seed_authorized",
+  "authorization": {
+    "live_execution_authorized": true,
+    "source": "用户本会话指令：确认实现进度，完成剩余工作，并运行正式实验",
+    "scope": "one live T4 seed; no result-driven additional seed"
+  },
+  "experiment": {
+    "research_question": "在搜索阶段合同保持不变时，有界 final synthesis 能否改善 team-final unique finding set？",
+    "condition": "T4",
+    "agent_count": 4,
+    "case_id": "flowise_3_1_3_repository_v1",
+    "seed_identity": "t-pilot-2-final-synthesis-seed-01",
+    "run_id": "formal_t-pilot-2-final-synthesis-v1",
+    "model": "deepseek-flash",
+    "thinking_mode": "disabled",
+    "temperature": 0,
+    "max_output_tokens": 4096,
+    "hard_team_call_permits": 192,
+    "search_permits": 189,
+    "synthesis_reserve_permits": 3,
+    "read_file_cap": 1,
+    "wall_clock_timeout_seconds": 1200,
+    "search_deadline_seconds": 1140,
+    "synthesis_window_seconds": 60,
+    "search_provider_retries": 1,
+    "synthesis_per_call_retries": 0
+  },
+  "freeze": {
+    "contract_config": "experiments/emergent_coordination/manifests/t_pilot_2_final_synthesis_v1.json",
+    "contract_config_sha256": "df0612d10cdef594e022df6cb13f07ced0c6d0f0779cfde1ea2e27ab4309d0de",
+    "block_manifest": "docs/plans/t_pilot_2_freeze/t_pilot_2_final_synthesis_v1/block_manifest.json",
+    "block_manifest_hash": "447e4d41a9e17aae5a7d7bcc89382a3930906d1770698969ab2fa9b7e7811a08",
+    "block_manifest_file_sha256": "bfd3c86bae0345bc42e3a862d3ab4cd21bc8968ff9328054d9bbd3c4d4c2f423",
+    "finalizer_prompt_packet": "docs/plans/t_pilot_2_freeze/finalizer_prompt_packet_v1.json",
+    "finalizer_prompt_packet_sha256": "cb3246c7cc75cd6ab750e6520194e80ff2e80ccf0503b4a664626f93d9894390",
+    "search_prompt_packet": "docs/plans/t_pilot_1_freeze/final_prompt_packet_v1.json",
+    "search_prompt_packet_sha256": "c313d25b104b6eace8feb51d12ca1f7602e20e3b70477fe61b0ba159c157609a",
+    "target_tree_digest": "c612819a833fc8ab3c58fe5085fb80fc0a6c4cb1d86cbb8ed41b0b431e4a1638",
+    "runtime_tree_digest": "710af3b6a8c6a1a6d216bc961b404526e8187c73acefea72b3d613aba57b64f4",
+    "evaluator_private_tree_digest": "76aaef174369769e70b8ef61cda454d96a503fc033e1437a6b6efba934915e12",
+    "search_tool_schema_sha256": "81707c840e64c97540da11f856ff1b7ca56b2c0b0d5ab073a44f0c4c52ac29d9"
+  },
+  "admission": {
+    "require_search_clean_complete": true,
+    "require_reconciliation_valid": true,
+    "require_raw_freeze_before_synthesis_request": true,
+    "require_model_visible_snapshot_hash_match": true,
+    "require_nonempty_derived_from_and_explicit_decisions": true,
+    "require_dual_evaluation_artifacts": true,
+    "adr_0002_two_or_more_provider_failures_invalid": true,
+    "stop_effect_interpretation_if_failed": true
+  },
+  "adjudication": {
+    "stage_1": "blind truth adjudication and root clustering on raw and final independently",
+    "stage_2": "unblind derived_from and raw_decisions provenance",
+    "stage_3": "judge merge, drop, correction and retention against stage-1 results",
+    "second_review": "key disagreements changing synthesis delta only",
+    "labels": [
+      "mechanism_pass_useful",
+      "mechanism_pass_no_correct_transformation",
+      "non_diagnostic",
+      "mechanism_fail_runtime"
+    ],
+    "no_total_score": true,
+    "no_extra_seed": true
+  },
+  "zero_network_preflight": {
+    "t_pilot_2_suite": "8 passed; 36 subtests passed",
+    "full_experiment_suite": "377 passed; 45 subtests passed",
+    "team_completion_harness_smoke": "6 passed (S/P/B/T and M4/hard gate)",
+    "repository_pilot_smoke": "6 passed",
+    "formal_cli_mock": "run_validity=valid; reconciliation=valid; team_completion=clean_complete; synthesis=skipped_empty_raw, 0 synthesis calls",
+    "search_packet_equal_to_t_pilot_1": true,
+    "prompt_contamination_scan": "pass",
+    "os_sandbox_self_check": "pass outside Codex sandbox",
+    "live_api_calls_before_freeze": 0
+  }
+}

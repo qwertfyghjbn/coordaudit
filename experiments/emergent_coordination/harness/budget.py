@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import threading
+import time
 import uuid
 from dataclasses import dataclass, field
 from typing import Any
 
 
 BUDGET_SCHEMA_VERSION = 3
+TEAM_SYNTHESIS_BUDGET_SCHEMA_VERSION = 4
 LEGACY_BUDGET_KEYS = frozenset(
     {"global_input_token_cap", "global_output_token_cap", "per_agent_token_cap", "max_llm_calls"}
 )
@@ -32,6 +34,18 @@ def validate_budget_config(budgets: dict[str, Any]) -> None:
         raise ValueError("post-sync reservation values must be non-negative")
     if hard is not None and post_sync_per_agent * post_sync_agents > int(hard):
         raise ValueError("post-sync reservations cannot exceed hard_team_call_permits")
+    synthesis_reserve = int(budgets.get("synthesis_reserve_permits", 0) or 0)
+    if synthesis_reserve < 0:
+        raise ValueError("synthesis_reserve_permits must be non-negative")
+    if hard is not None and synthesis_reserve > int(hard):
+        raise ValueError("synthesis_reserve_permits cannot exceed hard_team_call_permits")
+    synthesis_window = budgets.get("synthesis_window_seconds")
+    if synthesis_window is not None and float(synthesis_window) < 0:
+        raise ValueError("synthesis_window_seconds must be non-negative")
+    if synthesis_window is not None and hard is not None:
+        wall = budgets.get("wall_clock_timeout")
+        if wall is not None and float(synthesis_window) >= float(wall):
+            raise ValueError("synthesis_window_seconds must leave search wall-clock time")
 
 
 def describe_budget_semantics(budgets: dict[str, Any]) -> dict[str, Any]:
@@ -42,7 +56,7 @@ def describe_budget_semantics(budgets: dict[str, Any]) -> dict[str, Any]:
     post_sync_agents = int(budgets.get("post_sync_reservation_agents", 0) or 0)
     hard = budgets.get("hard_team_call_permits")
     return {
-        "schema_version": BUDGET_SCHEMA_VERSION,
+        "schema_version": TEAM_SYNTHESIS_BUDGET_SCHEMA_VERSION if int(budgets.get("synthesis_reserve_permits", 0) or 0) else BUDGET_SCHEMA_VERSION,
         "primary_budget_unit": "attempted_model_call",
         "token_usage_role": "observed_outcome",
         "retry_attempts_consume_permits": True,
@@ -56,6 +70,21 @@ def describe_budget_semantics(budgets: dict[str, Any]) -> dict[str, Any]:
             "reserve": team_reserve,
             "trigger": "remaining_team_permits_lte_reserve" if team_reserve else None,
             "inside_hard_budget": True,
+        },
+        "team_synthesis": {
+            "policy": "team_synthesis_v1" if int(budgets.get("synthesis_reserve_permits", 0) or 0) else None,
+            "reserve_permits": int(budgets.get("synthesis_reserve_permits", 0) or 0),
+            "window_seconds": budgets.get("synthesis_window_seconds"),
+            "trigger": "all_search_agents_terminal",
+            "inside_hard_budget": True,
+            "normal_work_permits": (
+                None if hard is None else int(hard) - int(budgets.get("synthesis_reserve_permits", 0) or 0)
+            ),
+            "search_wall_clock_seconds": (
+                None
+                if hard is None or budgets.get("wall_clock_timeout") is None or not budgets.get("synthesis_window_seconds")
+                else float(budgets["wall_clock_timeout"]) - float(budgets["synthesis_window_seconds"])
+            ),
         },
         "post_sync_reservation": {
             "permits_per_eligible_agent": post_sync_per_agent,
@@ -138,6 +167,11 @@ class BudgetTracker:
     # shared last-minute pool.
     post_sync_reservation_per_agent: int = 0
     post_sync_eligible_agents: tuple[str, ...] = ()
+    # T-Pilot 2 team synthesis: permits statically reserved inside the hard
+    # budget for the post-terminal condition-neutral finalizer, plus its own
+    # wall-clock window carved out of (never added to) the run wall clock.
+    synthesis_reserve_permits: int = 0
+    synthesis_window_seconds: float = 0.0
     token_stop_threshold: int | None = None
     wall_clock_timeout: float | None = None
     global_input_tokens: int = 0
@@ -183,12 +217,31 @@ class BudgetTracker:
             and self.post_sync_reservation_per_agent * len(self.post_sync_eligible_agents) > self.hard_team_call_permits
         ):
             raise ValueError("post-sync reservations cannot exceed the hard team budget")
+        if self.synthesis_reserve_permits < 0:
+            raise ValueError("synthesis reserve permits must be non-negative")
+        if (
+            self.hard_team_call_permits is not None
+            and self.synthesis_reserve_permits > self.hard_team_call_permits
+        ):
+            raise ValueError("synthesis reserve permits cannot exceed the hard team budget")
+        if self.synthesis_window_seconds < 0:
+            raise ValueError("synthesis window seconds must be non-negative")
+        if (
+            self.wall_clock_timeout is not None
+            and self.synthesis_window_seconds
+            and self.synthesis_window_seconds >= self.wall_clock_timeout
+        ):
+            raise ValueError("synthesis window must leave search wall-clock time")
         self._final_synthesis_authorized: str | None = None
         self._team_finalization_started = False
         self._team_finalization_trigger: dict[str, Any] | None = None
         self._team_finalization_event_emitted = False
         self._registered_agents: set[str] = set()
         self._terminal_agents: set[str] = set()
+        self._synthesis_phase_open = False
+        self._synthesis_calls = 0
+        self._synthesis_opened_at: float | None = None
+        self._started_at = time.monotonic()
         self._post_sync_windows: dict[str, dict[str, Any]] = {
             agent_id: {
                 "opened": False,
@@ -210,6 +263,73 @@ class BudgetTracker:
     def mark_agent_terminal(self, agent_id: str) -> None:
         with self._lock:
             self._terminal_agents.add(agent_id)
+
+    @property
+    def synthesis_phase_open(self) -> bool:
+        with self._lock:
+            return self._synthesis_phase_open
+
+    @property
+    def synthesis_calls_used(self) -> int:
+        with self._lock:
+            return self._synthesis_calls
+
+    def open_synthesis_phase(self) -> None:
+        """Atomically admit the post-terminal team-synthesis phase."""
+        with self._condition:
+            if self._synthesis_phase_open:
+                return
+            self._synthesis_phase_open = True
+            self._synthesis_opened_at = time.monotonic()
+            self._condition.notify_all()
+
+    def close_synthesis_phase(self) -> None:
+        with self._condition:
+            self._synthesis_phase_open = False
+            self._condition.notify_all()
+
+    def check_search_wall_clock(self) -> None:
+        """Per-call search deadline: run wall clock minus the synthesis window.
+
+        While the synthesis phase is not open, search calls are bounded by
+        wall_clock_timeout - synthesis_window_seconds (the wall-clock
+        reservation is static, like the synthesis permit reserve).  Contracts
+        without a synthesis window keep the original full-budget limit.
+        """
+        if self.wall_clock_timeout is None:
+            return
+        with self._lock:
+            phase_open = self._synthesis_phase_open
+            limit = self.wall_clock_timeout
+            if self.synthesis_window_seconds and not phase_open:
+                limit = self.wall_clock_timeout - self.synthesis_window_seconds
+            elapsed = time.monotonic() - self._started_at
+        if elapsed > limit:
+            raise BudgetExhausted(
+                "search_wall_clock_deadline",
+                {**self.snapshot(), "elapsed_seconds": elapsed, "search_deadline_seconds": limit},
+            )
+
+    def check_synthesis_window(self) -> None:
+        """Bound the synthesis phase by its own window and the total run clock."""
+        with self._lock:
+            opened_at = self._synthesis_opened_at
+            window = self.synthesis_window_seconds
+            total_limit = self.wall_clock_timeout
+            elapsed_total = time.monotonic() - self._started_at
+        if opened_at is None:
+            return
+        elapsed_phase = time.monotonic() - opened_at
+        if window and elapsed_phase > window:
+            raise BudgetExhausted(
+                "synthesis_window_deadline",
+                {**self.snapshot(), "phase_elapsed_seconds": elapsed_phase, "window_seconds": window},
+            )
+        if total_limit is not None and elapsed_total > total_limit:
+            raise BudgetExhausted(
+                "wall_clock_timeout",
+                {**self.snapshot(), "elapsed_seconds": elapsed_total},
+            )
 
     @property
     def team_finalization_active(self) -> bool:
@@ -271,7 +391,7 @@ class BudgetTracker:
                     }
                 )
             return {
-                "schema_version": BUDGET_SCHEMA_VERSION,
+                "schema_version": TEAM_SYNTHESIS_BUDGET_SCHEMA_VERSION if self.synthesis_reserve_permits else BUDGET_SCHEMA_VERSION,
                 "llm_calls": self.llm_calls,
                 "attempted_llm_calls": self.llm_calls,
                 "per_agent": {key: dict(value) for key, value in self.per_agent.items()},
@@ -292,6 +412,12 @@ class BudgetTracker:
                 },
                 "final_synthesis_authorized_for": self._final_synthesis_authorized,
                 "in_flight_provider_calls": sum(1 for entry in self.permit_ledger if entry.get("outcome") == "granted"),
+                "team_synthesis": {
+                    "reserve_permits": self.synthesis_reserve_permits,
+                    "window_seconds": self.synthesis_window_seconds,
+                    "phase_open": self._synthesis_phase_open,
+                    "calls": self._synthesis_calls,
+                },
                 "enforced_limits": enforced_limits,
                 "runtime_limits": {
                     "wall_clock_timeout_seconds": self.wall_clock_timeout,
@@ -385,10 +511,25 @@ class BudgetTracker:
                 if self.hard_team_call_permits is not None and self.llm_calls >= self.hard_team_call_permits:
                     self.admission_closed = True
                     raise BudgetExhausted("hard_team_call_permits", self.snapshot())
-                if call_kind not in {"normal", "final_synthesis", "post_sync_initial", "post_sync_followup", "post_sync_submit"}:
+                if call_kind not in {"normal", "final_synthesis", "post_sync_initial", "post_sync_followup", "post_sync_submit", "team_synthesis"}:
                     raise ValueError(f"unsupported call kind: {call_kind}")
                 if call_kind == "normal" and self._normal_work_permit_limit is not None and self.llm_calls >= self._normal_work_permit_limit:
                     raise BudgetExhausted("post_sync_reservation_protected", self.snapshot())
+                if call_kind == "normal" and self.synthesis_reserve_permits:
+                    synthesis_normal_limit = (
+                        None
+                        if self.hard_team_call_permits is None
+                        else self.hard_team_call_permits - self.synthesis_reserve_permits
+                    )
+                    if self._normal_work_permit_limit is not None:
+                        synthesis_normal_limit = (
+                            self._normal_work_permit_limit
+                            if synthesis_normal_limit is None
+                            else min(synthesis_normal_limit, self._normal_work_permit_limit)
+                        )
+                    if synthesis_normal_limit is not None and self.llm_calls >= synthesis_normal_limit:
+                        self.admission_closed = True
+                        raise BudgetExhausted("team_synthesis_reserved", self.snapshot())
                 if call_kind.startswith("post_sync_"):
                     state = self._post_sync_windows.get(agent_id)
                     if state is None or not state["opened"]:
@@ -421,6 +562,14 @@ class BudgetTracker:
                         raise BudgetExhausted("final_synthesis_not_authorized", self.snapshot())
                     if self.reserved_final_synthesis_permits != 1:
                         raise BudgetExhausted("final_synthesis_not_reserved", self.snapshot())
+                if call_kind == "team_synthesis":
+                    if not self._synthesis_phase_open:
+                        raise BudgetExhausted("team_synthesis_not_active", self.snapshot())
+                    if self.synthesis_reserve_permits < 1:
+                        raise BudgetExhausted("team_synthesis_not_reserved", self.snapshot())
+                    if self._synthesis_calls >= self.synthesis_reserve_permits:
+                        self.admission_closed = True
+                        raise BudgetExhausted("synthesis_reserve_exhausted", self.snapshot())
                 if self.token_stop_threshold is None:
                     break
                 observed_tokens = self.global_input_tokens + self.global_output_tokens
@@ -459,6 +608,8 @@ class BudgetTracker:
             self.permit_ledger.append({**permit.as_dict(), "call_kind": call_kind, "outcome": "granted", "token_usage": {}})
             if call_kind == "final_synthesis":
                 self._final_synthesis_authorized = None
+            if call_kind == "team_synthesis":
+                self._synthesis_calls += 1
             return permit
 
     def settle_call_permit(self, permit: CallPermit, *, outcome: str, usage: TokenUsage | None = None) -> None:

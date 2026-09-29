@@ -19,6 +19,7 @@ from experiments.emergent_coordination.harness.completion import (
 from experiments.emergent_coordination.harness.events import EventLog, TranscriptLog
 from experiments.emergent_coordination.harness.llm.client import LLMClient
 from experiments.emergent_coordination.harness.prompts import result_sync_message, system_prompt, user_prompt
+from experiments.emergent_coordination.harness.task_board import LEASE_GATED_OPERATIONS
 from experiments.emergent_coordination.harness.tools.sandbox import AgentSandbox, ToolError
 from experiments.emergent_coordination.harness.tools.specs import tools_for_mode
 
@@ -71,6 +72,7 @@ class AgentRunner:
             raise ValueError("post-sync window requires result_sync_v1")
         self.post_sync_window_policy = post_sync_window_policy
         self._task_lifecycle_prompt = prompt_profile in {
+            "repository_v1_t_pilot_1_shared_objective",
             "repository_v1_t4_task_lifecycle_v2",
             "repository_v1_t4_nonoverlap_v1",
             "repository_v1_t4_sequenced_bootstrap_v1",
@@ -154,6 +156,11 @@ class AgentRunner:
                 # the window without another model call.
                 self._post_sync_evidence_visible = True
             self._step += 1
+            if not response.tool_calls and self.sandbox.board is not None:
+                # A round with no tool call is a non-board choice: under the
+                # v3 lease it must not keep a bootstrap slot or a queue
+                # position that later agents are waiting on.
+                self.sandbox.board.note_non_board_activity(self.agent_id, trigger="non_board_round")
             if response.tool_calls:
                 self._messages.append(
                     {
@@ -457,6 +464,11 @@ class AgentRunner:
         # provider error/timeout consumes it and never gets a hidden retry.
         retry_limit = 0 if call_kind == "final_synthesis" else self.max_provider_retries
         for retry_index in range(retry_limit + 1):
+            # The T-Pilot 2 synthesis reservation carves a static wall-clock
+            # window out of the run budget; search calls are bounded by the
+            # earlier deadline.  Contracts without the window keep the full
+            # run limit, so historical semantics are unchanged.
+            self.budget.check_search_wall_clock()
             requested = self.event_log.emit(
                 "call_permit_requested",
                 agent_id=self.agent_id,
@@ -608,6 +620,11 @@ class AgentRunner:
         return self._completion_started and self.completion_policy in HARD_FINALIZATION_POLICIES
 
     def _dispatch(self, name: str, raw_arguments: str, *, parent_event_id: str, call_id: str | None = None) -> str:
+        if self.sandbox.board is not None and name not in LEASE_GATED_OPERATIONS:
+            # Leaving (or never entering) the sequenced bootstrap decision
+            # must release the initialization lease without pausing this
+            # action; a no-op for policies other than initialization_lease_v3.
+            self.sandbox.board.note_non_board_activity(self.agent_id, trigger="non_board_tool")
         post_sync_tools = self._post_sync_tools()
         if post_sync_tools is not None and name not in post_sync_tools:
             return self._reject_prohibited_tool(name, raw_arguments, call_id=call_id, parent_event_id=parent_event_id)

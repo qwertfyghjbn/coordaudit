@@ -94,6 +94,22 @@ def prepare_run_workspace(
     return layout
 
 
+def prepare_finalizer_workspace(layout: WorkspaceLayout, agent_id: str = "team_finalizer") -> Path:
+    """Create the post-terminal finalizer's private target copy.
+
+    Idempotent: called after every search agent is terminal, it only adds the
+    finalizer's own directory under the existing private root and copies the
+    same frozen target tree the search agents received.
+    """
+    private = layout.agent_private(agent_id)
+    if layout.agent_target(agent_id).exists():
+        return private
+    private.mkdir(parents=True, exist_ok=True)
+    layout.agent_scratch(agent_id).mkdir(parents=True, exist_ok=True)
+    _copy_tree(layout.target_root, layout.agent_target(agent_id))
+    return private
+
+
 def _lock_down_evaluator_private(path: Path) -> None:
     path.chmod(path.stat().st_mode | stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR)
 

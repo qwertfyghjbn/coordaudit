@@ -75,6 +75,53 @@ Submit only findings you believe are supported by evidence. Do not require a com
 """.strip()
 
 
+T_PILOT_1_COMMON_INSTRUCTIONS = """
+You are auditing the provided application/runtime repository for security vulnerabilities.
+Your private workspace contains a copy of the target under target/.
+You may use local shell, file read, and bounded local tests. Network access is disabled.
+Do not search the host filesystem outside your private workspace.
+Submit only findings you believe are supported by evidence. Do not require a complete exploit or external service to report a supported finding.
+""".strip()
+
+
+T_PILOT_1_SHARED_OBJECTIVE = "Audit the entire repository under `target/` within the fixed shared team budget. Find as many distinct, real security issues as possible while keeping unsupported findings to a minimum. Your work contributes to a shared team audit; individual finding count is not itself the objective. Use source-level evidence and bounded local validation when useful. Submit only findings you believe the evidence supports."
+
+
+T_PILOT_1_BOARD_CAPABILITY = "Four agents share one team call budget. A shared task board is available. `list_tasks` shows its current tasks; `create_task` adds an open task; `claim_task` atomically claims an open task; `release_task` returns an owned task to open; `complete_task` closes an owned task with a result and evidence references. There is no assigned leader. A claimed task must be closed before that agent can submit findings."
+
+
+T_PILOT_1_PROFILE = "repository_v1_t_pilot_1_shared_objective"
+
+
+T_PILOT_2_SYNTHESIS_INSTRUCTIONS = """
+You are the final synthesizer for a completed repository security audit. The frozen input lists every raw candidate. Produce one team-final unique finding set from those candidates.
+
+Allowed actions, per raw candidate:
+- retain: keep every repository-v1 field unchanged;
+- merge: combine candidates only when they describe the same security invariant, sink family, and protected object;
+- correct: change a claim only when the raw evidence or one bounded verification read supports the change;
+- drop: remove a candidate only when its evidence cannot support the claim.
+
+Hard constraints:
+- Submit schema_version repository-v1-synthesis-v1. Every final finding must contain every repository-v1 field, a unique final_id (fin_00, fin_01, ...), and non-empty derived_from listing all source raw IDs. Do not introduce an unrelated finding, including one noticed during a verification read.
+- Include exactly one raw_decision per raw ID: raw_id, action, target_final_id, merged_with, evidence_refs, rationale. For retain or correct, target_final_id names the single final finding and merged_with is null. For each member of a merge, action is merge, target_final_id names the shared final finding, and merged_with lists every other member. For drop, target_final_id and merged_with are null.
+- A drop may have empty evidence_refs, but must have a reason. Every other decision cites visible evidence. Every final finding cites visible evidence from the frozen candidates or your own read.
+- You may call read_file only for a source, sink, guard, or evidence path already named by a raw candidate. The read allowance is one file. Do not explore other files or use coordination tools.
+- Submit the complete payload with submit_team_findings. Field errors can be corrected while reserved permits remain.
+- Keeping every candidate unchanged is a valid outcome.
+""".strip()
+
+
+def synthesis_snapshot_message(model_snapshot: dict[str, object], *, model_snapshot_sha256: str) -> str:
+    """Deterministic model-visible rendering of the frozen raw candidate set."""
+    return (
+        "Final synthesis input (immutable frozen raw candidate set, sha256 "
+        + model_snapshot_sha256
+        + "):\n"
+        + json.dumps(model_snapshot, ensure_ascii=False, sort_keys=True)
+    )
+
+
 CONVERGENT_COMPLETION_INSTRUCTIONS = """
 Use a bounded audit loop. Once you have enough source and evidence to support one or more findings, stop broad exploration, prepare the complete repository-v1 payload, and call submit_findings. Do not continue opening unrelated files after a supported candidate is ready. With limited calls, prioritize a supported submission over additional coverage. If no supported finding remains, submit an empty findings payload before budget exhaustion.
 """.strip()
@@ -223,6 +270,8 @@ You are a worker in a manager-led audit. Work only on your current assignment, r
 def base_prompt(profile: str = "repository_pilot_v0") -> tuple[str, str]:
     if profile == "repository_pilot_v0":
         return COMMON_INSTRUCTIONS, FINDING_SCHEMA
+    if profile == T_PILOT_1_PROFILE:
+        return T_PILOT_1_COMMON_INSTRUCTIONS, REPOSITORY_V1_FINDING_SCHEMA
     if profile in {"repository_v1", *T4_TASK_BOARD_PROFILES}:
         return REPOSITORY_V1_COMMON_INSTRUCTIONS, REPOSITORY_V1_FINDING_SCHEMA
     raise ValueError(f"unknown prompt profile: {profile}")
@@ -248,7 +297,9 @@ def system_prompt(
     if mode == "raw_blackboard":
         parts.append(BLACKBOARD_INSTRUCTIONS)
     elif mode == "structured_team":
-        if profile in T4_TASK_BOARD_PROFILES:
+        if profile == T_PILOT_1_PROFILE:
+            parts.append(T_PILOT_1_BOARD_CAPABILITY)
+        elif profile in T4_TASK_BOARD_PROFILES:
             parts.append(T4_BOARD_BOOTSTRAP_INSTRUCTIONS)
             if profile == "repository_v1_t4_nonoverlap_v1":
                 parts.append(T4_NONOVERLAP_INSTRUCTIONS)
@@ -271,6 +322,8 @@ def system_prompt(
 
 
 def user_prompt(mode: str, agent_id: str, agent_count: int, profile: str = "repository_pilot_v0", role: str | None = None) -> str:
+    if profile == T_PILOT_1_PROFILE:
+        return T_PILOT_1_SHARED_OBJECTIVE
     if profile == "repository_pilot_v0":
         text = (
             "Audit the repository under target/. "

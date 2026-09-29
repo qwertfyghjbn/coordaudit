@@ -48,6 +48,10 @@ class RunConfig:
     post_sync_window_policy: str | None = None
     completion_generation: str | None = None
     team_finalization_deadline_seconds: float | None = None
+    synthesis_phase_policy: str | None = None
+    synthesis_reserve_permits: int = 0
+    synthesis_window_seconds: float | None = None
+    synthesis_read_file_cap: int = 1
     require_os_sandbox: bool = False
     run_id: str | None = None
     runs_dir: Path = DEFAULT_RUNS_DIR
@@ -174,6 +178,16 @@ def merge_findings(agent_results: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return merged
 
 
+def _final_findings_for_evaluation(final_payload: dict[str, Any]) -> list[dict[str, Any]]:
+    """Project C_final onto the repository-v1 evaluator input shape."""
+    projected = []
+    for finding in final_payload.get("findings", []):
+        item = {key: value for key, value in finding.items() if key not in {"final_id", "derived_from"}}
+        item.setdefault("submitted_by", "team_finalizer")
+        projected.append(item)
+    return projected
+
+
 def run_experiment(config: RunConfig, llm: LLMClient) -> dict[str, Any]:
     budgets = dict(config.budgets or {})
     if config.post_sync_window_policy in {"t4_post_sync_window_v1", "t4_post_sync_window_v2"}:
@@ -183,6 +197,23 @@ def run_experiment(config: RunConfig, llm: LLMClient) -> dict[str, Any]:
     if config.team_finalization_policy is not None:
         budgets.setdefault("team_finalization_policy", config.team_finalization_policy)
         budgets.setdefault("team_finalization_reserve", config.team_finalization_reserve)
+    if config.synthesis_phase_policy is not None:
+        if config.synthesis_phase_policy != "team_synthesis_v1":
+            raise ValueError(f"unsupported synthesis_phase_policy: {config.synthesis_phase_policy}")
+        if config.team_completion_policy != "all_agents_terminal_v1" or config.completion_generation != "completion_v2_team":
+            raise ValueError("team_synthesis_v1 requires the all-search-agents-terminal completion_v2_team barrier")
+        if config.synthesis_reserve_permits < 1 or config.synthesis_window_seconds is None or config.synthesis_window_seconds <= 0:
+            raise ValueError("team_synthesis_v1 requires positive static permit and wall-clock reservations")
+        if config.synthesis_read_file_cap < 0:
+            raise ValueError("synthesis_read_file_cap must be non-negative")
+        if "synthesis_reserve_permits" in budgets and int(budgets["synthesis_reserve_permits"]) != config.synthesis_reserve_permits:
+            raise ValueError("synthesis reserve differs between config and budget")
+        if "synthesis_window_seconds" in budgets and float(budgets["synthesis_window_seconds"]) != config.synthesis_window_seconds:
+            raise ValueError("synthesis window differs between config and budget")
+        budgets.setdefault("synthesis_reserve_permits", config.synthesis_reserve_permits)
+        if config.synthesis_window_seconds is not None:
+            budgets.setdefault("synthesis_window_seconds", config.synthesis_window_seconds)
+        budgets.setdefault("wall_clock_timeout", 1200 if budgets.get("wall_clock_timeout") is None else budgets["wall_clock_timeout"])
     validate_budget_config(budgets)
     policy = get_policy(config.mode)
     if config.mode == "single" and config.agent_count != 1:
@@ -235,6 +266,8 @@ def run_experiment(config: RunConfig, llm: LLMClient) -> dict[str, Any]:
         post_sync_eligible_agents=(
             agent_ids if config.post_sync_window_policy in {"t4_post_sync_window_v1", "t4_post_sync_window_v2"} else ()
         ),
+        synthesis_reserve_permits=int(budgets.get("synthesis_reserve_permits", 0) or 0) if config.synthesis_phase_policy else 0,
+        synthesis_window_seconds=float(budgets.get("synthesis_window_seconds", 0) or 0) if config.synthesis_phase_policy else 0.0,
         token_stop_threshold=budgets.get("token_stop_threshold"),
         wall_clock_timeout=budgets.get("wall_clock_timeout"),
     )
@@ -278,6 +311,10 @@ def run_experiment(config: RunConfig, llm: LLMClient) -> dict[str, Any]:
         "post_sync_window_policy": config.post_sync_window_policy,
         "completion_generation": config.completion_generation,
         "team_finalization_deadline_seconds": config.team_finalization_deadline_seconds,
+        "synthesis_phase_policy": config.synthesis_phase_policy,
+        "synthesis_reserve_permits": config.synthesis_reserve_permits if config.synthesis_phase_policy else 0,
+        "synthesis_window_seconds": config.synthesis_window_seconds if config.synthesis_phase_policy else None,
+        "synthesis_read_file_cap": config.synthesis_read_file_cap if config.synthesis_phase_policy else None,
         "require_os_sandbox": config.require_os_sandbox,
         "start_time": utc_now(),
         "git_commit": git_commit(REPO_ROOT),
@@ -303,7 +340,54 @@ def run_experiment(config: RunConfig, llm: LLMClient) -> dict[str, Any]:
         case=case,
     )
     agent_results = policy.run_agents(context)
+    early_team_completion_event = None
+    if config.synthesis_phase_policy == "team_synthesis_v1":
+        search_budget_snapshot = budget.snapshot()
+        search_validity = _combine_validity(
+            classify_infrastructure_validity(search_budget_snapshot, agent_results),
+            reconcile_run(event_log, transcript_log, search_budget_snapshot),
+        )
+        early_team_completion_event = TeamCompletionBarrier(
+            agent_ids=context.agent_ids,
+            policy=config.team_completion_policy,
+        ).emit(
+            event_log,
+            agent_results,
+            budget_snapshot=search_budget_snapshot,
+            infrastructure_status=search_validity["status"],
+        )
+        if early_team_completion_event is None:
+            raise RuntimeError("team synthesis requires an all-search-agents-terminal barrier")
     _archive_evaluator_private(layout, case)
+    synthesis_result: dict[str, Any] | None = None
+    team_synthesis_payload: dict[str, Any] | None = None
+    team_synthesis_delta: dict[str, Any] | None = None
+    if config.synthesis_phase_policy == "team_synthesis_v1":
+        from experiments.emergent_coordination.harness.synthesis_runner import TeamSynthesisRunner
+
+        synthesis = TeamSynthesisRunner(
+            layout=layout,
+            event_log=event_log,
+            transcript_log=transcript_log,
+            budget=budget,
+            llm=llm,
+            agent_results=agent_results,
+            submissions=context.submissions,
+            agent_ids=list(context.agent_ids),
+            read_file_cap=config.synthesis_read_file_cap,
+        ).run()
+        synthesis_result = {
+            "status": synthesis.status,
+            "reason": synthesis.reason,
+            "provider_calls": synthesis.provider_calls,
+            "provider_failures": synthesis.provider_failures,
+            "read_file_calls": synthesis.read_file_calls,
+            "raw_decision_counts": synthesis.delta.get("raw_decision_counts"),
+            "degraded": synthesis.delta.get("degraded", False),
+            "model_snapshot_sha256": synthesis.model_snapshot_sha256,
+        }
+        team_synthesis_payload = synthesis.final_payload
+        team_synthesis_delta = synthesis.delta
     merged = merge_findings(agent_results)
     (run_dir / "merged_findings.json").write_text(
         json.dumps({"findings": merged}, indent=2, ensure_ascii=False),
@@ -324,13 +408,40 @@ def run_experiment(config: RunConfig, llm: LLMClient) -> dict[str, Any]:
             json.dumps(evaluation_bundle["private"], indent=2, ensure_ascii=False),
             encoding="utf-8",
         )
+        if config.synthesis_phase_policy == "team_synthesis_v1":
+            # Dual evaluation: evaluation.json keeps its historical raw-union
+            # meaning and is recorded as an explicit alias of the raw pass.
+            (run_dir / "evaluation_raw.json").write_text(
+                json.dumps(evaluation, indent=2, ensure_ascii=False), encoding="utf-8"
+            )
+            final_payload = team_synthesis_payload or {"findings": []}
+            final_for_evaluation = _final_findings_for_evaluation(final_payload)
+            final_bundle = _evaluate_for_case(case, final_for_evaluation, ground_truth, invalid_submissions)
+            (run_dir / "evaluation_final.json").write_text(
+                json.dumps(final_bundle["public"], indent=2, ensure_ascii=False), encoding="utf-8"
+            )
+            (layout.evaluator_private / "verification_final.json").write_text(
+                json.dumps(final_bundle["private"], indent=2, ensure_ascii=False), encoding="utf-8"
+            )
+            (run_dir / "synthesis_delta.json").write_text(
+                json.dumps(team_synthesis_delta, indent=2, ensure_ascii=False), encoding="utf-8"
+            )
+            manifest_path = run_dir / "run_manifest.json"
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            manifest["evaluation_artifacts"] = {
+                "evaluation_raw.json": "C_raw-union operative pass",
+                "evaluation_final.json": "C_final operative pass",
+                "synthesis_delta.json": "mechanical raw->final delta",
+                "evaluation.json": "alias of evaluation_raw.json (historical pipeline artifact)",
+            }
+            manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False), encoding="utf-8")
 
     budget_snapshot = budget.snapshot()
     validity = classify_infrastructure_validity(budget_snapshot, agent_results)
     preliminary_reconciliation = reconcile_run(event_log, transcript_log, budget_snapshot)
     validity = _combine_validity(validity, preliminary_reconciliation)
-    team_completion_event = None
-    if config.team_completion_policy is not None and config.completion_generation != "completion_v3":
+    team_completion_event = early_team_completion_event
+    if team_completion_event is None and config.team_completion_policy is not None and config.completion_generation != "completion_v3":
         team_completion_event = TeamCompletionBarrier(
             agent_ids=context.agent_ids,
             policy=config.team_completion_policy,
@@ -373,6 +484,7 @@ def run_experiment(config: RunConfig, llm: LLMClient) -> dict[str, Any]:
         "team_completion": team_completion_event["payload"] if team_completion_event else None,
         "reconciliation": reconciliation,
         "evaluation": evaluation,
+        "synthesis": synthesis_result,
         "end_time": utc_now(),
     }
     (run_dir / "summary.json").write_text(json.dumps(summary, indent=2, ensure_ascii=False, default=str), encoding="utf-8")
@@ -434,6 +546,12 @@ def classify_infrastructure_validity(
             "reasons": ["two_or_more_provider_failure_attempts"],
         }
     failed = failures[0]
+    if failed.get("agent_id") == "team_finalizer":
+        return {
+            "status": "valid_with_infrastructure_warning",
+            "provider_failure_attempts": 1,
+            "reasons": ["single_synthesis_provider_failure"],
+        }
     recovered = any(
         entry.get("agent_id") == failed.get("agent_id")
         and entry.get("outcome") == "succeeded"

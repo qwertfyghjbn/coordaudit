@@ -77,6 +77,10 @@ class ContractFamily:
     result_sync_policy: str | None = None
     post_sync_window_policy: str | None = None
     post_sync_reservation_per_agent: int = 0
+    synthesis_phase_policy: str | None = None
+    synthesis_reserve_permits: int = 0
+    synthesis_window_seconds: int | None = None
+    synthesis_read_file_cap: int = 0
 
 
 CONTRACT_FAMILIES: dict[str, ContractFamily] = {
@@ -197,6 +201,55 @@ CONTRACT_FAMILIES: dict[str, ContractFamily] = {
             team_finalization_reserve=32,
             task_board_sequencing_policy="initialization_lease_v1",
             task_closure_policy="task_closure_gate_v1",
+        ),
+        ContractFamily(
+            contract_id="t_pilot_1_shared_objective_v1",
+            repository_ids=("flowise_3_1_3_repository_v1",),
+            conditions=T4_COMPLETION_BUDGET_DIAGNOSTIC_CONDITIONS,
+            provider="openai_compatible",
+            requested_model="deepseek-flash",
+            max_output_tokens=4096,
+            hard_team_call_permits=192,
+            wall_clock_timeout_seconds=1200,
+            max_steps=96,
+            team_finalization_policy="team_remaining_permits_v1",
+            team_finalization_reserve=32,
+            task_board_sequencing_policy="initialization_lease_v2_optional",
+            task_closure_policy="task_closure_gate_v1",
+        ),
+        ContractFamily(
+            contract_id="t_pilot_1_shared_objective_v2",
+            repository_ids=("flowise_3_1_3_repository_v1",),
+            conditions=T4_COMPLETION_BUDGET_DIAGNOSTIC_CONDITIONS,
+            provider="openai_compatible",
+            requested_model="deepseek-flash",
+            max_output_tokens=4096,
+            hard_team_call_permits=192,
+            wall_clock_timeout_seconds=1200,
+            max_steps=96,
+            team_finalization_policy="team_remaining_permits_v1",
+            team_finalization_reserve=32,
+            task_board_sequencing_policy="initialization_lease_v3",
+            task_closure_policy="task_closure_gate_v1",
+        ),
+        ContractFamily(
+            contract_id="t_pilot_2_final_synthesis_v1",
+            repository_ids=("flowise_3_1_3_repository_v1",),
+            conditions=T4_COMPLETION_BUDGET_DIAGNOSTIC_CONDITIONS,
+            provider="openai_compatible",
+            requested_model="deepseek-flash",
+            max_output_tokens=4096,
+            hard_team_call_permits=192,
+            wall_clock_timeout_seconds=1200,
+            max_steps=96,
+            team_finalization_policy="team_remaining_permits_v1",
+            team_finalization_reserve=32,
+            task_board_sequencing_policy="initialization_lease_v3",
+            task_closure_policy="task_closure_gate_v1",
+            synthesis_phase_policy="team_synthesis_v1",
+            synthesis_reserve_permits=3,
+            synthesis_window_seconds=60,
+            synthesis_read_file_cap=1,
         ),
         ContractFamily(
             contract_id="t4_flowise_result_sync_v1",
@@ -389,6 +442,10 @@ class BlockConfig:
     team_finalization_deadline_seconds: int | None = None
     condition_runtime: dict[str, dict[str, Any]] | None = None
     prompt_profile: str | None = None
+    synthesis_phase_policy: str | None = None
+    synthesis_reserve_permits: int = 0
+    synthesis_window_seconds: int | None = None
+    synthesis_read_file_cap: int = 0
 
     def validate(self) -> None:
         family = CONTRACT_FAMILIES.get(self.contract_id)
@@ -454,7 +511,9 @@ class BlockConfig:
                 raise ContractViolation("unsupported team_completion_policy")
         if self.team_finalization_policy not in {None, "team_remaining_permits_v1"}:
             raise ContractViolation("unsupported team_finalization_policy")
-        if self.task_board_sequencing_policy not in {None, "initialization_lease_v1"}:
+        if self.task_board_sequencing_policy not in {
+            None, "initialization_lease_v1", "initialization_lease_v2_optional", "initialization_lease_v3"
+        }:
             raise ContractViolation("unsupported task_board_sequencing_policy")
         if self.task_closure_policy not in {None, "task_closure_gate_v1"}:
             raise ContractViolation("unsupported task_closure_policy")
@@ -470,6 +529,10 @@ class BlockConfig:
             raise ContractViolation("team_finalization_reserve must be within the hard team budget")
         if self.reserved_final_synthesis_permits < 0:
             raise ContractViolation("reserved final synthesis permits must be non-negative")
+        if (self.synthesis_phase_policy, self.synthesis_reserve_permits, self.synthesis_window_seconds, self.synthesis_read_file_cap) != (
+            family.synthesis_phase_policy, family.synthesis_reserve_permits, family.synthesis_window_seconds, family.synthesis_read_file_cap
+        ):
+            raise ContractViolation("team synthesis fields must equal the registered contract family")
         if self.completion_generation not in {None, "completion_v2_team", "completion_v3", "mixed_v2_v3"}:
             raise ContractViolation("unsupported completion_generation")
         if self.prompt_profile not in {
@@ -479,6 +542,7 @@ class BlockConfig:
             "repository_v1_t4_task_lifecycle_v2",
             "repository_v1_t4_nonoverlap_v1",
             "repository_v1_t4_sequenced_bootstrap_v1",
+            "repository_v1_t_pilot_1_shared_objective",
             "repository_v1_t4_result_sync_v1",
             "repository_v1_t4_result_inspection_prompt_v1",
             "repository_v1_t4_post_sync_inspection_v2",
@@ -567,6 +631,49 @@ class BlockConfig:
                 raise ContractViolation("T4 sequenced task-closure diagnostic contains T4 only")
             if self.prompt_profile != "repository_v1_t4_sequenced_bootstrap_v1":
                 raise ContractViolation("T4 sequenced task-closure diagnostic preserves the sequenced bootstrap prompt")
+        elif self.contract_id == "t_pilot_1_shared_objective_v1":
+            if self.completion_generation != "completion_v2_team":
+                raise ContractViolation("T-Pilot 1 requires completion_v2_team")
+            if self.completion_policy != "convergent_v2" or self.team_completion_policy != "all_agents_terminal_v1":
+                raise ContractViolation("T-Pilot 1 freezes existing T4 completion policies")
+            if self.team_finalization_policy != family.team_finalization_policy or self.team_finalization_reserve != 32:
+                raise ContractViolation("T-Pilot 1 freezes team finalization at reserve=32")
+            if self.task_board_sequencing_policy != family.task_board_sequencing_policy:
+                raise ContractViolation("T-Pilot 1 requires initialization_lease_v2_optional")
+            if self.task_closure_policy != "task_closure_gate_v1":
+                raise ContractViolation("T-Pilot 1 requires task_closure_gate_v1")
+            if self.result_sync_policy is not None or self.post_sync_window_policy is not None:
+                raise ContractViolation("T-Pilot 1 excludes result sync and post-sync window")
+            if self.prompt_profile != "repository_v1_t_pilot_1_shared_objective":
+                raise ContractViolation("T-Pilot 1 requires the frozen shared-objective prompt")
+        elif self.contract_id == "t_pilot_1_shared_objective_v2":
+            if self.completion_generation != "completion_v2_team":
+                raise ContractViolation("T-Pilot 1 v2 requires completion_v2_team")
+            if self.completion_policy != "convergent_v2" or self.team_completion_policy != "all_agents_terminal_v1":
+                raise ContractViolation("T-Pilot 1 v2 freezes existing T4 completion policies")
+            if self.team_finalization_policy != family.team_finalization_policy or self.team_finalization_reserve != 32:
+                raise ContractViolation("T-Pilot 1 v2 freezes team finalization at reserve=32")
+            if self.task_board_sequencing_policy != family.task_board_sequencing_policy:
+                raise ContractViolation("T-Pilot 1 v2 requires initialization_lease_v3")
+            if self.task_closure_policy != "task_closure_gate_v1":
+                raise ContractViolation("T-Pilot 1 v2 requires task_closure_gate_v1")
+            if self.result_sync_policy is not None or self.post_sync_window_policy is not None:
+                raise ContractViolation("T-Pilot 1 v2 excludes result sync and post-sync window")
+            if self.prompt_profile != "repository_v1_t_pilot_1_shared_objective":
+                raise ContractViolation("T-Pilot 1 v2 preserves the frozen shared-objective prompt")
+        elif self.contract_id == "t_pilot_2_final_synthesis_v1":
+            if self.completion_generation != "completion_v2_team":
+                raise ContractViolation("T-Pilot 2 requires completion_v2_team")
+            if self.completion_policy != "convergent_v2" or self.team_completion_policy != "all_agents_terminal_v1":
+                raise ContractViolation("T-Pilot 2 preserves the search completion policies")
+            if self.team_finalization_policy != family.team_finalization_policy or self.team_finalization_reserve != 32:
+                raise ContractViolation("T-Pilot 2 preserves team finalization at reserve=32")
+            if self.task_board_sequencing_policy != "initialization_lease_v3" or self.task_closure_policy != "task_closure_gate_v1":
+                raise ContractViolation("T-Pilot 2 preserves lease and task closure")
+            if self.result_sync_policy is not None or self.post_sync_window_policy is not None or self.reserved_final_synthesis_permits:
+                raise ContractViolation("T-Pilot 2 excludes result sync, post-sync and completion_v3 synthesis")
+            if self.prompt_profile != "repository_v1_t_pilot_1_shared_objective":
+                raise ContractViolation("T-Pilot 2 preserves the frozen search prompt")
         elif self.contract_id == "t4_flowise_result_sync_v1":
             if self.completion_generation != "completion_v2_team":
                 raise ContractViolation("T4 result-sync diagnostic requires completion_generation=completion_v2_team")
@@ -767,6 +874,12 @@ class BlockConfig:
             "post_sync_window_policy": self.post_sync_window_policy,
             "post_sync_reservation_per_agent": self.post_sync_reservation_per_agent,
             "reserved_final_synthesis_permits": self.reserved_final_synthesis_permits,
+            **({
+                "synthesis_phase_policy": self.synthesis_phase_policy,
+                "synthesis_reserve_permits": self.synthesis_reserve_permits,
+                "synthesis_window_seconds": self.synthesis_window_seconds,
+                "synthesis_read_file_cap": self.synthesis_read_file_cap,
+            } if self.synthesis_phase_policy is not None else {}),
             "completion_generation": self.completion_generation,
             "team_finalization_deadline_seconds": self.team_finalization_deadline_seconds,
             **({"condition_runtime": self.condition_runtime} if self.condition_runtime is not None else {}),
@@ -817,6 +930,10 @@ def load_block_config(path: Path) -> BlockConfig:
             ),
             team_finalization_reserve=int(raw.get("team_finalization_reserve", 0) or 0),
             reserved_final_synthesis_permits=int(budget.get("reserved_final_synthesis_permits", 0) or 0),
+            synthesis_phase_policy=(str(raw["synthesis_phase_policy"]) if raw.get("synthesis_phase_policy") is not None else None),
+            synthesis_reserve_permits=int(budget.get("synthesis_reserve_permits", 0) or 0),
+            synthesis_window_seconds=_optional_int(runtime.get("synthesis_window_seconds")),
+            synthesis_read_file_cap=int(runtime.get("synthesis_read_file_cap", 0) or 0),
             completion_generation=(
                 str(raw["completion_generation"]) if raw.get("completion_generation") is not None else None
             ),

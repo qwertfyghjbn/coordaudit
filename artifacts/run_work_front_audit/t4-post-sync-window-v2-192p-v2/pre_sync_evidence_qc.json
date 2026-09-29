@@ -1,0 +1,31 @@
+{
+  "input_block_manifest_sha256": "cc11bd82c3bd791ea61a02cdb4d58ec420e973757829c3f56572a8a3ff252133",
+  "runs": {
+    "matched-seed-01": {
+      "sync_event_id": "evt_00001197",
+      "sync_timestamp": "2026-09-22T12:47:28.791211+00:00",
+      "run_manifest_sha256": "3e39ddba70563372af0a75996776e1ccc98b7f0079d53812b75b02f67f8c84c0",
+      "agents": 4,
+      "work_fronts": 6,
+      "cross_agent_directed_pairs": 26
+    },
+    "matched-seed-02": {
+      "sync_event_id": "evt_00001126",
+      "sync_timestamp": "2026-09-23T00:46:08.428540+00:00",
+      "run_manifest_sha256": "b1e0148bd2881f1b1cf6047b58e9a182f360185c9a3cc60d6ca8e78bf302b91a",
+      "agents": 4,
+      "work_fronts": 6,
+      "cross_agent_directed_pairs": 26
+    },
+    "matched-seed-03": {
+      "sync_event_id": "evt_00001203",
+      "sync_timestamp": "2026-09-23T00:48:01.900985+00:00",
+      "run_manifest_sha256": "f6b8b0263a62ed944e705c46bef5a8deb440aafafd5bd287dd9517aea03eec8c",
+      "agents": 4,
+      "work_fronts": 6,
+      "cross_agent_directed_pairs": 26
+    }
+  },
+  "refs_checked": 54,
+  "errors": []
+}

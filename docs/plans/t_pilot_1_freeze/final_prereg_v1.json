@@ -1,0 +1,94 @@
+{
+  "schema_version": "t-pilot-1-prereg-v1",
+  "status": "frozen_zero_network_preflight_passed_pending_separate_live_authorization",
+  "live_execution_authorized": false,
+  "seed_identity": "t-pilot-1-flowise-shared-objective-seed-01",
+  "condition": {
+    "id": "T4",
+    "mode": "structured_team",
+    "agent_count": 4
+  },
+  "paths": {
+    "design": "docs/plans/T_PILOT_1_DESIGN.md",
+    "contract_config": "experiments/emergent_coordination/manifests/t_pilot_1_shared_objective_v1.json",
+    "block_manifest": "docs/plans/t_pilot_1_freeze/t_pilot_1_shared_objective_v1/block_manifest.json",
+    "rendered_prompt_packet": "docs/plans/t_pilot_1_freeze/final_prompt_packet_v1.json"
+  },
+  "sha256": {
+    "contract_config_file": "b5c8e1a14fcdb3355d1763610fd8e204c3a56098946b0205b7544bd7a10b97f9",
+    "block_manifest_file": "2022bdbd7afa4a5b9bcbbb0a047ee7327ec04d3772b6166a19b889ecbeedfc85",
+    "block_manifest_canonical": "be7c12f41cea6ba6df4bf1c4dfe8516a0d72b386f3d82442009200fd13ad437b",
+    "rendered_prompt_packet_file": "c313d25b104b6eace8feb51d12ca1f7602e20e3b70477fe61b0ba159c157609a",
+    "shared_objective_text": "59f4519fc53cb1dca940ac636747fd0443221410163ce6930f75e267c405d28b",
+    "task_board_capability_text": "c396950d227f08b8c1af168ba3d391a9a490bd1f95a9b49d94064c9b66a374c1",
+    "team_finalization_message_text": "a67d60e1486854c3bc46c6241e9fd7e7390672511f0298dfcd6a22ddc99935a7",
+    "tool_schema_canonical": "81707c840e64c97540da11f856ff1b7ca56b2c0b0d5ab073a44f0c4c52ac29d9",
+    "target_tree": "c612819a833fc8ab3c58fe5085fb80fc0a6c4cb1d86cbb8ed41b0b431e4a1638",
+    "runtime_source_tree": "9475bdb3370a60eabca06714ebb0a4739c9a0afafe49781bfbfa57a1724b91ff"
+  },
+  "policies": {
+    "task_board_sequencing_policy": "initialization_lease_v2_optional",
+    "task_closure_policy": "task_closure_gate_v1",
+    "result_sync_policy": null,
+    "post_sync_window_policy": null,
+    "completion_policy": "convergent_v2",
+    "team_completion_policy": "all_agents_terminal_v1",
+    "team_finalization_policy": "team_remaining_permits_v1",
+    "team_finalization_reserve": 32
+  },
+  "admission": {
+    "run_validity": "valid",
+    "reconciliation": "valid",
+    "first_model_request": "4/4",
+    "contract_prompt_tool_budget_digest_match": true,
+    "lifecycle_explainable": true,
+    "provider_or_runtime_defect_not_dominant": true,
+    "finite_termination": true,
+    "claimed_task_closure_legal": true,
+    "board_use_required": false,
+    "nonempty_findings_required": false
+  },
+  "rubric": {
+    "A": {
+      "distinct_primary_work_fronts_at_least": 3,
+      "duplicate_focused_actions_at_most_fraction": "1/4",
+      "two_agents_majority_same_front": false,
+      "explicit_board_linked_agents_at_least": 2,
+      "avoid_covered_or_fill_uncovered_episode_at_least": 1
+    },
+    "B": "A diversity and low-overlap criteria, without A board-linked evidence",
+    "C": "at least two agents share primary front and duplicate focused actions >1/3, or cosmetic task diversity with actual majority investigation on one security question and no board-induced adjustment",
+    "other": "mixed / indeterminate",
+    "report_raw_numerators_denominators_and_sensitivity": true,
+    "single_seed_mechanism_smoke_only": true
+  },
+  "adjudication": {
+    "stage_1": "automatic timeline, tasks, model-visible board snapshots, file/symbol actions, candidate front evidence",
+    "stage_2": "one primary reviewer marks fronts, scope/overlap, board-linked decisions, preliminary classification",
+    "stage_3": "second reviewer checks ambiguous front split/merge, all explicit board-linked positives, classification-changing overlap, and final classification",
+    "adjudicate_only_key_disagreements": true,
+    "manual_fields": [
+      "transcript/event/evidence refs",
+      "rationale",
+      "uncertainty label"
+    ]
+  },
+  "zero_network_preflight": {
+    "optional_board_cases_A_through_E": "pass",
+    "historical_v1_lease_unchanged": "pass",
+    "initial_model_visible_requests": "4/4 exact packet match",
+    "finalization_message_and_tool_surface": "exact packet match",
+    "candidate_contamination_forbidden_hits": 0,
+    "full_experiment_test_suite": "343 passed; 9 subtests passed; 1 dependency warning",
+    "s_p_b_t_mock_preflight": "6 passed including S1/P4/B4/T4/M4/hard-gate",
+    "repository_v1_contract_and_case_selection": "17 passed",
+    "repository_pilot_v0_smoke": "6 passed",
+    "live_api_calls": 0
+  },
+  "completion_interpretation": "budget-triggered finalization does not mean repository coverage complete",
+  "t_pilot_2_deferred": [
+    "team synthesis",
+    "finding deduplication",
+    "final TP/FP ranking"
+  ]
+}
